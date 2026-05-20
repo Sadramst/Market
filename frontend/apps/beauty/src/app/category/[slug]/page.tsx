@@ -17,7 +17,7 @@ type Category = {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await fetchApi<Category>(`/categories/slug/${slug}`, { revalidate: 3600 });
+  const category = await fetchApi<Category>(`/categories/${slug}`, { revalidate: 3600 });
   if (!category) return { title: "Category Not Found" };
   return {
     title: `${category.name} — Beauty Services in Perth`,
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const category = await fetchApi<Category>(`/categories/slug/${slug}`, { revalidate: 3600, tags: ["category", slug] });
+  const category = await fetchApi<Category>(`/categories/${slug}`, { revalidate: 3600, tags: ["category", slug] });
   if (!category) notFound();
 
   const providersData = await fetchApi<{

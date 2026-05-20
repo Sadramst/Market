@@ -11,7 +11,7 @@ type Category = { name: string; slug: string };
 export async function generateMetadata({ params }: { params: Promise<{ suburb: string; category: string }> }): Promise<Metadata> {
   const { suburb: suburbSlug, category: catSlug } = await params;
   const suburb = await fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 });
-  const category = await fetchApi<Category>(`/categories/slug/${catSlug}`, { revalidate: 3600 });
+  const category = await fetchApi<Category>(`/categories/${catSlug}`, { revalidate: 3600 });
   if (!suburb || !category) return { title: "Not Found" };
   return {
     title: `${category.name} in ${suburb.name} — Beauty Services`,
@@ -24,7 +24,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
   const { suburb: suburbSlug, category: catSlug } = await params;
   const [suburb, category] = await Promise.all([
     fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 }),
-    fetchApi<Category>(`/categories/slug/${catSlug}`, { revalidate: 3600 }),
+    fetchApi<Category>(`/categories/${catSlug}`, { revalidate: 3600 }),
   ]);
   if (!suburb || !category) notFound();
 

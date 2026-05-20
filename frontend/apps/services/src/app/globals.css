@@ -1,12 +1,20 @@
 @import "tailwindcss";
 
-/* IT Services theme — Professional Blue */
+@theme {
+  --color-primary: #3B82F6;
+  --color-primary-light: #DBEAFE;
+  --color-primary-dark: #1D4ED8;
+  --color-secondary: #14B8A6;
+  --color-secondary-light: #CCFBF1;
+  --color-accent: #EFF6FF;
+  --color-accent-foreground: #1E3A8A;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+}
+
 :root {
-  --primary: #3B82F6;
-  --primary-light: #DBEAFE;
-  --primary-dark: #1D4ED8;
-  --secondary: #14B8A6;
-  --secondary-light: #CCFBF1;
   --background: #F8FAFC;
   --foreground: #0F172A;
   --muted: #F1F5F9;
@@ -14,16 +22,15 @@
   --border: #E2E8F0;
   --card: #FFFFFF;
   --card-foreground: #0F172A;
-  --accent: #EFF6FF;
-  --accent-foreground: #1E3A8A;
-  --success: #22C55E;
-  --warning: #F59E0B;
-  --error: #EF4444;
   --radius: 0.5rem;
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
+}
+
+*:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
 }

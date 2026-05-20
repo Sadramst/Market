@@ -1,12 +1,21 @@
 @import "tailwindcss";
 
-/* Beauty theme — Rose Gold palette */
+@theme {
+  --color-primary: #E8788A;
+  --color-primary-light: #FFE0E0;
+  --color-primary-dark: #B84D65;
+  --color-secondary: #D4A574;
+  --color-secondary-light: #FFEDD5;
+  --color-accent: #FFF5F5;
+  --color-accent-foreground: #7A2040;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-error: #EF4444;
+  --font-display: var(--font-playfair), "Playfair Display", serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+}
+
 :root {
-  --primary: #E8788A;
-  --primary-light: #FFE0E0;
-  --primary-dark: #B84D65;
-  --secondary: #D4A574;
-  --secondary-light: #FFEDD5;
   --background: #FAFAF9;
   --foreground: #1C1917;
   --muted: #F5F5F4;
@@ -14,20 +23,21 @@
   --border: #E7E5E4;
   --card: #FFFFFF;
   --card-foreground: #1C1917;
-  --accent: #FFF5F5;
-  --accent-foreground: #7A2040;
-  --success: #4ADE80;
-  --warning: #FBBF24;
-  --error: #EF4444;
   --radius: 0.75rem;
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Playfair Display", serif;
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus ring for accessibility */
+*:focus-visible {
+  outline: 2px solid #E8788A;
+  outline-offset: 2px;
 }

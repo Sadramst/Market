@@ -17,7 +17,6 @@ obj/
 .env.production
 .env.staging
 appsettings.Development.json
-appsettings.Production.json
 
 # IDE
 .vs/

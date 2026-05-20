@@ -7,13 +7,15 @@ type RequestOptions = {
   body?: unknown;
   headers?: Record<string, string>;
   token?: string;
+  revalidate?: number | false;
+  tags?: string[];
 };
 
 export async function apiClient<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<ApiResponse<T>> {
-  const { method = "GET", body, headers = {}, token } = options;
+  const { method = "GET", body, headers = {}, token, revalidate, tags } = options;
 
   const config: RequestInit = {
     method,
@@ -28,9 +30,35 @@ export async function apiClient<T>(
     config.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-  const data: ApiResponse<T> = await response.json();
-  return data;
+  // Next.js ISR/SSR cache options
+  if (method === "GET") {
+    if (revalidate !== undefined) {
+      (config as Record<string, unknown>).next = { revalidate, ...(tags ? { tags } : {}) };
+    } else if (tags) {
+      (config as Record<string, unknown>).next = { tags };
+    }
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      return errorData ?? {
+        success: false,
+        message: `Request failed with status ${response.status}`,
+        errors: [],
+        timestamp: new Date().toISOString(),
+      };
+    }
+    return await response.json();
+  } catch {
+    return {
+      success: false,
+      message: "Network error — unable to reach server",
+      errors: ["NETWORK_ERROR"],
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
 
 export async function apiUpload<T>(

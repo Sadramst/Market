@@ -1,0 +1,71 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { fetchApi } from "@/lib/api";
+import { generatePageMeta } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/ui";
+
+export const metadata: Metadata = generatePageMeta({
+  title: "Beauty Categories — All Services",
+  description: "Browse all beauty service categories in Perth. Find nail salons, hair stylists, lash technicians, brow artists, skin clinics, and more.",
+  path: "/categories",
+});
+
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  iconName?: string;
+  providerCount: number;
+  subCategories: Array<{ id: string; name: string; slug: string; providerCount: number }>;
+};
+
+const categoryIcons: Record<string, string> = {
+  nails: "💅", hair: "💇‍♀️", lashes: "👁️", brows: "✨",
+  "skin-care": "🧴", makeup: "💄", body: "🌸", cosmetic: "💉", wellness: "🧘",
+};
+
+export default async function CategoriesPage() {
+  const categories = await fetchApi<Category[]>("/categories/beauty", { revalidate: 3600, tags: ["categories"] });
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Categories" }]} />
+
+      <h1 className="text-3xl font-display font-bold mb-2">Beauty Categories</h1>
+      <p className="text-gray-500 mb-10">Browse all beauty service types available in Perth</p>
+
+      {categories && categories.length > 0 ? (
+        <div className="space-y-10">
+          {categories.map((cat) => (
+            <div key={cat.slug}>
+              <Link href={`/category/${cat.slug}`} className="flex items-center gap-3 group mb-4">
+                <span className="text-3xl">{categoryIcons[cat.slug] || "✨"}</span>
+                <div>
+                  <h2 className="text-xl font-display font-bold group-hover:text-primary transition-colors">
+                    {cat.name}
+                  </h2>
+                  <span className="text-sm text-gray-400">{cat.providerCount} providers</span>
+                </div>
+              </Link>
+              {cat.subCategories.length > 0 && (
+                <div className="flex flex-wrap gap-2 ml-12">
+                  {cat.subCategories.map((sub) => (
+                    <Link
+                      key={sub.slug}
+                      href={`/category/${sub.slug}`}
+                      className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-full text-sm hover:bg-rose-100 transition-colors"
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-400">Categories loading...</p>
+      )}
+    </div>
+  );
+}

@@ -55,10 +55,9 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 
         builder.HasOne(p => p.User).WithOne(u => u.Provider).HasForeignKey<Provider>(p => p.UserId);
 
-        // Full-text search index (PostgreSQL)
-        // TODO: Migrate to Elasticsearch/OpenSearch for advanced search
-        builder.HasIndex(p => new { p.BusinessName, p.City }).HasMethod("gin")
-            .IsTsVectorExpressionIndex("english");
+        // Composite index for search queries
+        // TODO: Migrate to Elasticsearch/OpenSearch for full-text search
+        builder.HasIndex(p => new { p.BusinessName, p.City });
     }
 }
 
@@ -144,6 +143,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Domain.Reviews.Revie
         builder.Property(r => r.Title).HasMaxLength(200);
         builder.Property(r => r.Comment).HasMaxLength(2000);
         builder.Property(r => r.AdminNotes).HasMaxLength(500);
+        builder.Property(r => r.ProviderReply).HasMaxLength(2000);
 
         builder.HasOne(r => r.User).WithMany(u => u.Reviews).HasForeignKey(r => r.UserId);
         builder.HasOne(r => r.Provider).WithMany(p => p.Reviews).HasForeignKey(r => r.ProviderId);

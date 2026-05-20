@@ -162,6 +162,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// --- Health Check ---
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+    .WithTags("Health");
+
 // --- Seed Database ---
 using (var scope = app.Services.CreateScope())
 {

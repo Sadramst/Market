@@ -1,0 +1,29 @@
+export default function ReviewsPage() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-6">Review Moderation</h1>
+
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Reviewer</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Provider</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Rating</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                No reviews to moderate yet.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

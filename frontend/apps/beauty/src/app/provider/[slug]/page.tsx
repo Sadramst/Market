@@ -89,35 +89,44 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
         ]} />
 
         {/* Header */}
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden mb-8">
-          <div className="h-48 bg-gradient-to-br from-rose-100 to-pink-100 relative">
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-8">
+          <div className="h-52 bg-gradient-to-br from-rose-100 via-pink-50 to-rose-50 relative">
             {provider.coverUrl && (
               <img src={provider.coverUrl} alt="" className="w-full h-full object-cover" />
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
           </div>
-          <div className="p-6 sm:p-8 -mt-12 relative">
+          <div className="p-6 sm:p-8 -mt-14 relative">
             <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-              <div className="w-24 h-24 rounded-xl bg-white border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+              <div className="w-28 h-28 rounded-2xl bg-white border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
                 {provider.logoUrl ? (
                   <img src={provider.logoUrl} alt={provider.businessName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-3xl font-display text-rose-400">{provider.businessName.charAt(0)}</span>
+                  <div className="w-full h-full bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center">
+                    <span className="text-3xl font-display gradient-text">{provider.businessName.charAt(0)}</span>
+                  </div>
                 )}
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900">{provider.businessName}</h1>
-                {provider.tagline && <p className="text-gray-500 mt-1">{provider.tagline}</p>}
-                <div className="flex flex-wrap items-center gap-4 mt-2">
+                {provider.tagline && <p className="text-gray-400 mt-1">{provider.tagline}</p>}
+                <div className="flex flex-wrap items-center gap-4 mt-3">
                   <div className="flex items-center gap-2">
                     <StarRating rating={provider.averageRating} size="md" />
-                    <span className="text-sm text-gray-500">
-                      {provider.averageRating.toFixed(1)} ({provider.totalReviews} reviews)
+                    <span className="text-sm text-gray-400">
+                      {provider.averageRating.toFixed(1)} ({provider.totalReviews} review{provider.totalReviews !== 1 ? "s" : ""})
                     </span>
                   </div>
                   {provider.city && (
-                    <span className="text-sm text-gray-500">📍 {provider.city}{provider.state ? `, ${provider.state}` : ""}</span>
+                    <span className="text-sm text-gray-400 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                      {provider.city}{provider.state ? `, ${provider.state}` : ""}
+                    </span>
                   )}
-                  <span className="text-sm text-gray-500">❤️ {provider.followerCount} followers</span>
+                  <span className="text-sm text-gray-400 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    {provider.followerCount} followers
+                  </span>
                 </div>
               </div>
               {/* TODO: Follow + Contact buttons (requires auth) */}
@@ -130,28 +139,31 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           <div className="lg:col-span-2 space-y-8">
             {/* About */}
             {provider.description && (
-              <section className="bg-white rounded-xl border border-gray-100 p-6">
+              <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-xl font-display font-bold mb-3">About</h2>
-                <p className="text-gray-600 whitespace-pre-line">{provider.description}</p>
+                <p className="text-gray-500 whitespace-pre-line leading-relaxed">{provider.description}</p>
               </section>
             )}
 
             {/* Services */}
-            <section className="bg-white rounded-xl border border-gray-100 p-6">
+            <section className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="text-xl font-display font-bold mb-4">Services</h2>
               {provider.services.length > 0 ? (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-50">
                   {provider.services.map((svc) => (
-                    <div key={svc.id} className="py-4 flex items-start justify-between gap-4">
+                    <div key={svc.id} className="py-4 flex items-start justify-between gap-4 group">
                       <div>
                         <h3 className="font-medium text-gray-900">{svc.name}</h3>
-                        {svc.description && <p className="text-sm text-gray-500 mt-1">{svc.description}</p>}
-                        <span className="text-xs text-gray-400 mt-1 block">{svc.durationMinutes} min</span>
+                        {svc.description && <p className="text-sm text-gray-400 mt-1">{svc.description}</p>}
+                        <span className="text-xs text-gray-300 mt-1 block flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {svc.durationMinutes} min
+                        </span>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="font-semibold text-gray-900">
+                        <span className="font-semibold text-gray-900 text-lg">
                           ${svc.priceFrom}
-                          {svc.priceTo && svc.priceTo !== svc.priceFrom ? `–$${svc.priceTo}` : ""}
+                          {svc.priceTo && svc.priceTo !== svc.priceFrom ? <span className="text-gray-400 font-normal"> – ${svc.priceTo}</span> : ""}
                         </span>
                       </div>
                     </div>
@@ -164,15 +176,15 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
             {/* Gallery */}
             {provider.gallery.length > 0 && (
-              <section className="bg-white rounded-xl border border-gray-100 p-6">
+              <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-xl font-display font-bold mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {provider.gallery.map((img) => (
-                    <div key={img.id} className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                    <div key={img.id} className="aspect-square rounded-xl overflow-hidden bg-gray-50 group">
                       <img
                         src={img.thumbnailUrl || img.imageUrl}
                         alt={img.altText || provider.businessName}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
                     </div>
@@ -182,7 +194,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             )}
 
             {/* Reviews */}
-            <section className="bg-white rounded-xl border border-gray-100 p-6">
+            <section className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="text-xl font-display font-bold mb-4">Reviews</h2>
               {reviews.length > 0 ? (
                 <div className="space-y-6">
@@ -190,12 +202,12 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <div key={review.id} className="border-b border-gray-50 pb-6 last:border-0 last:pb-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-sm font-medium text-rose-600">
+                          <div className="w-10 h-10 bg-gradient-to-br from-rose-100 to-pink-50 rounded-full flex items-center justify-center text-sm font-semibold text-rose-500">
                             {review.userFirstName.charAt(0)}
                           </div>
                           <div>
                             <p className="font-medium text-sm text-gray-900">{review.userFirstName}</p>
-                            <p className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
+                            <p className="text-xs text-gray-300">{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
                           </div>
                         </div>
                         <StarRating rating={review.rating} />
@@ -220,43 +232,43 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact Info */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6 sticky top-24">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
               <h3 className="font-display font-bold mb-4">Contact</h3>
               <div className="space-y-3 text-sm">
                 {provider.address && (
-                  <div className="flex items-start gap-2">
-                    <span className="text-gray-400">📍</span>
-                    <span className="text-gray-600">{provider.address}</span>
+                  <div className="flex items-start gap-3">
+                    <svg className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                    <span className="text-gray-500">{provider.address}</span>
                   </div>
                 )}
                 {provider.phone && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">📞</span>
+                  <div className="flex items-center gap-3">
+                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                     <a href={`tel:${provider.phone}`} className="text-primary hover:underline">{provider.phone}</a>
                   </div>
                 )}
                 {provider.email && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">✉️</span>
+                  <div className="flex items-center gap-3">
+                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     <a href={`mailto:${provider.email}`} className="text-primary hover:underline">{provider.email}</a>
                   </div>
                 )}
                 {provider.website && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">🌐</span>
+                  <div className="flex items-center gap-3">
+                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
                     <a href={provider.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{provider.website.replace(/^https?:\/\//, "")}</a>
                   </div>
                 )}
                 {provider.instagram && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">📸</span>
+                  <div className="flex items-center gap-3">
+                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     <a href={`https://instagram.com/${provider.instagram}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@{provider.instagram}</a>
                   </div>
                 )}
               </div>
 
               {/* TODO: Booking/Contact CTA button */}
-              <button className="w-full mt-6 px-4 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-colors">
+              <button className="w-full mt-6 px-4 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]">
                 Contact Provider
               </button>
             </div>

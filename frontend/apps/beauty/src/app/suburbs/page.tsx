@@ -37,31 +37,34 @@ export default async function SuburbsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Suburbs" }]} />
 
-      <h1 className="text-3xl font-display font-bold mb-2">Perth Suburbs</h1>
-      <p className="text-gray-500 mb-10">Browse beauty services by location</p>
+      <h1 className="text-3xl sm:text-4xl font-display font-bold mb-2 text-gray-900">Perth Suburbs</h1>
+      <p className="text-gray-400 mb-10">Browse beauty services by location</p>
 
       {/* Letter navigation */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap gap-1.5 mb-10 p-4 bg-white rounded-2xl border border-gray-100">
         {sortedLetters.map((letter) => (
-          <a key={letter} href={`#${letter}`} className="w-8 h-8 flex items-center justify-center rounded bg-rose-50 text-rose-600 text-sm font-medium hover:bg-rose-100 transition-colors">
+          <a key={letter} href={`#${letter}`} className="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500 text-sm font-semibold hover:bg-rose-100 hover:text-rose-600 transition-all">
             {letter}
           </a>
         ))}
       </div>
 
       {sortedLetters.map((letter) => (
-        <div key={letter} id={letter} className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-100 pb-2">{letter}</h2>
+        <div key={letter} id={letter} className="mb-10">
+          <h2 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b border-gray-100 flex items-center gap-2">
+            <span className="w-8 h-8 bg-rose-50 rounded-lg flex items-center justify-center text-rose-500 text-sm font-bold">{letter}</span>
+            <span>{letter}</span>
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {grouped[letter].map((suburb) => (
               <Link
                 key={suburb.slug}
                 href={`/${suburb.slug}`}
-                className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100 hover:border-rose-200 hover:shadow-sm transition-all group"
+                className="flex items-center justify-between p-3 rounded-xl bg-white border border-gray-100 hover:border-rose-200 transition-all group hover:shadow-sm"
               >
-                <span className="text-sm font-medium text-gray-700 group-hover:text-primary">{suburb.name}</span>
+                <span className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors">{suburb.name}</span>
                 {suburb.providerCount > 0 && (
-                  <span className="text-xs text-gray-400">{suburb.providerCount}</span>
+                  <span className="text-xs text-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">{suburb.providerCount}</span>
                 )}
               </Link>
             ))}

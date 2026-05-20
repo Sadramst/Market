@@ -10,8 +10,8 @@ public static partial class DatabaseSeeder
 {
     private static async Task SeedMoreBeautyProviders(AppDbContext context, UserManager<AppUser> userManager)
     {
-        // Guard: skip if we already seeded the extras
-        if (await context.Providers.AnyAsync(p => p.Slug == "thai-bliss-massage-perth"))
+        // Guard: skip if we already seeded all extras (check last provider)
+        if (await context.Providers.AnyAsync(p => p.Slug == "beauty-and-bliss-east-perth"))
             return;
 
         var rng = new Random(99);
@@ -48,7 +48,8 @@ public static partial class DatabaseSeeder
 
             var parts = name.Split(' ');
             var user = new AppUser { UserName = email, Email = email, FirstName = parts[0], LastName = parts.Length > 1 ? string.Join(" ", parts[1..]) : "Beauty", EmailConfirmed = true };
-            await userManager.CreateAsync(user, "Provider@123!");
+            var createResult = await userManager.CreateAsync(user, "Provider@123!");
+            if (!createResult.Succeeded) return;
             await userManager.AddToRoleAsync(user, UserRoles.Provider);
 
             var suburb = suburbs.FirstOrDefault(s => s.Name == suburbName) ?? suburbs[0];
@@ -99,7 +100,8 @@ public static partial class DatabaseSeeder
                 if (reviewer == null)
                 {
                     reviewer = new AppUser { UserName = re, Email = re, FirstName = fn, LastName = ln, EmailConfirmed = true };
-                    await userManager.CreateAsync(reviewer, "Customer@123!");
+                    var revResult = await userManager.CreateAsync(reviewer, "Customer@123!");
+                    if (!revResult.Succeeded) continue;
                     await userManager.AddToRoleAsync(reviewer, UserRoles.Customer);
                 }
                 context.Reviews.Add(new Domain.Reviews.Review

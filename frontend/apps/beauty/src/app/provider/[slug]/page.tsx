@@ -148,7 +148,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             {/* Services */}
             <section className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="text-xl font-display font-bold mb-4">Services</h2>
-              {provider.services.length > 0 ? (
+              {(provider.services?.length ?? 0) > 0 ? (
                 <div className="divide-y divide-gray-50">
                   {provider.services.map((svc) => (
                     <div key={svc.id} className="py-4 flex items-start justify-between gap-4 group">
@@ -175,7 +175,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             </section>
 
             {/* Gallery */}
-            {provider.galleryImages.length > 0 && (
+            {(provider.galleryImages?.length ?? 0) > 0 && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-xl font-display font-bold mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

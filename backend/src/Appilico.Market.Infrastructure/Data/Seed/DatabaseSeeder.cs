@@ -1,7 +1,8 @@
-using Appilico.Market.Domain;
+﻿using Appilico.Market.Domain;
 using Appilico.Market.Domain.Auth;
 using Appilico.Market.Domain.Categories;
 using Appilico.Market.Domain.Locations;
+using Appilico.Market.Domain.Reviews;
 using Appilico.Market.Domain.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Appilico.Market.Infrastructure.Data.Seed;
 
-public static class DatabaseSeeder
+public static partial class DatabaseSeeder
 {
+
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -26,6 +28,7 @@ public static class DatabaseSeeder
         await SeedITCategories(context);
         await SeedPerthSuburbs(context);
         await SeedAppSettings(context);
+        await SeedBeautyProviders(context, userManager);
     }
 
     private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
@@ -279,4 +282,5 @@ public static class DatabaseSeeder
         context.AppSettings.AddRange(settings);
         await context.SaveChangesAsync();
     }
+
 }

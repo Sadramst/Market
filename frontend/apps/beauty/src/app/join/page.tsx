@@ -46,12 +46,12 @@ export default function JoinPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/register"
+            <a
+              href="https://admin.appilico.com.au"
               className="inline-flex items-center justify-center px-8 py-4 bg-primary text-white rounded-full text-lg font-semibold hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
             >
               Create Free Account
-            </Link>
+            </a>
             <Link
               href="#benefits"
               className="inline-flex items-center justify-center px-8 py-4 border border-gray-200 text-gray-600 rounded-full text-lg font-medium hover:border-rose-200 hover:text-primary transition-colors"
@@ -113,14 +113,14 @@ export default function JoinPage() {
           <div className="relative">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-4">Ready to Get Started?</h2>
             <p className="text-gray-400 mb-8 max-w-lg mx-auto">Join hundreds of Perth beauty professionals already growing their business with Appilico.</p>
-            <Link
-              href="/register"
+            <a
+              href="https://admin.appilico.com.au"
               className="inline-flex items-center px-8 py-4 bg-primary text-white rounded-full text-lg font-semibold hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/25"
             >
               Create Free Account
-            </Link>
+            </a>
             <p className="text-sm text-gray-500 mt-6">
-              Already have an account? <Link href="/login" className="text-rose-400 hover:text-rose-300 underline underline-offset-2">Sign in</Link>
+              Already have an account? <a href="https://admin.appilico.com.au" className="text-rose-400 hover:text-rose-300 underline underline-offset-2">Sign in</a>
             </p>
           </div>
         </div>

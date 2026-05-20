@@ -96,6 +96,21 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full deployment guide.
 - **Admin**: admin@appilico.com / Admin@123!
 - **Moderator**: moderator@appilico.com / Mod@12345!
 
+## TODO — Analytics Setup
+
+Before go-live, set up analytics by adding these environment variables in **Vercel → Project Settings → Environment Variables**:
+
+| Variable | Where to Get | Format |
+|----------|-------------|--------|
+| `NEXT_PUBLIC_GA_ID` | [Google Analytics 4](https://analytics.google.com/) → Admin → Data Streams → Measurement ID | `G-XXXXXXXXXX` |
+| `NEXT_PUBLIC_CLARITY_ID` | [Microsoft Clarity](https://clarity.microsoft.com/) → Settings → Installation → Project ID | alphanumeric string |
+
+**Steps:**
+1. Create a GA4 property for `beauty.appilico.com.au`
+2. Create a Clarity project for `beauty.appilico.com.au`
+3. Add both env vars in Vercel for the beauty project (Production environment)
+4. Redeploy — analytics will activate automatically
+
 ## License
 
 Proprietary — All rights reserved.

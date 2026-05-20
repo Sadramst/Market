@@ -66,7 +66,11 @@ export default async function CategoriesPage() {
           ))}
         </div>
       ) : (
-        <p className="text-gray-400">Categories loading...</p>
+        <div className="text-center py-16">
+          <span className="text-4xl mb-4 block">💅</span>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No categories available</h3>
+          <p className="text-gray-400 text-sm max-w-md mx-auto">Beauty service categories will appear here soon. Check back later.</p>
+        </div>
       )}
     </div>
   );

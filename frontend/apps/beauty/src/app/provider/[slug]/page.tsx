@@ -47,10 +47,9 @@ type Review = {
   id: string;
   rating: number;
   comment: string;
-  userFirstName: string;
+  userName: string;
   createdAt: string;
   providerReply?: string;
-  providerRepliedAt?: string;
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -203,10 +202,10 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-rose-100 to-pink-50 rounded-full flex items-center justify-center text-sm font-semibold text-rose-500">
-                            {review.userFirstName.charAt(0)}
+                            {(review.userName ?? 'U').charAt(0)}
                           </div>
                           <div>
-                            <p className="font-medium text-sm text-gray-900">{review.userFirstName}</p>
+                            <p className="font-medium text-sm text-gray-900">{review.userName ?? 'Anonymous'}</p>
                             <p className="text-xs text-gray-300">{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
                           </div>
                         </div>

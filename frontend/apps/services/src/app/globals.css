@@ -15,11 +15,11 @@
 }
 
 :root {
-  --background: #F8FAFC;
+  --background: #FAFBFD;
   --foreground: #0F172A;
   --muted: #F1F5F9;
   --muted-foreground: #64748B;
-  --border: #E2E8F0;
+  --border: #E8EDF5;
   --card: #FFFFFF;
   --card-foreground: #0F172A;
   --radius: 0.5rem;
@@ -33,4 +33,36 @@ body {
 *:focus-visible {
   outline: 2px solid #3B82F6;
   outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+
+/* Premium card */
+.service-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.08);
+}
+
+/* Gradient text */
+.gradient-text-blue {
+  background: linear-gradient(135deg, #3B82F6, #14B8A6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

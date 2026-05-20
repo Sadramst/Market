@@ -49,7 +49,7 @@ const testimonials = [
 
 export default async function HomePage() {
   const providers = await fetchApi<{ items: Array<{ slug: string; businessName: string; city: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string; categories?: string[] }> }>(
-    "/providers?pageSize=6&sortBy=rating&providerType=0",
+    "/providers/search?pageSize=6&sortBy=rating&providerType=0",
     { revalidate: 300, tags: ["featured-providers"] }
   );
 

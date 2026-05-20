@@ -53,7 +53,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       logoUrl?: string;
     }>;
     pagination: { currentPage: number; totalPages: number; totalCount: number };
-  }>(`/providers?${apiParams.toString()}`, { revalidate: 60, tags: ["providers"] });
+  }>(`/providers/search?${apiParams.toString()}`, { revalidate: 60, tags: ["providers"] });
 
   const items = data?.items ?? [];
   const pagination = data?.pagination ?? { currentPage: 1, totalPages: 1, totalCount: 0 };

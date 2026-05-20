@@ -47,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     // Providers
-    const providersRes = await fetch(`${API}/providers?providerType=0&pageSize=1000`, { next: { revalidate: 86400 } });
+    const providersRes = await fetch(`${API}/providers/search?providerType=0&pageSize=1000`, { next: { revalidate: 86400 } });
     if (providersRes.ok) {
       const providersJson = await providersRes.json();
       const items = providersJson.success ? providersJson.data?.items ?? [] : [];

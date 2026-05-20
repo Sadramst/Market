@@ -55,7 +55,7 @@ type Review = {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const provider = await fetchApi<Provider>(`/providers/slug/${slug}`, { revalidate: 300 });
+  const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 300 });
   if (!provider) return { title: "Provider Not Found" };
 
   return {
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProviderPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const provider = await fetchApi<Provider>(`/providers/slug/${slug}`, { revalidate: 300, tags: ["provider", slug] });
+  const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 300, tags: ["provider", slug] });
   if (!provider) notFound();
 
   const reviewsData = await fetchApi<{ items: Review[] }>(`/reviews/provider/${provider.id}?pageSize=10`, { revalidate: 300, tags: ["reviews", slug] });

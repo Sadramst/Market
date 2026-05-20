@@ -2,7 +2,7 @@
 
 @theme {
   --color-primary: #E8788A;
-  --color-primary-light: #FFE0E0;
+  --color-primary-light: #FFE0E6;
   --color-primary-dark: #B84D65;
   --color-secondary: #D4A574;
   --color-secondary-light: #FFEDD5;
@@ -11,16 +11,19 @@
   --color-success: #4ADE80;
   --color-warning: #FBBF24;
   --color-error: #EF4444;
+  --color-rose-gold: #B76E79;
+  --color-blush: #FFF0F3;
+  --color-champagne: #F7E7CE;
   --font-display: var(--font-playfair), "Playfair Display", serif;
   --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
 :root {
-  --background: #FAFAF9;
+  --background: #FEFCFB;
   --foreground: #1C1917;
   --muted: #F5F5F4;
   --muted-foreground: #78716C;
-  --border: #E7E5E4;
+  --border: #F0E8E5;
   --card: #FFFFFF;
   --card-foreground: #1C1917;
   --radius: 0.75rem;
@@ -31,13 +34,69 @@ body {
   color: var(--foreground);
 }
 
-/* Smooth scroll for anchor links */
 html {
   scroll-behavior: smooth;
 }
 
-/* Focus ring for accessibility */
 *:focus-visible {
   outline: 2px solid #E8788A;
   outline-offset: 2px;
+}
+
+/* Premium animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+
+/* Premium glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Premium gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #E8788A 0%, #B76E79 50%, #D4A574 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium card hover */
+.premium-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(232, 120, 138, 0.15);
 }

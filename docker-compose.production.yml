@@ -11,6 +11,7 @@ services:
       - "127.0.0.1:5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - AllowedHosts=*
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=appilico_market;Username=${DB_USER};Password=${DB_PASSWORD}
       - Jwt__Key=${JWT_SECRET_KEY}
       - Jwt__Issuer=appilico-market-api

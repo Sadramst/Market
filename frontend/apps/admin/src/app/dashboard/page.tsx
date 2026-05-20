@@ -26,7 +26,7 @@ export default function DashboardPage() {
           fetch(`${API_URL}/categories/beauty`).then(r => r.json()).catch(() => null),
         ]);
         setStats({
-          providers: provRes?.data?.totalCount ?? provRes?.pagination?.totalItems ?? 0,
+          providers: provRes?.data?.pagination?.totalCount ?? provRes?.data?.totalCount ?? provRes?.pagination?.totalItems ?? 0,
           pending: 0,
           reviews: 0,
           categories: catRes?.data?.length ?? 0,

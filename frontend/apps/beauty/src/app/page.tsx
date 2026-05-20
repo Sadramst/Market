@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { fetchApi } from "@/lib/api";
 
-const categories = [
-  { name: "Nails", icon: "💅", slug: "nails", desc: "Manicures, pedicures & nail art" },
-  { name: "Hair", icon: "💇‍♀️", slug: "hair", desc: "Cuts, colour & styling" },
-  { name: "Lashes", icon: "👁️", slug: "lashes", desc: "Extensions & lifts" },
-  { name: "Brows", icon: "✨", slug: "brows", desc: "Threading, tinting & lamination" },
-  { name: "Skin Care", icon: "🧴", slug: "skin-care", desc: "Facials & treatments" },
-  { name: "Makeup", icon: "💄", slug: "makeup", desc: "Glam, bridal & everyday" },
-  { name: "Body", icon: "🌸", slug: "body", desc: "Massage, waxing & tanning" },
-  { name: "Cosmetic", icon: "💉", slug: "cosmetic", desc: "Injectables & aesthetics" },
-  { name: "Wellness", icon: "🧘", slug: "wellness", desc: "Holistic health & spa" },
-];
+const categoryIcons: Record<string, string> = {
+  nails: "💅", hair: "💇‍♀️", lashes: "👁️", brows: "✨",
+  "skin-care": "🧴", makeup: "💄", body: "🌸", cosmetic: "💉", wellness: "🧘",
+};
+
+const categoryDescriptions: Record<string, string> = {
+  nails: "Manicures, pedicures & nail art",
+  hair: "Cuts, colour & styling",
+  lashes: "Extensions & lifts",
+  brows: "Threading, tinting & lamination",
+  "skin-care": "Facials & treatments",
+  makeup: "Glam, bridal & everyday",
+  body: "Massage, waxing & tanning",
+  cosmetic: "Injectables & aesthetics",
+  wellness: "Holistic health & spa",
+};
 
 const popularSuburbs = [
   { name: "Perth CBD", slug: "perth" },
@@ -48,10 +53,40 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const providers = await fetchApi<{ items: Array<{ slug: string; businessName: string; city: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string; categories?: string[] }> }>(
-    "/providers/search?pageSize=6&sortBy=rating&providerType=0",
-    { revalidate: 300, tags: ["featured-providers"] }
-  );
+  const [providers, categoriesData, suburbsData] = await Promise.all([
+    fetchApi<{ items: Array<{ slug: string; businessName: string; city: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string; categories?: string[] }> }>(
+      "/providers/search?pageSize=6&sortBy=rating&marketplaceType=0",
+      { revalidate: 300, tags: ["featured-providers"] }
+    ),
+    fetchApi<Array<{ name: string; slug: string; providerCount: number }>>(
+      "/categories/beauty",
+      { revalidate: 3600, tags: ["categories"] }
+    ),
+    fetchApi<Array<{ name: string }>>(
+      "/locations/suburbs",
+      { revalidate: 3600, tags: ["suburbs"] }
+    ),
+  ]);
+
+  const categories = (categoriesData ?? []).map(cat => ({
+    name: cat.name,
+    slug: cat.slug,
+    icon: categoryIcons[cat.slug] || "✨",
+    desc: categoryDescriptions[cat.slug] || cat.name,
+    count: cat.providerCount,
+  }));
+
+  const totalProviders = providers?.items?.length
+    ? (await fetchApi<{ pagination: { totalCount: number } }>("/providers/search?pageSize=1&marketplaceType=0", { revalidate: 300 }))?.pagination?.totalCount ?? 0
+    : 0;
+  const totalSuburbs = suburbsData?.length ?? 0;
+
+  const stats = [
+    { value: totalProviders > 0 ? `${totalProviders}+` : "50+", label: "Beauty Professionals" },
+    { value: totalSuburbs > 0 ? `${totalSuburbs}+` : "80+", label: "Perth Suburbs" },
+    { value: `${categories.length || 9}`, label: "Service Categories" },
+    { value: "Free", label: "To Get Started" },
+  ];
 
   return (
     <>
@@ -127,7 +162,17 @@ export default async function HomePage() {
           <p className="text-gray-400 mt-3 max-w-lg mx-auto">Find the perfect beauty professional for every need</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
-          {categories.map((cat, i) => (
+          {(categories.length > 0 ? categories : [
+            { name: "Nails", slug: "nails", icon: "💅", desc: "Manicures, pedicures & nail art", count: 0 },
+            { name: "Hair", slug: "hair", icon: "💇‍♀️", desc: "Cuts, colour & styling", count: 0 },
+            { name: "Lashes", slug: "lashes", icon: "👁️", desc: "Extensions & lifts", count: 0 },
+            { name: "Brows", slug: "brows", icon: "✨", desc: "Threading, tinting & lamination", count: 0 },
+            { name: "Skin Care", slug: "skin-care", icon: "🧴", desc: "Facials & treatments", count: 0 },
+            { name: "Makeup", slug: "makeup", icon: "💄", desc: "Glam, bridal & everyday", count: 0 },
+            { name: "Body", slug: "body", icon: "🌸", desc: "Massage, waxing & tanning", count: 0 },
+            { name: "Cosmetic", slug: "cosmetic", icon: "💉", desc: "Injectables & aesthetics", count: 0 },
+            { name: "Wellness", slug: "wellness", icon: "🧘", desc: "Holistic health & spa", count: 0 },
+          ]).map((cat, i) => (
             <Link
               key={cat.slug}
               href={`/category/${cat.slug}`}
@@ -138,9 +183,14 @@ export default async function HomePage() {
               <span className="text-4xl mb-3 block group-hover:animate-float">{cat.icon}</span>
               <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors">{cat.name}</h3>
               <p className="text-sm text-gray-400 mt-1">{cat.desc}</p>
-              <div className="mt-3 flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                Browse
-                <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <div className="mt-3 flex items-center justify-between">
+                {cat.count > 0 && (
+                  <span className="text-xs text-gray-400">{cat.count} provider{cat.count !== 1 ? "s" : ""}</span>
+                )}
+                <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
+                  Browse
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </span>
               </div>
             </Link>
           ))}

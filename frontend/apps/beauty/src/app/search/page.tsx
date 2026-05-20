@@ -39,7 +39,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   apiParams.set("sortBy", sort);
   apiParams.set("page", String(page));
   apiParams.set("pageSize", "12");
-  apiParams.set("providerType", "0");
+  apiParams.set("marketplaceType", "0");
 
   const data = await fetchApi<{
     items: Array<{

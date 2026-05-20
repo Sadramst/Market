@@ -24,6 +24,22 @@ public class ProvidersController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("featured")]
+    public async Task<IActionResult> Featured([FromQuery] int limit = 6, [FromQuery] int? providerType = null)
+    {
+        var request = new ProviderSearchRequest
+        {
+            IsFeatured = true,
+            PageSize = limit,
+            SortBy = "rating",
+            SortDescending = true
+        };
+        if (providerType.HasValue)
+            request.MarketplaceType = (Appilico.Market.Domain.ProviderType)providerType.Value;
+        var result = await _providerService.SearchAsync(request);
+        return Ok(result);
+    }
+
     [HttpGet("{slug}")]
     public async Task<IActionResult> GetBySlug(string slug)
     {

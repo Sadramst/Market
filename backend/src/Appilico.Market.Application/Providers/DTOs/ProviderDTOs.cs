@@ -146,6 +146,8 @@ public class ProviderSearchRequest
     public ProviderType? MarketplaceType { get; set; }
     public Guid? CategoryId { get; set; }
     public Guid? SuburbId { get; set; }
+    public string? Category { get; set; }  // Category slug (frontend sends ?category=nails)
+    public string? Suburb { get; set; }    // Suburb slug (frontend sends ?suburb=subiaco)
     public string? City { get; set; }
     public bool? IsFeatured { get; set; }
     public int Page { get; set; } = 1;

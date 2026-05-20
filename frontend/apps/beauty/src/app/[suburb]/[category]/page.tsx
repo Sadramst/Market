@@ -31,7 +31,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
   const providersData = await fetchApi<{
     items: Array<{ slug: string; businessName: string; averageRating: number; totalReviews: number }>;
     pagination: { totalCount: number };
-  }>(`/providers/search?suburb=${suburbSlug}&category=${catSlug}&providerType=0&pageSize=12`, { revalidate: 300 });
+  }>(`/providers/search?suburb=${suburbSlug}&category=${catSlug}&marketplaceType=0&pageSize=12`, { revalidate: 300 });
 
   const providers = providersData?.items ?? [];
   const totalCount = providersData?.pagination?.totalCount ?? 0;

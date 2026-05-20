@@ -28,6 +28,7 @@ public static partial class DatabaseSeeder
         await SeedITCategories(context);
         await SeedPerthSuburbs(context);
         await SeedAppSettings(context);
+        await SeedMissingSuburbs(context);
         await SeedBeautyProviders(context, userManager);
         await SeedMoreBeautyProviders(context, userManager);
     }
@@ -284,4 +285,44 @@ public static partial class DatabaseSeeder
         await context.SaveChangesAsync();
     }
 
+    private static async Task SeedMissingSuburbs(AppDbContext context)
+    {
+        var missing = new (string Name, string PostCode)[]
+        {
+            ("Floreat", "6014"),
+            ("Swanbourne", "6010"),
+            ("North Perth", "6006"),
+            ("Mirrabooka", "6061"),
+            ("Swan View", "6056"),
+            ("Forrestfield", "6058"),
+            ("East Victoria Park", "6101"),
+            ("Palmyra", "6157"),
+            ("Bicton", "6157"),
+            ("Hamilton Hill", "6163"),
+            ("Spearwood", "6163"),
+            ("Bibra Lake", "6163"),
+            ("Beeliar", "6164"),
+            ("Yangebup", "6164"),
+            ("Waikiki", "6169"),
+            ("Bertram", "6167"),
+        };
+
+        foreach (var (name, postCode) in missing)
+        {
+            var slug = name.ToLower().Replace(" ", "-").Replace("'", "");
+            if (!await context.Suburbs.AnyAsync(s => s.Slug == slug))
+            {
+                context.Suburbs.Add(new Suburb
+                {
+                    Name = name,
+                    Slug = slug,
+                    State = "WA",
+                    PostCode = postCode,
+                    IsActive = true
+                });
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
 }

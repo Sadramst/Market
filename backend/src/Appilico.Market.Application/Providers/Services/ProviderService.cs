@@ -47,11 +47,37 @@ public class ProviderService : IProviderService
             .Where(p => p.Status == ProviderStatus.Approved)
             .AsQueryable();
 
+        // Resolve providerType alias (frontend sends ?marketplaceType=0)
         if (request.MarketplaceType.HasValue)
             query = query.Where(p => p.ProviderType == request.MarketplaceType.Value);
 
+        // Resolve category slug to ID
+        if (!request.CategoryId.HasValue && !string.IsNullOrEmpty(request.Category))
+        {
+            var cat = await _context.Categories.FirstOrDefaultAsync(c => c.Slug == request.Category);
+            if (cat != null)
+                request.CategoryId = cat.Id;
+        }
+
+        // Filter by category (including subcategories of parent)
         if (request.CategoryId.HasValue)
-            query = query.Where(p => p.Services.Any(s => s.CategoryId == request.CategoryId.Value));
+        {
+            var catId = request.CategoryId.Value;
+            var subCatIds = await _context.Categories
+                .Where(c => c.ParentCategoryId == catId)
+                .Select(c => c.Id)
+                .ToListAsync();
+            subCatIds.Add(catId);
+            query = query.Where(p => p.Services.Any(s => subCatIds.Contains(s.CategoryId)));
+        }
+
+        // Resolve suburb slug to ID
+        if (!request.SuburbId.HasValue && !string.IsNullOrEmpty(request.Suburb))
+        {
+            var sub = await _context.Suburbs.FirstOrDefaultAsync(s => s.Slug == request.Suburb);
+            if (sub != null)
+                request.SuburbId = sub.Id;
+        }
 
         if (request.SuburbId.HasValue)
             query = query.Where(p => p.ServiceAreas.Any(sa => sa.SuburbId == request.SuburbId.Value));

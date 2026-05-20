@@ -25,7 +25,7 @@ public class LocationsController : ControllerBase
         if (!string.IsNullOrEmpty(state))
             query = query.Where(s => s.State == state);
 
-        var suburbs = await query.OrderBy(s => s.Name).Take(50).ToListAsync();
+        var suburbs = await query.OrderBy(s => s.Name).Take(500).ToListAsync();
 
         var dtos = suburbs.Select(s => new
         {

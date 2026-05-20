@@ -34,7 +34,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const providersData = await fetchApi<{
     items: Array<{ slug: string; businessName: string; city?: string; averageRating: number; totalReviews: number }>;
     pagination: { totalCount: number };
-  }>(`/providers/search?category=${slug}&providerType=0&pageSize=12`, { revalidate: 300, tags: ["providers", slug] });
+  }>(`/providers/search?category=${slug}&marketplaceType=0&pageSize=12`, { revalidate: 300, tags: ["providers", slug] });
 
   const providers = providersData?.items ?? [];
   const totalCount = providersData?.pagination?.totalCount ?? 0;

@@ -78,8 +78,8 @@ npm run dev
 | POST | /api/auth/register | Register user |
 | POST | /api/auth/login | Login |
 | POST | /api/auth/refresh | Refresh JWT |
-| GET | /api/providers | Search/list providers |
-| GET | /api/providers/slug/{slug} | Get provider by slug |
+| GET | /api/providers/search | Search/list providers |
+| GET | /api/providers/{slug} | Get provider by slug |
 | POST | /api/providers | Create provider (auth) |
 | GET | /api/categories/beauty | Beauty categories |
 | GET | /api/categories/it | IT categories |

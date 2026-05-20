@@ -1,0 +1,14 @@
+{
+  "name": "@appilico/shared",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./types": "./src/types/index.ts",
+    "./api": "./src/api/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./hooks": "./src/hooks/index.ts"
+  },
+  "scripts": {
+    "lint": "echo 'lint shared'"
+  }
+}

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+/* Beauty theme — Rose Gold palette */
+:root {
+  --primary: #E8788A;
+  --primary-light: #FFE0E0;
+  --primary-dark: #B84D65;
+  --secondary: #D4A574;
+  --secondary-light: #FFEDD5;
+  --background: #FAFAF9;
+  --foreground: #1C1917;
+  --muted: #F5F5F4;
+  --muted-foreground: #78716C;
+  --border: #E7E5E4;
+  --card: #FFFFFF;
+  --card-foreground: #1C1917;
+  --accent: #FFF5F5;
+  --accent-foreground: #7A2040;
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --error: #EF4444;
+  --radius: 0.75rem;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", serif;
+}

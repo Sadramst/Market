@@ -1,0 +1,29 @@
+{
+  "name": "appilico-market",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "dev:beauty": "turbo run dev --filter=@appilico/beauty",
+    "dev:services": "turbo run dev --filter=@appilico/services",
+    "dev:admin": "turbo run dev --filter=@appilico/admin",
+    "build:beauty": "turbo run build --filter=@appilico/beauty",
+    "build:services": "turbo run build --filter=@appilico/services",
+    "build:admin": "turbo run build --filter=@appilico/admin"
+  },
+  "keywords": [],
+  "author": "Appilico",
+  "license": "PROPRIETARY",
+  "description": "Appilico Multi-Brand Marketplace Frontend",
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "turbo": "^2.9.14",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,6 @@
+@Appilico.Market.Api_HostAddress = http://localhost:5096
+
+GET {{Appilico.Market.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+bin/
+obj/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+appsettings.Development.json
+appsettings.Production.json
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Docker
+postgres_data/
+
+# Misc
+*.swp
+*.swo
+*~
+.turbo

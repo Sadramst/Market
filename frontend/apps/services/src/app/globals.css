@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* IT Services theme — Professional Blue */
+:root {
+  --primary: #3B82F6;
+  --primary-light: #DBEAFE;
+  --primary-dark: #1D4ED8;
+  --secondary: #14B8A6;
+  --secondary-light: #CCFBF1;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --border: #E2E8F0;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --accent: #EFF6FF;
+  --accent-foreground: #1E3A8A;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --radius: 0.5rem;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}

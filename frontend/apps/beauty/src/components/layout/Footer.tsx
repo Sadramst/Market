@@ -1,124 +1,139 @@
 import Link from "next/link";
 
 const footerLinks = {
-  marketplace: [
+  discover: [
     { label: "Browse Providers", href: "/search" },
     { label: "Categories", href: "/categories" },
-    { label: "Suburbs", href: "/suburbs" },
-  ],
-  categories: [
+    { label: "Perth Suburbs", href: "/suburbs" },
     { label: "Nails", href: "/category/nails" },
     { label: "Hair", href: "/category/hair" },
     { label: "Lashes", href: "/category/lashes" },
-    { label: "Makeup", href: "/category/makeup" },
+  ],
+  services: [
+    { label: "Brows", href: "/category/brows" },
     { label: "Skin Care", href: "/category/skin-care" },
+    { label: "Makeup", href: "/category/makeup" },
+    { label: "Body", href: "/category/body" },
+    { label: "Cosmetic", href: "/category/cosmetic" },
+    { label: "Wellness", href: "/category/wellness" },
   ],
   business: [
     { label: "List Your Business", href: "/join" },
     { label: "Provider Login", href: "/login" },
-  ],
-  company: [
-    { label: "About", href: "/about" },
+    { label: "About Us", href: "/about" },
     { label: "Contact", href: "/contact" },
+  ],
+  legal: [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
   ],
 };
 
+const popularSuburbs = [
+  { label: "Perth CBD", href: "/perth" },
+  { label: "Subiaco", href: "/subiaco" },
+  { label: "Fremantle", href: "/fremantle" },
+  { label: "Joondalup", href: "/joondalup" },
+  { label: "Claremont", href: "/claremont" },
+  { label: "Mt Lawley", href: "/mount-lawley" },
+];
+
 export function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400">
-      {/* Newsletter CTA */}
-      <div className="border-b border-gray-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <h3 className="text-lg font-display font-bold text-white">Stay in the loop</h3>
-              <p className="text-sm text-gray-500 mt-1">Get the latest beauty trends and new providers in Perth</p>
+    <footer className="bg-[#0F0F0F] text-gray-400 mt-auto">
+      {/* Main footer */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-x-6 gap-y-10">
+          {/* Brand */}
+          <div className="col-span-2">
+            <Link href="/" className="inline-flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                <span className="text-white font-display font-bold text-sm leading-none">A</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[15px] font-display font-bold text-white leading-tight">Appilico</span>
+                <span className="text-[9px] font-medium text-primary tracking-[0.2em] uppercase leading-none">Beauty</span>
+              </div>
+            </Link>
+            <p className="mt-4 text-sm text-gray-500 leading-relaxed max-w-xs">
+              Perth&apos;s premium beauty marketplace. Discover top-rated salons, spas, and beauty professionals near you.
+            </p>
+
+            {/* Popular suburbs */}
+            <div className="mt-6">
+              <h4 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Popular Areas</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {popularSuburbs.map((s) => (
+                  <Link key={s.href} href={s.href} className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded-md text-[11px] text-gray-500 hover:text-white transition-colors">
+                    {s.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-            <form className="flex gap-2 max-w-md w-full" action="#">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 px-4 py-2.5 rounded-lg bg-gray-900 border border-gray-800 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 text-sm transition-colors"
-              />
-              <button type="submit" className="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors shrink-0">
-                Subscribe
-              </button>
-            </form>
+          </div>
+
+          {/* Link columns */}
+          <div>
+            <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-4">Discover</h3>
+            <ul className="space-y-2.5">
+              {footerLinks.discover.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-[13px] hover:text-white transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-4">Services</h3>
+            <ul className="space-y-2.5">
+              {footerLinks.services.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-[13px] hover:text-white transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-4">Business</h3>
+            <ul className="space-y-2.5">
+              {footerLinks.business.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-[13px] hover:text-white transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-4">Legal</h3>
+            <ul className="space-y-2.5">
+              {footerLinks.legal.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-[13px] hover:text-white transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
 
-      {/* Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-block">
-              <span className="text-2xl font-display font-bold text-white">Appilico</span>
-              <span className="text-rose-400/80 text-sm ml-1">Beauty</span>
-            </Link>
-            <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-              Perth&apos;s premier beauty &amp; wellness marketplace. Discover top-rated professionals near you.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-white text-sm font-semibold mb-4 tracking-wide uppercase">Marketplace</h3>
-            <ul className="space-y-2.5">
-              {footerLinks.marketplace.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white text-sm font-semibold mb-4 tracking-wide uppercase">Categories</h3>
-            <ul className="space-y-2.5">
-              {footerLinks.categories.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white text-sm font-semibold mb-4 tracking-wide uppercase">For Business</h3>
-            <ul className="space-y-2.5">
-              {footerLinks.business.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white text-sm font-semibold mb-4 tracking-wide uppercase">Company</h3>
-            <ul className="space-y-2.5">
-              {footerLinks.company.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-800/50 mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-600">&copy; {new Date().getFullYear()} Appilico. All rights reserved.</p>
-          <p className="text-xs text-gray-600">Perth, Western Australia 🇦🇺</p>
+      {/* Bottom bar */}
+      <div className="border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p className="text-[11px] text-gray-600">&copy; {new Date().getFullYear()} Appilico Pty Ltd. All rights reserved.</p>
+          <p className="text-[11px] text-gray-600 flex items-center gap-1.5">
+            Made with <span className="text-primary text-xs">♥</span> in Perth, Western Australia
+          </p>
         </div>
       </div>
     </footer>

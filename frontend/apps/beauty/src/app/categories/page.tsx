@@ -12,7 +12,6 @@ export const metadata: Metadata = generatePageMeta({
 });
 
 export default async function CategoriesPage() {
-  // Fetch provider counts per category in parallel (graceful fallback)
   const counts = await Promise.all(
     BEAUTY_CATEGORIES.map(async (cat) => {
       const data = await fetchApi<{ pagination: { totalCount: number } }>(
@@ -24,37 +23,40 @@ export default async function CategoriesPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-10">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Categories" }]} />
 
-      <h1 className="text-3xl sm:text-4xl font-display font-bold mb-2 text-gray-900">Beauty Categories</h1>
-      <p className="text-gray-400 mb-10">Browse all beauty service types available in Perth</p>
+      <div className="mb-12">
+        <span className="text-[11px] font-semibold text-primary uppercase tracking-[0.2em]">Explore</span>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900 mt-2">Beauty Categories</h1>
+        <p className="text-gray-400 mt-2 text-[15px]">Browse all beauty service types available in Perth</p>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {BEAUTY_CATEGORIES.map((cat, i) => (
           <Link
             key={cat.slug}
             href={`/category/${cat.slug}`}
-            className="premium-card group relative p-6 rounded-2xl bg-white border border-gray-100 hover:border-rose-200 overflow-hidden animate-fade-in-up"
-            style={{ animationDelay: `${i * 0.05}s` }}
+            className="premium-card group relative bg-white rounded-2xl border border-gray-100/80 overflow-hidden animate-fade-in-up"
+            style={{ animationDelay: `${i * 0.04}s` }}
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-rose-50/80 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center shrink-0">
-                <span className="text-3xl">{cat.icon}</span>
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-lg font-display font-bold text-gray-900 group-hover:text-primary transition-colors">{cat.name}</h2>
-                <p className="text-sm text-gray-400 mt-1 line-clamp-2">{cat.description}</p>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    {counts[i] > 0 ? `${counts[i]} provider${counts[i] !== 1 ? "s" : ""}` : "New"}
-                  </span>
-                  <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
-                    Browse
-                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </span>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-secondary/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative p-7">
+              <div className="flex items-start justify-between mb-5">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blush to-primary-light/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                  <span className="text-3xl">{cat.icon}</span>
                 </div>
+                <div className="flex items-center gap-1.5 text-primary text-[13px] font-medium opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-300">
+                  Explore
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </div>
+              </div>
+              <h2 className="text-lg font-display font-bold text-gray-900 group-hover:text-primary transition-colors duration-200">{cat.name}</h2>
+              <p className="text-[13px] text-gray-400 mt-1.5 leading-relaxed">{cat.description}</p>
+              <div className="mt-4 pt-4 border-t border-gray-50">
+                <span className="text-[12px] text-gray-400">
+                  {counts[i] > 0 ? `${counts[i]} provider${counts[i] !== 1 ? "s" : ""}` : "New category"}
+                </span>
               </div>
             </div>
           </Link>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { categoryJsonLd } from "@/lib/seo";
 import { Breadcrumbs, EmptyState } from "@/components/ui";
+import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 
 type Suburb = { name: string; slug: string; state: string; postCode: string };
@@ -39,7 +40,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
   if (!suburb || !cat) notFound();
 
   const providersData = await fetchApi<{
-    items: Array<{ slug: string; businessName: string; averageRating: number; totalReviews: number }>;
+    items: Array<{ slug: string; businessName: string; averageRating: number; totalReviews: number; city?: string; logoUrl?: string; tagline?: string }>;
     pagination: { totalCount: number };
   }>(`/providers/search?suburb=${suburbSlug}&category=${catSlug}&marketplaceType=0&pageSize=12`, { revalidate: 300 });
 
@@ -48,40 +49,32 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-10">
         <Breadcrumbs items={[
           { label: "Home", href: "/" },
           { label: suburb.name, href: `/${suburb.slug}` },
           { label: cat.displayName },
         ]} />
 
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-3xl">{cat.icon}</span>
-          <h1 className="text-3xl font-display font-bold">
-            {cat.displayName} in {suburb.name}, Perth WA
-          </h1>
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blush to-primary-light/50 flex items-center justify-center">
+              <span className="text-xl">{cat.icon}</span>
+            </div>
+            <div>
+              <span className="text-[11px] font-semibold text-primary uppercase tracking-[0.2em]">{suburb.name}</span>
+              <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900">
+                {cat.displayName} in {suburb.name}
+              </h1>
+            </div>
+          </div>
+          <p className="text-gray-400 text-[15px]">{totalCount} provider{totalCount !== 1 ? "s" : ""} found</p>
         </div>
-        <p className="text-gray-500 mb-8">{totalCount} provider{totalCount !== 1 ? "s" : ""} found</p>
 
         {providers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {providers.map((p) => (
-              <Link key={p.slug} href={`/provider/${p.slug}`} className="group bg-white rounded-xl border border-gray-100 hover:border-rose-200 hover:shadow-lg transition-all overflow-hidden">
-                <div className="aspect-[4/3] bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center">
-                  <span className="text-5xl font-display text-rose-300">{p.businessName.charAt(0)}</span>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold group-hover:text-primary transition-colors">{p.businessName}</h3>
-                  <div className="flex items-center gap-1 mt-2 text-sm">
-                    {p.averageRating > 0 ? (
-                      <>
-                        <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                        <span>{p.averageRating.toFixed(1)} ({p.totalReviews})</span>
-                      </>
-                    ) : <span className="text-gray-400">New</span>}
-                  </div>
-                </div>
-              </Link>
+              <ProviderCard key={p.slug} {...p} />
             ))}
           </div>
         ) : (

@@ -80,7 +80,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-10">
         <Breadcrumbs items={[
           { label: "Home", href: "/" },
           { label: "Search", href: "/search" },
@@ -88,12 +88,12 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
         ]} />
 
         {/* Header */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-8">
-          <div className="h-52 bg-gradient-to-br from-rose-100 via-pink-50 to-rose-50 relative">
+        <div className="bg-white rounded-2xl border border-gray-100/80 overflow-hidden mb-8">
+          <div className="h-56 bg-gradient-to-br from-blush via-pink-50/50 to-cream relative">
             {provider.coverImageUrl && (
               <img src={provider.coverImageUrl} alt="" className="w-full h-full object-cover" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
           </div>
           <div className="p-6 sm:p-8 -mt-14 relative">
             <div className="flex flex-col sm:flex-row sm:items-end gap-4">
@@ -101,34 +101,33 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                 {provider.logoUrl ? (
                   <img src={provider.logoUrl} alt={provider.businessName} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center">
-                    <span className="text-3xl font-display gradient-text">{provider.businessName.charAt(0)}</span>
+                  <div className="w-full h-full bg-gradient-to-br from-blush to-cream flex items-center justify-center">
+                    <span className="text-3xl font-display gradient-text font-bold">{provider.businessName.charAt(0)}</span>
                   </div>
                 )}
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900">{provider.businessName}</h1>
-                {provider.tagline && <p className="text-gray-400 mt-1">{provider.tagline}</p>}
+                {provider.tagline && <p className="text-[15px] text-gray-400 mt-1">{provider.tagline}</p>}
                 <div className="flex flex-wrap items-center gap-4 mt-3">
                   <div className="flex items-center gap-2">
                     <StarRating rating={provider.averageRating} size="md" />
-                    <span className="text-sm text-gray-400">
+                    <span className="text-[13px] text-gray-400">
                       {provider.averageRating.toFixed(1)} ({provider.totalReviews} review{provider.totalReviews !== 1 ? "s" : ""})
                     </span>
                   </div>
                   {provider.city && (
-                    <span className="text-sm text-gray-400 flex items-center gap-1">
+                    <span className="text-[13px] text-gray-400 flex items-center gap-1">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
                       {provider.city}{provider.state ? `, ${provider.state}` : ""}
                     </span>
                   )}
-                  <span className="text-sm text-gray-400 flex items-center gap-1">
+                  <span className="text-[13px] text-gray-400 flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                     {provider.followerCount} followers
                   </span>
                 </div>
               </div>
-              {/* TODO: Follow + Contact buttons (requires auth) */}
             </div>
           </div>
         </div>
@@ -138,29 +137,29 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           <div className="lg:col-span-2 space-y-8">
             {/* About */}
             {provider.description && (
-              <section className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="text-xl font-display font-bold mb-3">About</h2>
-                <p className="text-gray-500 whitespace-pre-line leading-relaxed">{provider.description}</p>
+              <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
+                <h2 className="text-lg font-display font-bold text-gray-900 mb-3">About</h2>
+                <p className="text-[14px] text-gray-400 whitespace-pre-line leading-relaxed">{provider.description}</p>
               </section>
             )}
 
             {/* Services */}
-            <section className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="text-xl font-display font-bold mb-4">Services</h2>
+            <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
+              <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Services</h2>
               {(provider.services?.length ?? 0) > 0 ? (
                 <div className="divide-y divide-gray-50">
                   {provider.services.map((svc) => (
                     <div key={svc.id} className="py-4 flex items-start justify-between gap-4 group">
                       <div>
-                        <h3 className="font-medium text-gray-900">{svc.name}</h3>
-                        {svc.description && <p className="text-sm text-gray-400 mt-1">{svc.description}</p>}
-                        <span className="text-xs text-gray-300 mt-1 block flex items-center gap-1">
+                        <h3 className="text-[15px] font-medium text-gray-900">{svc.name}</h3>
+                        {svc.description && <p className="text-[13px] text-gray-400 mt-1">{svc.description}</p>}
+                        <span className="text-[11px] text-gray-300 mt-1.5 flex items-center gap-1">
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                           {svc.durationMinutes} min
                         </span>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="font-semibold text-gray-900 text-lg">
+                        <span className="font-semibold text-gray-900 text-[15px]">
                           ${svc.priceFrom}
                           {svc.priceTo && svc.priceTo !== svc.priceFrom ? <span className="text-gray-400 font-normal"> – ${svc.priceTo}</span> : ""}
                         </span>
@@ -169,21 +168,21 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm">No services listed yet.</p>
+                <p className="text-gray-400 text-[13px]">No services listed yet.</p>
               )}
             </section>
 
             {/* Gallery */}
             {(provider.galleryImages?.length ?? 0) > 0 && (
-              <section className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="text-xl font-display font-bold mb-4">Gallery</h2>
+              <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
+                <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {provider.galleryImages.map((img) => (
                     <div key={img.id} className="aspect-square rounded-xl overflow-hidden bg-gray-50 group">
                       <img
                         src={img.thumbnailUrl || img.imageUrl}
                         alt={img.altText || provider.businessName}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                         loading="lazy"
                       />
                     </div>
@@ -193,36 +192,36 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             )}
 
             {/* Reviews */}
-            <section className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="text-xl font-display font-bold mb-4">Reviews</h2>
+            <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
+              <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Reviews</h2>
               {reviews.length > 0 ? (
                 <div className="space-y-6">
                   {reviews.map((review) => (
                     <div key={review.id} className="border-b border-gray-50 pb-6 last:border-0 last:pb-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-rose-100 to-pink-50 rounded-full flex items-center justify-center text-sm font-semibold text-rose-500">
+                          <div className="w-9 h-9 bg-gradient-to-br from-primary/15 to-primary/5 rounded-full flex items-center justify-center text-[13px] font-semibold text-primary">
                             {(review.userName ?? 'U').charAt(0)}
                           </div>
                           <div>
-                            <p className="font-medium text-sm text-gray-900">{review.userName ?? 'Anonymous'}</p>
-                            <p className="text-xs text-gray-300">{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
+                            <p className="text-[13px] font-medium text-gray-900">{review.userName ?? 'Anonymous'}</p>
+                            <p className="text-[11px] text-gray-300">{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
                           </div>
                         </div>
                         <StarRating rating={review.rating} />
                       </div>
-                      <p className="text-gray-600 mt-3 text-sm">{review.comment}</p>
+                      <p className="text-[13px] text-gray-500 mt-3 leading-relaxed">{review.comment}</p>
                       {review.providerReply && (
-                        <div className="mt-3 ml-6 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xs font-medium text-gray-500 mb-1">Response from {provider.businessName}</p>
-                          <p className="text-sm text-gray-600">{review.providerReply}</p>
+                        <div className="mt-3 ml-6 p-3 bg-blush/50 rounded-xl">
+                          <p className="text-[11px] font-medium text-gray-500 mb-1">Response from {provider.businessName}</p>
+                          <p className="text-[13px] text-gray-600">{review.providerReply}</p>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm">No reviews yet. Be the first to leave a review!</p>
+                <p className="text-gray-400 text-[13px]">No reviews yet. Be the first to leave a review!</p>
               )}
               {/* TODO: Write review form (requires auth) */}
             </section>
@@ -231,9 +230,9 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact Info */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
-              <h3 className="font-display font-bold mb-4">Contact</h3>
-              <div className="space-y-3 text-sm">
+            <div className="bg-white rounded-2xl border border-gray-100/80 p-6 sticky top-24">
+              <h3 className="text-lg font-display font-bold text-gray-900 mb-4">Contact</h3>
+              <div className="space-y-3 text-[13px]">
                 {provider.address && (
                   <div className="flex items-start gap-3">
                     <svg className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
@@ -267,7 +266,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
               </div>
 
               {/* TODO: Booking/Contact CTA button */}
-              <button className="w-full mt-6 px-4 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]">
+              <button className="w-full mt-6 px-4 py-3.5 bg-gray-900 text-white rounded-xl text-[15px] font-semibold hover:bg-gray-800 transition-all active:scale-[0.98]">
                 Contact Provider
               </button>
             </div>

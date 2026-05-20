@@ -14,20 +14,17 @@ export const metadata: Metadata = generatePageMeta({
 type ApiSuburb = { slug: string; providerCount: number };
 
 export default async function SuburbsPage() {
-  // Fetch provider counts from API (graceful fallback)
   const apiSuburbs = await fetchApi<ApiSuburb[]>("/locations/suburbs", { revalidate: 3600, tags: ["suburbs"] });
   const countMap = new Map<string, number>();
   if (apiSuburbs) {
     for (const s of apiSuburbs) countMap.set(s.slug, s.providerCount);
   }
 
-  // Merge static list with API counts
   const suburbs = PERTH_SUBURBS.map((s) => ({
     ...s,
     providerCount: countMap.get(s.slug) ?? 0,
   }));
 
-  // Group by first letter
   const grouped: Record<string, typeof suburbs> = {};
   for (const s of suburbs) {
     const letter = s.name.charAt(0).toUpperCase();
@@ -35,18 +32,22 @@ export default async function SuburbsPage() {
     grouped[letter].push(s);
   }
   const sortedLetters = Object.keys(grouped).sort();
+  const totalWithProviders = suburbs.filter((s) => s.providerCount > 0).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-10">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Suburbs" }]} />
 
-      <h1 className="text-3xl sm:text-4xl font-display font-bold mb-2 text-gray-900">Perth Suburbs</h1>
-      <p className="text-gray-400 mb-10">Browse beauty services by location — {suburbs.length} suburbs across Perth</p>
+      <div className="mb-12">
+        <span className="text-[11px] font-semibold text-primary uppercase tracking-[0.2em]">Local</span>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900 mt-2">Perth Suburbs</h1>
+        <p className="text-gray-400 mt-2 text-[15px]">{suburbs.length} suburbs &middot; {totalWithProviders} with active providers</p>
+      </div>
 
       {/* Letter navigation */}
-      <div className="flex flex-wrap gap-1.5 mb-10 p-4 bg-white rounded-2xl border border-gray-100">
+      <div className="flex flex-wrap gap-1 mb-12 p-4 bg-white rounded-2xl border border-gray-100/80">
         {sortedLetters.map((letter) => (
-          <a key={letter} href={`#${letter}`} className="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500 text-sm font-semibold hover:bg-rose-100 hover:text-rose-600 transition-all">
+          <a key={letter} href={`#${letter}`} className="w-9 h-9 flex items-center justify-center rounded-xl text-[13px] font-semibold text-gray-400 hover:text-primary hover:bg-blush transition-all">
             {letter}
           </a>
         ))}
@@ -54,25 +55,25 @@ export default async function SuburbsPage() {
 
       {sortedLetters.map((letter) => (
         <div key={letter} id={letter} className="mb-10">
-          <h2 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b border-gray-100 flex items-center gap-2">
-            <span className="w-8 h-8 bg-rose-50 rounded-lg flex items-center justify-center text-rose-500 text-sm font-bold">{letter}</span>
-            <span>{letter}</span>
+          <h2 className="text-[13px] font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+            <span className="w-7 h-7 bg-blush rounded-lg flex items-center justify-center text-primary text-[11px] font-bold">{letter}</span>
+            {letter}
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
             {grouped[letter].map((suburb) => (
               <Link
                 key={suburb.slug}
                 href={`/${suburb.slug}`}
-                className="flex items-center justify-between p-3 rounded-xl bg-white border border-gray-100 hover:border-rose-200 transition-all group hover:shadow-sm"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-gray-100/80 hover:border-primary/20 transition-all group hover:shadow-sm"
               >
                 <div>
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors">{suburb.name}</span>
-                  <span className="block text-xs text-gray-300">{suburb.postCode}</span>
+                  <span className="text-[13px] font-medium text-gray-700 group-hover:text-primary transition-colors">{suburb.name}</span>
+                  <span className="block text-[11px] text-gray-300">{suburb.postCode}</span>
                 </div>
                 {suburb.providerCount > 0 ? (
-                  <span className="text-xs text-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">{suburb.providerCount}</span>
+                  <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full font-medium">{suburb.providerCount}</span>
                 ) : (
-                  <span className="text-xs text-primary/50 bg-primary/5 px-2 py-0.5 rounded-full">New</span>
+                  <span className="text-[10px] text-primary/50 bg-primary/5 px-2 py-0.5 rounded-full font-medium">New</span>
                 )}
               </Link>
             ))}

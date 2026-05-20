@@ -152,19 +152,19 @@ export function JoinForm() {
 
   if (success) {
     return (
-      <div className="max-w-lg mx-auto bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-xl shadow-rose-100/30">
-        <div className="w-16 h-16 mx-auto rounded-full bg-green-50 flex items-center justify-center mb-5">
-          <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="max-w-lg mx-auto bg-white rounded-2xl border border-gray-100/80 p-8 text-center shadow-xl shadow-gray-200/30">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-50 flex items-center justify-center mb-5">
+          <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <h2 className="text-2xl font-display font-bold text-gray-900 mb-3">Application Submitted!</h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-[15px] text-gray-400 mb-6">
           We&apos;ll review your listing and approve it within 24 hours. You&apos;ll receive an email once your profile is live.
         </p>
         <button
           onClick={() => router.push("/")}
-          className="px-6 py-2.5 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-colors"
+          className="px-6 py-3 bg-gray-900 text-white rounded-xl text-[13px] font-semibold hover:bg-gray-800 transition-colors"
         >
           Back to Home
         </button>
@@ -195,7 +195,7 @@ export function JoinForm() {
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 shadow-xl shadow-rose-100/30">
+      <div className="bg-white rounded-2xl border border-gray-100/80 p-6 sm:p-8 shadow-xl shadow-gray-200/30">
         {error && (
           <div className="mb-5 p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">{error}</div>
         )}
@@ -364,12 +364,12 @@ export function JoinForm() {
           )}
 
           {step < 4 ? (
-            <button onClick={next} className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-all">
-              Continue →
+            <button onClick={next} className="px-6 py-3 bg-gray-900 text-white rounded-xl text-[13px] font-semibold hover:bg-gray-800 transition-all">
+              Continue \u2192
             </button>
           ) : (
             <button onClick={submit} disabled={loading}
-              className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-all disabled:opacity-50">
+              className="px-6 py-3 bg-gray-900 text-white rounded-xl text-[13px] font-semibold hover:bg-gray-800 transition-all disabled:opacity-50">
               {loading ? "Submitting..." : "Submit Application"}
             </button>
           )}

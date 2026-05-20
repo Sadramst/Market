@@ -17,13 +17,13 @@ type Provider = {
   phone?: string;
   email?: string;
   website?: string;
-  instagram?: string;
-  facebook?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
   averageRating: number;
   totalReviews: number;
   followerCount: number;
   logoUrl?: string;
-  coverUrl?: string;
+  coverImageUrl?: string;
   businessHoursJson?: string;
   services: Array<{
     id: string;
@@ -34,7 +34,7 @@ type Provider = {
     durationMinutes: number;
     categoryName?: string;
   }>;
-  gallery: Array<{
+  galleryImages: Array<{
     id: string;
     imageUrl: string;
     thumbnailUrl?: string;
@@ -91,8 +91,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
         {/* Header */}
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-8">
           <div className="h-52 bg-gradient-to-br from-rose-100 via-pink-50 to-rose-50 relative">
-            {provider.coverUrl && (
-              <img src={provider.coverUrl} alt="" className="w-full h-full object-cover" />
+            {provider.coverImageUrl && (
+              <img src={provider.coverImageUrl} alt="" className="w-full h-full object-cover" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
           </div>
@@ -175,11 +175,11 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             </section>
 
             {/* Gallery */}
-            {provider.gallery.length > 0 && (
+            {provider.galleryImages.length > 0 && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-xl font-display font-bold mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {provider.gallery.map((img) => (
+                  {provider.galleryImages.map((img) => (
                     <div key={img.id} className="aspect-square rounded-xl overflow-hidden bg-gray-50 group">
                       <img
                         src={img.thumbnailUrl || img.imageUrl}
@@ -259,10 +259,10 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <a href={provider.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{provider.website.replace(/^https?:\/\//, "")}</a>
                   </div>
                 )}
-                {provider.instagram && (
-                  <div className="flex items-center gap-3">
-                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <a href={`https://instagram.com/${provider.instagram}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@{provider.instagram}</a>
+                {provider.instagramUrl && (
+                  <div className="flex items-start gap-3">
+                    <svg className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <a href={provider.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{provider.instagramUrl.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@')}</a>
                   </div>
                 )}
               </div>

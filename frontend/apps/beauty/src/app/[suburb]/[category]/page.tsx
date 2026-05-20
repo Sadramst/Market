@@ -4,29 +4,39 @@ import { notFound } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { categoryJsonLd } from "@/lib/seo";
 import { Breadcrumbs, EmptyState } from "@/components/ui";
+import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 
 type Suburb = { name: string; slug: string; state: string; postCode: string };
-type Category = { name: string; slug: string };
 
 export async function generateMetadata({ params }: { params: Promise<{ suburb: string; category: string }> }): Promise<Metadata> {
   const { suburb: suburbSlug, category: catSlug } = await params;
   const suburb = await fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 });
-  const category = await fetchApi<Category>(`/categories/${catSlug}`, { revalidate: 3600 });
-  if (!suburb || !category) return { title: "Not Found" };
+  const cat = findCategory(catSlug);
+  if (!suburb || !cat) return { title: "Not Found" };
   return {
-    title: `${category.name} in ${suburb.name} — Beauty Services`,
-    description: `Find the best ${category.name.toLowerCase()} services in ${suburb.name}, ${suburb.state}. Compare prices, read reviews, and book appointments.`,
+    title: `${cat.displayName} in ${suburb.name}, Perth WA`,
+    description: `Find the best ${cat.displayName.toLowerCase()} in ${suburb.name}. Compare providers, read reviews and get in touch. Updated ${new Date().getFullYear()}.`,
     alternates: { canonical: `https://beauty.appilico.com.au/${suburbSlug}/${catSlug}` },
   };
 }
 
+export async function generateStaticParams() {
+  const suburbs = await fetchApi<Array<{ slug: string }>>("/locations/suburbs", { revalidate: 86400 });
+  const params: Array<{ suburb: string; category: string }> = [];
+  const suburbSlugs = suburbs?.map((s) => s.slug) ?? [];
+  for (const suburb of suburbSlugs.slice(0, 50)) {
+    for (const cat of BEAUTY_CATEGORIES) {
+      params.push({ suburb, category: cat.slug });
+    }
+  }
+  return params;
+}
+
 export default async function SuburbCategoryPage({ params }: { params: Promise<{ suburb: string; category: string }> }) {
   const { suburb: suburbSlug, category: catSlug } = await params;
-  const [suburb, category] = await Promise.all([
-    fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 }),
-    fetchApi<Category>(`/categories/${catSlug}`, { revalidate: 3600 }),
-  ]);
-  if (!suburb || !category) notFound();
+  const cat = findCategory(catSlug);
+  const suburb = await fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 });
+  if (!suburb || !cat) notFound();
 
   const providersData = await fetchApi<{
     items: Array<{ slug: string; businessName: string; averageRating: number; totalReviews: number }>;
@@ -42,13 +52,16 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
         <Breadcrumbs items={[
           { label: "Home", href: "/" },
           { label: suburb.name, href: `/${suburb.slug}` },
-          { label: category.name },
+          { label: cat.displayName },
         ]} />
 
-        <h1 className="text-3xl font-display font-bold mb-2">
-          {category.name} in {suburb.name}
-        </h1>
-        <p className="text-gray-500 mb-8">{totalCount} providers found</p>
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-3xl">{cat.icon}</span>
+          <h1 className="text-3xl font-display font-bold">
+            {cat.displayName} in {suburb.name}, Perth WA
+          </h1>
+        </div>
+        <p className="text-gray-500 mb-8">{totalCount} provider{totalCount !== 1 ? "s" : ""} found</p>
 
         {providers.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -74,7 +87,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
         ) : (
           <EmptyState
             icon="🔍"
-            title={`No ${category.name.toLowerCase()} providers in ${suburb.name} yet`}
+            title={`No ${cat.name.toLowerCase()} providers in ${suburb.name} yet`}
             description="Try browsing nearby suburbs or check back soon!"
           />
         )}
@@ -82,7 +95,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd(category, suburb)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd({ name: cat.name, slug: cat.slug }, suburb)) }}
       />
     </>
   );

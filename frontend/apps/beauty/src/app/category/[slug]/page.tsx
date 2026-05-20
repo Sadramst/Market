@@ -4,35 +4,30 @@ import { notFound } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { categoryJsonLd } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/ui";
+import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 
-type Category = {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  iconName?: string;
-  providerCount: number;
-  subCategories: Array<{ id: string; name: string; slug: string; providerCount: number }>;
-};
+export async function generateStaticParams() {
+  return BEAUTY_CATEGORIES.map((cat) => ({ slug: cat.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await fetchApi<Category>(`/categories/${slug}`, { revalidate: 3600 });
-  if (!category) return { title: "Category Not Found" };
+  const cat = findCategory(slug);
+  if (!cat) return { title: "Category Not Found" };
   return {
-    title: `${category.name} — Beauty Services in Perth`,
-    description: category.description || `Find the best ${category.name.toLowerCase()} services in Perth, WA. Browse providers, compare prices, and read reviews.`,
+    title: `${cat.name} — Beauty Services in Perth`,
+    description: `Find the best ${cat.name.toLowerCase()} services in Perth, WA. Browse providers, compare prices, and read reviews.`,
     alternates: { canonical: `https://beauty.appilico.com.au/category/${slug}` },
   };
 }
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const category = await fetchApi<Category>(`/categories/${slug}`, { revalidate: 3600, tags: ["category", slug] });
-  if (!category) notFound();
+  const cat = findCategory(slug);
+  if (!cat) notFound();
 
   const providersData = await fetchApi<{
-    items: Array<{ slug: string; businessName: string; city?: string; averageRating: number; totalReviews: number }>;
+    items: Array<{ slug: string; businessName: string; city?: string; averageRating: number; totalReviews: number; description?: string }>;
     pagination: { totalCount: number };
   }>(`/providers/search?category=${slug}&marketplaceType=0&pageSize=12`, { revalidate: 300, tags: ["providers", slug] });
 
@@ -45,27 +40,17 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         <Breadcrumbs items={[
           { label: "Home", href: "/" },
           { label: "Categories", href: "/categories" },
-          { label: category.name },
+          { label: cat.name },
         ]} />
 
-        <h1 className="text-3xl sm:text-4xl font-display font-bold mb-2 text-gray-900">{category.name}</h1>
-        {category.description && <p className="text-gray-400 mb-4">{category.description}</p>}
-        <p className="text-sm text-gray-300 mb-8">{totalCount} provider{totalCount !== 1 ? "s" : ""} in this category</p>
-
-        {/* Sub-categories */}
-        {category.subCategories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            {category.subCategories.map((sub) => (
-              <Link
-                key={sub.slug}
-                href={`/category/${sub.slug}`}
-                className="px-4 py-2 bg-rose-50 text-rose-600 rounded-full text-sm font-medium hover:bg-rose-100 transition-all hover:shadow-sm"
-              >
-                {sub.name} ({sub.providerCount})
-              </Link>
-            ))}
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl">{cat.icon}</span>
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900">{cat.name}</h1>
+            <p className="text-gray-400">{cat.description}</p>
           </div>
-        )}
+        </div>
+        <p className="text-sm text-gray-300 mb-8">{totalCount} provider{totalCount !== 1 ? "s" : ""} in this category</p>
 
         {/* Providers */}
         {providers.length > 0 ? (
@@ -109,7 +94,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-50 flex items-center justify-center mb-5">
               <span className="text-3xl">💅</span>
             </div>
-            <h3 className="text-xl font-display font-bold text-gray-900">No {category.name.toLowerCase()} providers yet</h3>
+            <h3 className="text-xl font-display font-bold text-gray-900">No {cat.name.toLowerCase()} providers yet</h3>
             <p className="text-gray-400 mt-2">Be the first to list your business in this category!</p>
             <Link href="/join" className="inline-block mt-5 px-5 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-dark transition-colors">
               List Your Business
@@ -120,7 +105,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd(category)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd({ name: cat.name, slug: cat.slug })) }}
       />
     </>
   );

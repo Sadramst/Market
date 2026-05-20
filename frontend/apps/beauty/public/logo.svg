@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E4707A"/>
+      <stop offset="100%" stop-color="#C4566A"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon: stylised petal/drop -->
+  <circle cx="20" cy="24" r="18" fill="url(#g)"/>
+  <path d="M20 10c-3.5 5-9 10-9 15a9 9 0 0018 0c0-5-5.5-10-9-15z" fill="#fff" opacity=".92"/>
+  <circle cx="20" cy="28" r="3.2" fill="url(#g)"/>
+  <!-- Wordmark -->
+  <text x="48" y="33" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="26" fill="#1F1F1F" letter-spacing="-0.5">Appilico</text>
+</svg>

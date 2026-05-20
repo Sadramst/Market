@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "../../lib/auth";
+import { useEffect } from "react";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: (
@@ -25,6 +30,16 @@ const navItems = [
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!loading && !user) router.replace("/");
+  }, [loading, user, router]);
+
+  if (loading || !user) return null;
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -41,27 +56,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Link>
         </div>
         <nav className="flex-1 p-3 space-y-0.5 mt-2">
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+            const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-indigo-200/70 hover:bg-white/[0.07] hover:text-white transition-all text-sm font-medium"
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? "bg-white/10 text-white" : "text-indigo-200/70 hover:bg-white/[0.07] hover:text-white"}`}
             >
-              <span className="opacity-60">{item.icon}</span>
+              <span className={active ? "opacity-100" : "opacity-60"}>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
-          ))}
+            );
+          })}
         </nav>
         <div className="p-4 mx-3 mb-3 rounded-xl bg-white/[0.05] border border-white/5">
-          {/* TODO: Show logged-in admin info */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-indigo-600/30 flex items-center justify-center">
-              <span className="text-xs font-bold text-indigo-300">A</span>
+              <span className="text-xs font-bold text-indigo-300">{user.firstName.charAt(0)}</span>
             </div>
-            <div>
-              <p className="text-xs font-medium text-indigo-100/80">Admin User</p>
-              <p className="text-[11px] text-indigo-300/40">SuperAdmin</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-indigo-100/80 truncate">{user.firstName} {user.lastName}</p>
+              <p className="text-[11px] text-indigo-300/40">{user.roles[0]}</p>
             </div>
+            <button onClick={logout} title="Sign out" className="p-1.5 rounded-lg hover:bg-white/10 text-indigo-300/50 hover:text-white transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            </button>
           </div>
         </div>
       </aside>

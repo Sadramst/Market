@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "../lib/auth";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -16,8 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en-AU" className={inter.variable}>
       <body className="font-sans min-h-screen antialiased bg-gray-50 text-gray-900">
-        {/* TODO: Auth guard — redirect to login if not SuperAdmin/Moderator */}
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

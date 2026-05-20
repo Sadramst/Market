@@ -29,6 +29,7 @@ public static partial class DatabaseSeeder
         await SeedPerthSuburbs(context);
         await SeedAppSettings(context);
         await SeedBeautyProviders(context, userManager);
+        await SeedMoreBeautyProviders(context, userManager);
     }
 
     private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)

@@ -24,8 +24,8 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-1.5 shrink-0 group">
-            <span className="text-2xl font-display font-bold text-primary group-hover:text-primary-dark transition-colors">Appilico</span>
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <img src="/logo.svg" alt="Appilico Beauty" className="h-8 w-auto" />
             <span className="text-sm text-rose-400/80 font-medium">Beauty</span>
           </Link>
 

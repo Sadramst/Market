@@ -1,22 +1,47 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAuth } from "../../lib/auth";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+interface Stats {
+  providers: number;
+  pending: number;
+  reviews: number;
+  categories: number;
+}
+
 export default function DashboardPage() {
-  // TODO: Fetch real stats from API
-  const stats = [
-    { label: "Total Providers", value: "0", change: "+0 today", color: "from-indigo-500 to-indigo-600", icon: (
+  const { token } = useAuth();
+  const [stats, setStats] = useState<Stats>({ providers: 0, pending: 0, reviews: 0, categories: 0 });
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!token) return;
+    async function load() {
+      try {
+        const [provRes, catRes] = await Promise.all([
+          fetch(`${API_URL}/providers/search?pageSize=1`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).catch(() => null),
+          fetch(`${API_URL}/categories/beauty`).then(r => r.json()).catch(() => null),
+        ]);
+        setStats({
+          providers: provRes?.data?.totalCount ?? provRes?.pagination?.totalItems ?? 0,
+          pending: 0,
+          reviews: 0,
+          categories: catRes?.data?.length ?? 0,
+        });
+      } catch { /* ignore */ }
+      setLoaded(true);
+    }
+    load();
+  }, [token]);
+
+  const statCards = [
+    { label: "Total Providers", value: loaded ? String(stats.providers) : "...", change: "Active listings", color: "from-indigo-500 to-indigo-600", icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
     )},
-    { label: "Pending Approvals", value: "0", change: "Requires action", color: "from-amber-500 to-orange-500", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-    )},
-    { label: "Total Reviews", value: "0", change: "+0 this week", color: "from-emerald-500 to-green-600", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-    )},
-    { label: "Registered Users", value: "2", change: "Admin + Moderator", color: "from-blue-500 to-cyan-500", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-    )},
-    { label: "Active Reports", value: "0", change: "No issues", color: "from-rose-500 to-pink-600", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>
-    )},
-    { label: "Categories", value: "21", change: "9 beauty + 12 IT", color: "from-purple-500 to-violet-600", icon: (
+    { label: "Beauty Categories", value: loaded ? String(stats.categories) : "...", change: "Parent + sub", color: "from-purple-500 to-violet-600", icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
     )},
   ];
@@ -30,7 +55,7 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all group">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-gray-500">{stat.label}</span>

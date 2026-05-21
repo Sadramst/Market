@@ -24,6 +24,25 @@ function StarIcon({ className }: { className?: string }) {
   );
 }
 
+const CATEGORY_META: Record<string, { icon: string; gradient: string }> = {
+  nails: { icon: '💅', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' },
+  hair: { icon: '💇‍♀️', gradient: 'linear-gradient(135deg, #E8D5B0, #C9A96E)' },
+  lashes: { icon: '👁️', gradient: 'linear-gradient(135deg, #C4A8C8, #9B7B84)' },
+  brows: { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' },
+  'skin-care': { icon: '🧴', gradient: 'linear-gradient(135deg, #A8C8B0, #7B9B84)' },
+  'skin care': { icon: '🧴', gradient: 'linear-gradient(135deg, #A8C8B0, #7B9B84)' },
+  makeup: { icon: '💄', gradient: 'linear-gradient(135deg, #D4A0A8, #A35560)' },
+  body: { icon: '🌸', gradient: 'linear-gradient(135deg, #E8A8C0, #C8737A)' },
+  cosmetic: { icon: '💉', gradient: 'linear-gradient(135deg, #C4A8C8, #9B7B84)' },
+  wellness: { icon: '🧘', gradient: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)' },
+};
+
+function getCategoryMeta(categories?: string[]) {
+  if (!categories?.[0]) return { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
+  const slug = categories[0].toLowerCase().replace(/\s+/g, '-');
+  return CATEGORY_META[slug] || CATEGORY_META[categories[0].toLowerCase()] || { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
+}
+
 export function ProviderCard({
   slug,
   businessName,
@@ -36,19 +55,7 @@ export function ProviderCard({
   isVerified,
   hasRealData,
 }: ProviderCardProps) {
-  const categorySlug = categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || '';
-  const gradientMap: Record<string, string> = {
-    nails: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
-    hair: 'linear-gradient(135deg, #E8D5B0, #C9A96E)',
-    lashes: 'linear-gradient(135deg, #C4A8C8, #9B7B84)',
-    brows: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
-    'skin-care': 'linear-gradient(135deg, #A8C8B0, #7B9B84)',
-    makeup: 'linear-gradient(135deg, #D4A0A8, #A35560)',
-    body: 'linear-gradient(135deg, #E8A8C0, #C8737A)',
-    cosmetic: 'linear-gradient(135deg, #C4A8C8, #9B7B84)',
-    wellness: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)',
-  };
-  const coverGradient = gradientMap[categorySlug] || 'linear-gradient(135deg, var(--brand-rose-light), var(--brand-rose))';
+  const { icon, gradient } = getCategoryMeta(categories);
   const trustLabel = isVerified ? "Verified" : hasRealData ? "Source checked" : "New listing";
 
   return (
@@ -57,18 +64,20 @@ export function ProviderCard({
       className="premium-card group block overflow-hidden"
       style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}
     >
-      {/* Cover gradient */}
-      <div className="relative overflow-hidden" style={{ height: '140px', background: coverGradient }}>
+      {/* Cover */}
+      <div className="relative overflow-hidden" style={{ height: '140px', background: gradient }}>
         {logoUrl ? (
           <Image src={logoUrl} alt={businessName} fill className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[32px] mb-1">{categories?.[0] === 'Nails' ? '💅' : categories?.[0] === 'Hair' ? '💇‍♀️' : '✨'}</span>
-            <span className="text-white/90 text-[16px] italic" style={{ fontFamily: 'var(--font-heading)', textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>
+            <span className="text-[42px] mb-1.5 opacity-80 group-hover:scale-110 transition-transform duration-500">{icon}</span>
+            <span className="text-white/90 text-[15px] font-medium tracking-wide text-center px-4 truncate max-w-full" style={{ fontFamily: 'var(--font-heading)', textShadow: '0 1px 8px rgba(0,0,0,0.25)' }}>
               {businessName}
             </span>
           </div>
         )}
+        {/* Subtle bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-8" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.08), transparent)' }} />
       </div>
 
       {/* Card body */}
@@ -117,7 +126,7 @@ export function ProviderCard({
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
           <span className="text-[12px]" style={{ color: 'var(--brand-gold)' }}>{trustLabel}</span>
-          <span className="text-[12px] transition-colors" style={{ color: 'var(--text-muted)' }}>
+          <span className="text-[12px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: 'var(--brand-rose)' }}>
             View Profile →
           </span>
         </div>

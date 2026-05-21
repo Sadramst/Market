@@ -30,6 +30,7 @@ type Provider = {
   businessHoursJson?: string;
   isClaimed?: boolean;
   hasRealData?: boolean;
+  categories?: string[];
   services: Array<{
     id: string;
     name: string;
@@ -83,12 +84,33 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
   const reviewsData = await fetchApi<{ items: Review[] }>(`/reviews/provider/${provider.id}?pageSize=10`, { revalidate: 300, tags: ["reviews", slug] });
   const reviews = reviewsData?.items ?? [];
 
+  const categoryGradients: Record<string, string> = {
+    nails: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
+    hair: 'linear-gradient(135deg, #E8D5B0, #C9A96E)',
+    lashes: 'linear-gradient(135deg, #C4A8C8, #9B7B84)',
+    brows: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
+    'skin-care': 'linear-gradient(135deg, #A8C8B0, #7B9B84)',
+    'skin care': 'linear-gradient(135deg, #A8C8B0, #7B9B84)',
+    makeup: 'linear-gradient(135deg, #D4A0A8, #A35560)',
+    body: 'linear-gradient(135deg, #E8A8C0, #C8737A)',
+    cosmetic: 'linear-gradient(135deg, #C4A8C8, #9B7B84)',
+    wellness: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)',
+  };
+  const catSlug = provider.categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || '';
+  const bannerGradient = categoryGradients[catSlug] || categoryGradients[provider.categories?.[0]?.toLowerCase() || ''] || 'var(--gradient-rose)';
+
   return (
     <>
       {/* Gradient Banner */}
-      <div className="relative h-64" style={{ background: 'var(--gradient-rose)' }}>
-        {provider.coverImageUrl && (
+      <div className="relative h-64" style={{ background: bannerGradient }}>
+        {provider.coverImageUrl ? (
           <img src={provider.coverImageUrl} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[80px] opacity-20">
+              {catSlug === 'nails' ? '💅' : catSlug === 'hair' ? '💇‍♀️' : catSlug === 'lashes' ? '👁️' : catSlug === 'brows' ? '✨' : catSlug === 'skin-care' ? '🧴' : catSlug === 'makeup' ? '💄' : catSlug === 'body' ? '🌸' : catSlug === 'cosmetic' ? '💉' : catSlug === 'wellness' ? '🧘' : '✨'}
+            </span>
+          </div>
         )}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,20,16,0.3), transparent)' }} />
       </div>

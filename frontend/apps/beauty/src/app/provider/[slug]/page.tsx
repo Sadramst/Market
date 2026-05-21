@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { providerJsonLd } from "@/lib/seo";
 import { Breadcrumbs, StarRating } from "@/components/ui";
+import { ContactProviderButton } from "@/components/providers/ContactProviderButton";
+import { ReviewForm } from "@/components/providers/ReviewForm";
 
 type Provider = {
   id: string;
@@ -257,6 +259,9 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                 <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>No reviews yet. Be the first to leave a review!</p>
               )}
             </section>
+
+            {/* Leave a Review */}
+            <ReviewForm providerId={provider.id} providerName={provider.businessName} />
           </div>
 
           {/* Sidebar */}
@@ -296,9 +301,11 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                 )}
               </div>
 
-              <button className="w-full mt-6 px-4 py-3.5 text-[14px] font-medium text-white transition-all" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
-                Contact Provider
-              </button>
+              <ContactProviderButton
+                providerId={provider.id}
+                providerName={provider.businessName}
+                services={provider.services?.map(s => ({ name: s.name }))}
+              />
             </div>
           </div>
         </div>

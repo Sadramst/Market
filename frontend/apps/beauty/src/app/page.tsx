@@ -4,9 +4,18 @@ import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 
 const popularSuburbs = [
-  "Perth CBD", "Subiaco", "Fremantle", "Joondalup", "Claremont",
-  "Scarborough", "Applecross", "Mount Lawley", "Leederville", "Nedlands",
-  "Victoria Park", "Canning Vale",
+  { name: "Perth CBD", slug: "perth" },
+  { name: "Subiaco", slug: "subiaco" },
+  { name: "Fremantle", slug: "fremantle" },
+  { name: "Joondalup", slug: "joondalup" },
+  { name: "Claremont", slug: "claremont" },
+  { name: "Scarborough", slug: "scarborough" },
+  { name: "Applecross", slug: "applecross" },
+  { name: "Mount Lawley", slug: "mount-lawley" },
+  { name: "Leederville", slug: "leederville" },
+  { name: "Nedlands", slug: "nedlands" },
+  { name: "Victoria Park", slug: "victoria-park" },
+  { name: "Canning Vale", slug: "canning-vale" },
 ];
 
 const testimonials = [
@@ -201,12 +210,12 @@ export default async function HomePage() {
             Beauty <em>Near You</em>
           </h2>
           <div className="flex flex-wrap justify-center gap-3 mt-10">
-            {popularSuburbs.map((name) => (
-              <Link key={name} href={`/${name.toLowerCase().replace(/\s+/g, '-')}`}
+            {popularSuburbs.map((s) => (
+              <Link key={s.slug} href={`/${s.slug}`}
                 className="px-5 py-2.5 text-[14px] transition-all duration-200 hover:text-white"
                 style={{ border: '1px solid var(--border)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
               >
-                {name}
+                {s.name}
               </Link>
             ))}
           </div>

@@ -31,6 +31,14 @@ public class ReviewsController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    /// <summary>Submit a public review (no auth required)</summary>
+    [HttpPost("public")]
+    public async Task<IActionResult> CreatePublic([FromBody] CreatePublicReviewRequest request)
+    {
+        var result = await _reviewService.CreatePublicAsync(request);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     [Authorize]
     [HttpPost("{id:guid}/reply")]
     public async Task<IActionResult> Reply(Guid id, [FromBody] string reply)

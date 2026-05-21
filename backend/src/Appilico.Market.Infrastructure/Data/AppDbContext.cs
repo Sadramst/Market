@@ -2,6 +2,7 @@ using Appilico.Market.Domain;
 using Appilico.Market.Domain.Audit;
 using Appilico.Market.Domain.Auth;
 using Appilico.Market.Domain.Categories;
+using Appilico.Market.Domain.Enquiries;
 using Appilico.Market.Domain.ITServices;
 using Appilico.Market.Domain.Locations;
 using Appilico.Market.Domain.Media;
@@ -68,6 +69,9 @@ public class AppDbContext : IdentityDbContext<AppUser>
     // IT Services
     public DbSet<ServiceRequest> ServiceRequests => Set<ServiceRequest>();
     public DbSet<ServiceOffer> ServiceOffers => Set<ServiceOffer>();
+
+    // Enquiries
+    public DbSet<Enquiry> Enquiries => Set<Enquiry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

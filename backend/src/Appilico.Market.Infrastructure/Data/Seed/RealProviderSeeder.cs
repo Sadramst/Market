@@ -241,12 +241,12 @@ public static partial class DatabaseSeeder
 
         // ===== HAIR (15) =====
         new("Harper Hair Subiaco", "harper-hair-subiaco", "hair", "Subiaco", "6008",
-            null, null, "https://www.harperhair.com.au", "@harperhairperth",
+            "Shop 16/375 Hay Street, Subiaco WA 6008", "0435 689 859", "https://www.harperhair.com.au", "@harperhairsubiaco",
             4.9, 120, "Perth's premier destination for blonde hair, balayage and lived-in colour, Harper Hair in Subiaco attracts colour-obsessed clients from across the city. Their team of highly skilled colorists specialises in creating sun-kissed, natural-looking blondes and seamless extensions.",
             ["Balayage from $220", "Full Colour from $150", "Cut & Blow Dry $95", "Extensions from $500"]),
 
         new("Circles of Hair Perth", "circles-of-hair-perth", "hair", "Perth", "6000",
-            null, null, "https://circlesofhair.com.au", "@circlesofhair",
+            "296 Fitzgerald Street, Perth WA 6000", "1300 160 198", "https://circlesofhair.com.au", "@circlesofhair",
             4.9, 310, "Australia's most awarded hair salon for 2026, Circles of Hair has set the benchmark for professional styling in Perth. Renowned for their exceptional extensions programme — the team even manufactures their own extensions to meet their uncompromising quality standards.",
             ["Cut & Style from $100", "Balayage from $250", "Tape Extensions from $600", "Colour from $160"]),
 
@@ -318,37 +318,37 @@ public static partial class DatabaseSeeder
 
         // ===== LASHES (12) =====
         new("Glam Eyelash Extensions East Perth", "glam-eyelash-extensions-east-perth", "lashes", "East Perth", "6004",
-            null, null, "https://www.glameyelashextensions.com.au", "@glameyelashperth",
+            "7/8 Adelaide Terrace, East Perth WA 6004", "0497 833 273", "https://www.glameyelashextensions.com.au", "@glam_eyelashextensions",
             4.9, 185, "East Perth's premier lash studio specialising in Volume, Wispy, Wet Look and Fox Eye extensions, plus lash lifts. The team at Glam Eyelash also offers professional lash supplies retail and runs a respected lash training academy — making them one of Perth's most comprehensive lash destinations.",
             ["Classic Full Set $120", "Hybrid Full Set $150", "Volume Full Set $170", "Lash Lift $85", "Infill from $75"]),
 
-        new("Lash Nap Studio Mount Lawley", "lash-nap-studio-mount-lawley", "lashes", "Mount Lawley", "6050",
-            null, null, "https://www.lashnapstudio.com.au", "@lashnapstudio",
+        new("Lash Nap Studio Mount Lawley", "lash-nap-studio-mount-lawley", "lashes", "Bedford", "6052",
+            "91 May Street, Bedford WA 6052", "0481 869 889", "https://www.lashnapstudio.com.au", "@lash.nap.studio",
             4.8, 120, "A dedicated lash studio in Mount Lawley focused on enhancing natural beauty through expert eyelash extensions, lash lifts and tints, and brow services. The name says it all — a treatment so relaxing, clients regularly nap through their appointments.",
             ["Classic Full Set $130", "Volume Full Set $160", "Lash Lift & Tint $95", "Infill from $70"]),
 
         new("Perth Lash Extensions West Perth", "perth-lash-extensions-west-perth", "lashes", "West Perth", "6005",
-            null, null, "https://perthlashextensions.com.au", "@perthlashextensions",
+            "Shop 13, Plaistowe Mews, 102 Railway Street, West Perth WA 6005", "(08) 6245 7556", "https://perthlashextensions.com.au", "@perthtanslashbeauty",
             4.8, 340, "Experts in eyelash extensions since 2011, Perth Lash Extensions operates from convenient locations in West Perth and North Perth with free parking and evening appointments available. One of Perth's most established lash businesses with over a decade of experience.",
             ["Classic Full Set $135", "Hybrid $155", "Volume $175", "Mega Volume $195", "Lash Lift $90"]),
 
         new("Perth Lash Extensions North Perth", "perth-lash-extensions-north-perth", "lashes", "North Perth", "6006",
-            null, null, "https://perthlashextensions.com.au", "@perthlashextensions",
+            "Shop 4, 265 Walcott Street, North Perth WA 6006", "(08) 6245 7552", "https://perthlashextensions.com.au", "@perthtanslashbeauty",
             4.8, 280, "The North Perth location of Perth's most established lash studio, offering the same expert classic, hybrid and volume extensions since 2011. Evening appointments and free parking make this a favourite for busy working women across the northern suburbs.",
             ["Classic Full Set $135", "Hybrid $155", "Volume $175", "Lash Lift $90", "Infill from $75"]),
 
         new("Mollylash Wembley", "mollylash-wembley", "lashes", "Wembley", "6014",
-            null, null, "https://mollylash.com.au", "@mollylashperth",
+            "Shop 2, 334 Cambridge Street, Wembley WA 6014", "0416 370 290", "https://mollylash.com.au", "@ilovemollylash",
             4.8, 225, "A highly respected Perth lash and brow studio offering premier eyelash extensions, brow tinting and lamination, eyebrow microblading and cosmetic tattooing across their Wembley and Carlisle locations. Mollylash has built a devoted following for their natural-looking, long-lasting results.",
             ["Classic Full Set $130", "Hybrid $150", "Lash Lift $90", "Brow Lamination $85", "Microblading from $450"]),
 
         new("Mollylash Carlisle", "mollylash-carlisle", "lashes", "Carlisle", "6101",
-            null, null, "https://mollylash.com.au", "@mollylashperth",
+            "Shop 2, 31 Archer Street, Carlisle WA 6101", "0416 370 290", "https://mollylash.com.au", "@ilovemollylash",
             4.8, 198, "The Carlisle location of one of Perth's favourite lash and brow studios. Mollylash brings the same trusted standard of care to the eastern suburbs — natural-looking lash extensions, lash lifts, and expert brow services in a welcoming studio environment.",
             ["Classic Full Set $130", "Hybrid $150", "Lash Lift $90", "Brow Lamination $85"]),
 
         new("Lash Magnifique Aubin Grove", "lash-magnifique-aubin-grove", "lashes", "Aubin Grove", "6164",
-            null, null, "https://www.lashmagnifique.com.au", "@lashmagnifique",
+            null, "0481 245 859", "https://www.lashmagnifique.com.au", "@lashmagnifiquebeauty",
             4.9, 88, "Jean at Lash Magnifique runs a private, one-on-one home studio near Fremantle offering premium lash extensions in an unhurried, personal environment. Certified and experienced, every appointment includes a thorough consultation, patch test option and detailed aftercare advice.",
             ["Classic Set $120", "Natural Wispy $140", "Mega Volume from $170", "Infill from $70", "Lash Lift $90"]),
 
@@ -379,22 +379,22 @@ public static partial class DatabaseSeeder
 
         // ===== BROWS (10) =====
         new("Ellie Dunne Collective Claremont", "ellie-dunne-collective-claremont", "brows", "Claremont", "6010",
-            null, null, "https://www.elliedunnecollective.com", "@elliedunnecollective",
+            "23/337-339 Stirling Highway, Claremont WA 6010", "0451 234 268", "https://www.elliedunnecollective.com", "@elliedunnecollective",
             4.9, 340, "Claremont's most celebrated brow and beauty studio, Ellie Dunne Collective has earned its place in every savvy Perth woman's speed-dial. Ellie and her talented team offer microblading, feather-touch tattooing, brow lamination, lash lifts, spray tans and makeup applications — all from their gorgeous Claremont studio.",
             ["Microblading from $550", "Brow Lamination $88", "Lash Lift $95", "Spray Tan $55", "Makeup from $150"]),
 
-        new("Your Eyes Only Brow Studio Perth", "your-eyes-only-brow-studio-perth", "brows", "Perth", "6000",
-            null, null, "https://www.youreyesonlyhq.com", "@youreyesonlyhq",
+        new("Your Eyes Only Brow Studio Perth", "your-eyes-only-brow-studio-perth", "brows", "Subiaco", "6008",
+            "29 Catherine Street, Subiaco WA 6008", null, "https://www.youreyesonlyhq.com", "@youreyesonly_browstudio",
             4.8, 280, "Perth's leading dedicated brow studio, Your Eyes Only has made Racheal Keeley and her team the go-to for brow transformations across the city. From gentle waxing and shaping to permanent microblading and training masterclasses, they are Perth's foremost brow authorities.",
             ["Brow Wax & Tint $55", "Brow Lamination $88", "Microblading from $520", "Henna Brows $75"]),
 
         new("Elka Clinic Subiaco", "elka-clinic-subiaco", "brows", "Subiaco", "6008",
-            "3/29 Hood Street, Subiaco WA 6008", null, "https://www.elkaclinic.com.au", "@elkaclinicperth",
+            "3/29 Hood Street, Subiaco WA 6008", "1300 216 456", "https://www.elkaclinic.com.au", "@elka.clinic",
             4.9, 195, "A highly regarded permanent makeup and brow clinic in Subiaco, Elka Clinic specialises in eyebrow tattooing, nano brows, eyeliner tattoo, lip blush and microneedling. Their pharmacist-backed team brings both artistry and clinical knowledge to every treatment.",
             ["Nano Brows from $580", "Eyeliner Tattoo from $480", "Lip Blush from $550", "Microneedling from $220"]),
 
         new("Holly Garvey Brow Studio Leederville", "holly-garvey-brow-studio-leederville", "brows", "Leederville", "6007",
-            "324 Oxford Street, Leederville WA 6007", null, "https://www.hollygarvey.com", "@hollygarveyperth",
+            "324 Oxford Street, Leederville WA 6007", null, "https://www.hollygarvey.com", "@hollygarvey_beautydestination",
             4.9, 155, "Holly Garvey's boutique studio on Oxford Street in Leederville is the destination for those seeking beautifully shaped brows, semi-permanent makeup and lash lifts. Offering microblading, combination brows, soft powder brows and Yumi lash lifts — all with meticulous technique and thorough consultation.",
             ["Microblading from $540", "Brow Lamination $85", "Henna Brows $65", "Lash Lift $90", "Wax & Tint $52"]),
 
@@ -409,7 +409,7 @@ public static partial class DatabaseSeeder
             ["Brow Wax & Tint $58", "Brow Lamination $90", "Facials from $110", "Power Peel $145"]),
 
         new("Elka Brows Subiaco", "elka-brows-subiaco", "brows", "Subiaco", "6008",
-            "3/29 Hood Street, Subiaco WA 6008", null, "https://www.elkaclinic.com.au", "@elkabrows",
+            "3/29 Hood Street, Subiaco WA 6008", "1300 216 456", "https://www.elkaclinic.com.au", "@elka.clinic",
             4.8, 145, "Sister studio to Elka Clinic, Elka Brows on Hood Street in Subiaco specialises in eyebrow tattooing, microblading, feathering and scalp micropigmentation. A trusted Subiaco destination for those seeking precise, semi-permanent brow results.",
             ["Microblading from $560", "Nano Brows from $580", "Brow Feathering from $520"]),
 
@@ -429,8 +429,8 @@ public static partial class DatabaseSeeder
             ["Feather Touch Brows from $570", "Microblading from $550", "Ombre Brows from $580", "Henna $68"]),
 
         // ===== SKIN CARE (12) =====
-        new("BLANC Skin Clinic Perth", "blanc-skin-clinic-perth", "skin-care", "Perth", "6000",
-            null, null, "https://blancskin.com.au", "@blancskinperth",
+        new("BLANC Skin Clinic Perth", "blanc-skin-clinic-perth", "skin-care", "Cottesloe", "6011",
+            "8/12 Napoleon Street, Cottesloe WA 6011", "(08) 9284 5225", "https://blancskin.com.au", "@blanc_perth",
             4.9, 380, "An award-winning boutique cosmetic clinic known for its subtle, natural approach to aesthetics. BLANC offers clinical skin treatments, RF microneedling (Morpheus8), advanced skin rejuvenation, cosmetic injectables, body sculpting and luxurious Biologique Recherche facials — all delivered with understated elegance and exceptional results.",
             ["Facials from $150", "RF Microneedling from $400", "Skin Boosters from $350"]),
 
@@ -450,12 +450,12 @@ public static partial class DatabaseSeeder
             ["Signature Facial from $150", "Clinical Peel from $180", "Mesotherapy from $350"]),
 
         new("Erin Aesthetics Subiaco", "erin-aesthetics-subiaco", "skin-care", "Subiaco", "6008",
-            null, null, "https://www.erinaesthetics.com.au", "@erinaestheticsperth",
+            "7/513 Hay Street, Subiaco WA 6008", "0405 188 884", "https://www.erinaesthetics.com.au", "@erinaesthetics",
             4.9, 165, "Trained by world-class medical professionals and anti-ageing leaders, Erin Aesthetics is a premium Subiaco-based clinic maintaining exceptional standards across medical-grade peels, skin needling and mesotherapy. Known for their honesty-first approach and loyal clientele who trust them with their most complex skin concerns.",
             ["Medical Peel from $180", "Skin Needling from $280", "Mesotherapy from $320"]),
 
         new("SOOTHE Massage and DaySpa Nedlands", "soothe-massage-and-dayspa-nedlands", "skin-care", "Nedlands", "6009",
-            null, null, "https://www.soothespaperth.com", "@soothespaperth",
+            "163 Stirling Highway, Nedlands WA 6009", "(08) 9322 1886", "https://www.soothespaperth.com", "@soothe_dayspa",
             4.9, 310, "A refined 240sqm luxury day spa in the heart of Nedlands, SOOTHE is Perth's sanctuary for those who want true restoration. HydroPeptide facials, customised remedial massage, couples experiences, a German-designed infrared sauna and head spa treatments — all curated to slow the breath, soften the body and gently reset the mind.",
             ["Signature Facial $165", "Remedial Massage 60min $110", "Couples Massage from $220", "Infrared Sauna $55"]),
 
@@ -507,7 +507,7 @@ public static partial class DatabaseSeeder
 
         // ===== MAKEUP (8) =====
         new("Asha Artistry Joondalup", "asha-artistry-joondalup", "makeup", "Joondalup", "6027",
-            null, null, "https://www.ashaartistry.com.au", "@ashaartistryperth",
+            "2/37 Piccadilly Circle, Joondalup WA 6027", "0474 129 800", "https://www.ashaartistry.com.au", "@asha.artistry",
             4.9, 185, "Joondalup's premier makeup and hair studio for bridal parties, events and everyday glam. Asha Artistry offers airbrushed makeup, brow artistry, spray tanning and professional hairstyling — their bridal packages are celebrated for seamless communication, impeccable results and making brides feel a million dollars on their most important day.",
             ["Bridal Makeup from $220", "Bridesmaid Makeup from $120", "Spray Tan $55"]),
 
@@ -558,7 +558,7 @@ public static partial class DatabaseSeeder
             ["Swedish Massage 60min $90", "Remedial Massage $105", "Hot Stone $120", "Couples Massage $195"]),
 
         new("SOOTHE Massage and DaySpa Body Nedlands", "soothe-massage-dayspa-body-nedlands", "body", "Nedlands", "6009",
-            null, null, "https://www.soothespaperth.com", "@soothespaperth",
+            "163 Stirling Highway, Nedlands WA 6009", "(08) 9322 1886", "https://www.soothespaperth.com", "@soothe_dayspa",
             4.9, 310, "SOOTHE's 240sqm Nedlands sanctuary is Perth's most refined day spa experience. Customised remedial and relaxation massage, couples massage, infrared sauna, head spa and HydroPeptide facials — all curated to deliver true restoration in a light-filled, luxury environment that feels nothing like a typical day spa.",
             ["Remedial Massage 60min $115", "Relaxation 60min $105", "Couples $230", "Infrared Sauna $55"]),
 

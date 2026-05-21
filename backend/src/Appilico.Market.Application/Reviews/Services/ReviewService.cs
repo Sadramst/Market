@@ -28,10 +28,20 @@ public class CreateReviewRequest
     public string? Comment { get; set; }
 }
 
+public class CreatePublicReviewRequest
+{
+    public Guid ProviderId { get; set; }
+    public string AuthorName { get; set; } = string.Empty;
+    public int Rating { get; set; }
+    public string Comment { get; set; } = string.Empty;
+    public string? Source { get; set; }
+}
+
 public interface IReviewService
 {
     Task<ApiResponse<PaginatedResponse<ReviewDto>>> GetByProviderAsync(Guid providerId, int page, int pageSize);
     Task<ApiResponse<ReviewDto>> CreateAsync(string userId, CreateReviewRequest request);
+    Task<ApiResponse<ReviewDto>> CreatePublicAsync(CreatePublicReviewRequest request);
     Task<ApiResponse<ReviewDto>> ReplyAsync(Guid reviewId, string userId, string reply);
     Task<ApiResponse<ReviewDto>> AdminUpdateStatusAsync(Guid reviewId, ReviewStatus status);
 }
@@ -92,6 +102,48 @@ public class ReviewService : IReviewService
         await UpdateProviderRating(request.ProviderId);
 
         return ApiResponse<ReviewDto>.Ok(MapToDto(review), "Review submitted for moderation");
+    }
+
+    public async Task<ApiResponse<ReviewDto>> CreatePublicAsync(CreatePublicReviewRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.AuthorName) || request.AuthorName.Trim().Length < 2)
+            return ApiResponse<ReviewDto>.Fail("Name is required (minimum 2 characters)");
+
+        if (string.IsNullOrWhiteSpace(request.Comment) || request.Comment.Trim().Length < 20)
+            return ApiResponse<ReviewDto>.Fail("Review must be at least 20 characters");
+
+        if (request.Comment.Length > 500)
+            return ApiResponse<ReviewDto>.Fail("Review must be 500 characters or less");
+
+        if (request.Rating < 1 || request.Rating > 5)
+            return ApiResponse<ReviewDto>.Fail("Rating must be between 1 and 5");
+
+        var provider = await _context.Providers.FindAsync(request.ProviderId);
+        if (provider == null)
+            return ApiResponse<ReviewDto>.Fail("Provider not found");
+
+        // Auto-approve: 3-5 stars, >30 chars, no URLs
+        var hasUrl = request.Comment.Contains("http://") || request.Comment.Contains("https://") || request.Comment.Contains("www.");
+        var autoApprove = request.Rating >= 3 && request.Comment.Trim().Split(' ').Length > 5 && !hasUrl;
+
+        // Create a system user for anonymous review
+        var review = new Review
+        {
+            UserId = "anonymous",
+            ProviderId = request.ProviderId,
+            Rating = Math.Clamp(request.Rating, 1, 5),
+            Title = request.AuthorName.Trim(),
+            Comment = request.Comment.Trim(),
+            Status = autoApprove ? ReviewStatus.Approved : ReviewStatus.Pending,
+        };
+
+        _context.Reviews.Add(review);
+        await _context.SaveChangesAsync();
+
+        if (autoApprove)
+            await UpdateProviderRating(request.ProviderId);
+
+        return ApiResponse<ReviewDto>.Ok(MapToDto(review), "Thank you! Your review has been submitted.");
     }
 
     public async Task<ApiResponse<ReviewDto>> ReplyAsync(Guid reviewId, string userId, string reply)

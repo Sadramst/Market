@@ -49,7 +49,6 @@ export const PERTH_SUBURBS = [
   { name: "Morley", slug: "morley", postCode: "6062" },
   { name: "Mosman Park", slug: "mosman-park", postCode: "6012" },
   { name: "Mount Hawthorn", slug: "mount-hawthorn", postCode: "6016" },
-  { name: "Mount Hawthorn", slug: "mount-hawthorn", postCode: "6016" },
   { name: "Mount Lawley", slug: "mount-lawley", postCode: "6050" },
   { name: "Mundaring", slug: "mundaring", postCode: "6073" },
   { name: "Nedlands", slug: "nedlands", postCode: "6009" },

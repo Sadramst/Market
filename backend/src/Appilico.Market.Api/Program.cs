@@ -4,6 +4,7 @@ using Appilico.Market.Application.Auth.Services;
 using Appilico.Market.Application.Categories.Services;
 using Appilico.Market.Application.Providers.Services;
 using Appilico.Market.Application.Reviews.Services;
+using Appilico.Market.Application.Enquiries.Services;
 using Appilico.Market.Application.Social.Services;
 using Appilico.Market.Application.Validators;
 using Appilico.Market.Domain.Auth;
@@ -102,6 +103,7 @@ builder.Services.AddScoped<IProviderService, ProviderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ISocialService, SocialService>();
+builder.Services.AddScoped<IEnquiryService, EnquiryService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // --- Infrastructure Services ---

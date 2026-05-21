@@ -35,19 +35,25 @@ export default async function SuburbsPage() {
   const totalWithProviders = suburbs.filter((s) => s.providerCount > 0).length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Suburbs" }]} />
 
-      <div className="mb-12">
-        <span className="text-[11px] font-semibold text-primary uppercase tracking-[0.2em]">Local</span>
-        <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900 mt-2">Perth Suburbs</h1>
-        <p className="text-gray-400 mt-2 text-[15px]">{suburbs.length} suburbs &middot; {totalWithProviders} with active providers</p>
+      <div className="mb-12 mt-6">
+        <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>
+          Perth <em>Suburbs</em>
+        </h1>
+        <p className="mt-2 text-[15px] font-light" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+          {suburbs.length} suburbs · {totalWithProviders} with active providers
+        </p>
       </div>
 
       {/* Letter navigation */}
-      <div className="flex flex-wrap gap-1 mb-12 p-4 bg-white rounded-2xl border border-gray-100/80">
+      <div className="flex flex-wrap gap-1 mb-12 p-4" style={{ background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border)' }}>
         {sortedLetters.map((letter) => (
-          <a key={letter} href={`#${letter}`} className="w-9 h-9 flex items-center justify-center rounded-xl text-[13px] font-semibold text-gray-400 hover:text-primary hover:bg-blush transition-all">
+          <a key={letter} href={`#${letter}`}
+            className="w-9 h-9 flex items-center justify-center text-[13px] font-semibold transition-all hover:text-white"
+            style={{ color: 'var(--text-muted)', borderRadius: '4px' }}
+          >
             {letter}
           </a>
         ))}
@@ -55,25 +61,24 @@ export default async function SuburbsPage() {
 
       {sortedLetters.map((letter) => (
         <div key={letter} id={letter} className="mb-10">
-          <h2 className="text-[13px] font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
-            <span className="w-7 h-7 bg-blush rounded-lg flex items-center justify-center text-primary text-[11px] font-bold">{letter}</span>
+          <h2 className="text-[14px] font-semibold mb-4 pb-2 flex items-center gap-2" style={{ borderBottom: '1px solid var(--border)', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+            <span className="w-7 h-7 flex items-center justify-center text-[12px] font-bold" style={{ background: 'var(--bg-secondary)', borderRadius: '4px', color: 'var(--brand-rose)' }}>{letter}</span>
             {letter}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
             {grouped[letter].map((suburb) => (
-              <Link
-                key={suburb.slug}
-                href={`/${suburb.slug}`}
-                className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-gray-100/80 hover:border-primary/20 transition-all group hover:shadow-sm"
+              <Link key={suburb.slug} href={`/${suburb.slug}`}
+                className="flex items-center justify-between p-3.5 group transition-all"
+                style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}
               >
                 <div>
-                  <span className="text-[13px] font-medium text-gray-700 group-hover:text-primary transition-colors">{suburb.name}</span>
-                  <span className="block text-[11px] text-gray-300">{suburb.postCode}</span>
+                  <span className="text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>{suburb.name}</span>
+                  <span className="block text-[11px]" style={{ color: 'var(--text-muted)' }}>{suburb.postCode}</span>
                 </div>
                 {suburb.providerCount > 0 ? (
-                  <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full font-medium">{suburb.providerCount}</span>
+                  <span className="text-[10px] px-2 py-0.5 font-medium" style={{ background: 'var(--bg-secondary)', borderRadius: '50px', color: 'var(--text-muted)' }}>{suburb.providerCount}</span>
                 ) : (
-                  <span className="text-[10px] text-primary/50 bg-primary/5 px-2 py-0.5 rounded-full font-medium">New</span>
+                  <span className="text-[10px] px-2 py-0.5 font-medium" style={{ background: 'rgba(200,115,122,0.08)', borderRadius: '50px', color: 'var(--brand-rose)' }}>New</span>
                 )}
               </Link>
             ))}

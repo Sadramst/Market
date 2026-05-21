@@ -19,41 +19,34 @@ export default async function AboutPage() {
   const suburbCount = suburbsData?.length ?? 80;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       {/* Hero */}
       <section className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-rose-50 border border-rose-100 rounded-full text-sm text-rose-600 mb-6">
-          <span className="w-2 h-2 bg-primary rounded-full" />
+        <p className="text-[12px] font-medium uppercase tracking-[0.15em] mb-4" style={{ fontFamily: 'var(--font-body)', color: 'var(--brand-rose)' }}>
           Est. 2026 · Perth, Western Australia
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-display font-bold text-gray-900 mb-4 leading-tight">
-          Perth&apos;s Premier<br /><span className="gradient-text">Beauty Marketplace</span>
+        </p>
+        <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400 }}>
+          Perth&apos;s Premier<br /><em style={{ color: 'var(--brand-rose)' }}>Beauty Marketplace</em>
         </h1>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-[17px] font-light max-w-2xl mx-auto mt-4 leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
           Connecting customers with trusted beauty professionals across Western Australia.
         </p>
       </section>
 
       {/* Our Story */}
       <section className="mb-16">
-        <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Our Story</h2>
-        <div className="prose prose-lg text-gray-600 max-w-none">
-          <p>
-            Appilico was founded in Perth, Western Australia to help locals discover exceptional beauty professionals in their suburb. We believe everyone deserves access to trusted, reviewed, and easy-to-find beauty services.
-          </p>
-          <p>
-            Perth&apos;s beauty industry is thriving — with talented professionals working across dozens of suburbs, from Subiaco to Fremantle, Joondalup to Scarborough. But finding the right provider has always been a challenge. Scrolling through endless social media posts, asking friends for recommendations, or simply hoping for the best isn&apos;t good enough.
-          </p>
-          <p>
-            That&apos;s why we built Appilico — a single place where you can discover, compare, and connect with beauty professionals based on real reviews, verified portfolios, and transparent pricing.
-          </p>
+        <h2 className="mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: 600 }}>Our Story</h2>
+        <div className="space-y-4 text-[16px] font-light leading-[1.8]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+          <p>Appilico was founded in Perth, Western Australia to help locals discover exceptional beauty professionals in their suburb. We believe everyone deserves access to trusted, reviewed, and easy-to-find beauty services.</p>
+          <p>Perth&apos;s beauty industry is thriving — with talented professionals working across dozens of suburbs, from Subiaco to Fremantle, Joondalup to Scarborough. But finding the right provider has always been a challenge.</p>
+          <p>That&apos;s why we built Appilico — a single place where you can discover, compare, and connect with beauty professionals based on real reviews, verified portfolios, and transparent pricing.</p>
         </div>
       </section>
 
       {/* Mission */}
-      <section className="mb-16 bg-gradient-to-br from-rose-50 to-pink-50/50 rounded-2xl p-8 sm:p-10 border border-rose-100/50">
-        <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Our Mission</h2>
-        <p className="text-lg text-gray-600 leading-relaxed">
+      <section className="mb-16 p-8 sm:p-10" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+        <h2 className="mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: 600 }}>Our Mission</h2>
+        <p className="text-[17px] font-light leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
           To connect Perth&apos;s beauty community — making it effortless for customers to find their perfect beauty professional, and for providers to grow their business through visibility, reviews, and genuine connections.
         </p>
       </section>
@@ -61,43 +54,38 @@ export default async function AboutPage() {
       {/* Stats */}
       <section className="mb-16">
         <div className="grid grid-cols-3 gap-6">
-          <div className="text-center p-6 bg-white rounded-2xl border border-gray-100">
-            <div className="text-3xl font-display font-bold gradient-text">{providerCount}+</div>
-            <div className="text-sm text-gray-400 mt-1">Beauty Professionals</div>
-          </div>
-          <div className="text-center p-6 bg-white rounded-2xl border border-gray-100">
-            <div className="text-3xl font-display font-bold gradient-text">{suburbCount}+</div>
-            <div className="text-sm text-gray-400 mt-1">Perth Suburbs</div>
-          </div>
-          <div className="text-center p-6 bg-white rounded-2xl border border-gray-100">
-            <div className="text-3xl font-display font-bold gradient-text">9</div>
-            <div className="text-sm text-gray-400 mt-1">Service Categories</div>
-          </div>
+          {[
+            { value: `${providerCount}+`, label: "Beauty Professionals" },
+            { value: `${suburbCount}+`, label: "Perth Suburbs" },
+            { value: "9", label: "Service Categories" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+              <div className="text-[28px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--brand-rose)' }}>{stat.value}</div>
+              <div className="text-[13px] mt-1" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>{stat.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Built in Perth */}
       <section className="mb-16">
-        <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Built in Perth, for Perth</h2>
-        <p className="text-gray-600 leading-relaxed">
+        <h2 className="mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: 600 }}>Built in Perth, for Perth</h2>
+        <p className="text-[16px] font-light leading-[1.8]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
           We&apos;re a Perth-based team that understands the local beauty scene. Every feature we build is designed with Perth professionals and customers in mind — from suburb-specific search to local review verification. We&apos;re committed to supporting the growth of Perth&apos;s beauty industry.
         </p>
       </section>
 
       {/* CTA */}
-      <section className="text-center bg-gray-900 rounded-2xl p-10 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, rgba(232,120,138,0.4) 0%, transparent 50%)" }} />
-        <div className="relative">
-          <h2 className="text-2xl font-display font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto">Whether you&apos;re looking for beauty services or want to list your business, we&apos;re here for you.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/search" className="px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark transition-all">
-              Browse Providers
-            </Link>
-            <Link href="/join" className="px-6 py-3 border border-gray-600 text-gray-300 rounded-full font-medium hover:border-gray-500 hover:text-white transition-colors">
-              List Your Business
-            </Link>
-          </div>
+      <section className="text-center p-10 relative overflow-hidden" style={{ background: 'var(--gradient-dark)', borderRadius: '8px' }}>
+        <h2 className="mb-4" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-on-dark)', fontSize: '1.5rem', fontWeight: 400 }}>Ready to Get Started?</h2>
+        <p className="mb-8 max-w-md mx-auto text-[15px] font-light" style={{ fontFamily: 'var(--font-body)', color: 'rgba(250,247,244,0.7)' }}>Whether you&apos;re looking for beauty services or want to list your business, we&apos;re here for you.</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/search" className="px-6 py-3 text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}>
+            Browse Providers
+          </Link>
+          <Link href="/join" className="px-6 py-3 text-[14px] font-medium" style={{ border: '1px solid var(--brand-gold)', color: 'var(--brand-gold)', borderRadius: '2px' }}>
+            List Your Business
+          </Link>
         </div>
       </section>
     </div>

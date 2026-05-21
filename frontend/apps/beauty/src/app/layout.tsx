@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { DM_Sans, DM_Serif_Display, Cormorant_Garamond } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Analytics } from "@/components/Analytics";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", weight: ["300", "400", "500", "600"] });
+const dmSerif = DM_Serif_Display({ subsets: ["latin"], variable: "--font-dm-serif", weight: "400", style: ["normal", "italic"] });
+const cormorant = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-cormorant", weight: ["300", "400", "500", "600"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   title: {
@@ -42,8 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-AU" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="font-sans min-h-screen antialiased flex flex-col bg-white text-gray-900">
+    <html lang="en-AU" className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable}`}>
+      <body className="font-sans min-h-screen antialiased flex flex-col" style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
         <Analytics />
         <Header />
         <main className="flex-1">{children}</main>

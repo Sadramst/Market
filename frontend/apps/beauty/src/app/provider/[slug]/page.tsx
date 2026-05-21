@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { providerJsonLd } from "@/lib/seo";
-import { Breadcrumbs, StarRating, EmptyState } from "@/components/ui";
+import { Breadcrumbs, StarRating } from "@/components/ui";
 
 type Provider = {
   id: string;
@@ -80,105 +80,96 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <Breadcrumbs items={[
-          { label: "Home", href: "/" },
-          { label: "Search", href: "/search" },
-          { label: provider.businessName },
-        ]} />
+      {/* Gradient Banner */}
+      <div className="relative h-64" style={{ background: 'var(--gradient-rose)' }}>
+        {provider.coverImageUrl && (
+          <img src={provider.coverImageUrl} alt="" className="w-full h-full object-cover" />
+        )}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,20,16,0.3), transparent)' }} />
+      </div>
 
-        {/* Header */}
-        <div className="bg-white rounded-2xl border border-gray-100/80 overflow-hidden mb-8">
-          <div className="h-56 bg-gradient-to-br from-blush via-pink-50/50 to-cream relative">
-            {provider.coverImageUrl && (
-              <img src={provider.coverImageUrl} alt="" className="w-full h-full object-cover" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
-          </div>
-          <div className="p-6 sm:p-8 -mt-14 relative">
-            <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-              <div className="w-28 h-28 rounded-2xl bg-white border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
-                {provider.logoUrl ? (
-                  <img src={provider.logoUrl} alt={provider.businessName} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-blush to-cream flex items-center justify-center">
-                    <span className="text-3xl font-display gradient-text font-bold">{provider.businessName.charAt(0)}</span>
-                  </div>
-                )}
-              </div>
-              <div className="flex-1">
-                <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900">{provider.businessName}</h1>
-                {provider.tagline && <p className="text-[15px] text-gray-400 mt-1">{provider.tagline}</p>}
-                <div className="flex flex-wrap items-center gap-4 mt-3">
-                  <div className="flex items-center gap-2">
-                    <StarRating rating={provider.averageRating} size="md" />
-                    <span className="text-[13px] text-gray-400">
-                      {provider.averageRating.toFixed(1)} ({provider.totalReviews} review{provider.totalReviews !== 1 ? "s" : ""})
-                    </span>
-                  </div>
-                  {provider.city && (
-                    <span className="text-[13px] text-gray-400 flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
-                      {provider.city}{provider.state ? `, ${provider.state}` : ""}
-                    </span>
-                  )}
-                  <span className="text-[13px] text-gray-400 flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                    {provider.followerCount} followers
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative pb-16">
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Search", href: "/search" }, { label: provider.businessName }]} />
+
+        {/* Profile Header */}
+        <div className="p-6 sm:p-8" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: 'var(--shadow-md)' }}>
+          <div className="flex flex-col sm:flex-row sm:items-end gap-5">
+            <div className="w-28 h-28 overflow-hidden flex-shrink-0" style={{ borderRadius: '12px', border: '4px solid var(--bg-card)', boxShadow: 'var(--shadow-md)' }}>
+              {provider.logoUrl ? (
+                <img src={provider.logoUrl} alt={provider.businessName} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
+                  <span className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-heading)' }}>{provider.businessName.charAt(0)}</span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400 }}>{provider.businessName}</h1>
+              {provider.tagline && <p className="text-[15px] font-light mt-1" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{provider.tagline}</p>}
+              <div className="flex flex-wrap items-center gap-4 mt-3">
+                <div className="flex items-center gap-2">
+                  <StarRating rating={provider.averageRating} size="md" />
+                  <span className="text-[13px]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>
+                    {provider.averageRating.toFixed(1)} ({provider.totalReviews} review{provider.totalReviews !== 1 ? "s" : ""})
                   </span>
                 </div>
+                {provider.city && (
+                  <span className="text-[13px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                    📍 {provider.city}{provider.state ? `, ${provider.state}` : ""}
+                  </span>
+                )}
+                {provider.followerCount > 0 && (
+                  <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>❤️ {provider.followerCount} followers</span>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* Main */}
           <div className="lg:col-span-2 space-y-8">
             {/* About */}
             {provider.description && (
-              <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
-                <h2 className="text-lg font-display font-bold text-gray-900 mb-3">About</h2>
-                <p className="text-[14px] text-gray-400 whitespace-pre-line leading-relaxed">{provider.description}</p>
+              <section className="p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+                <h2 className="text-[18px] mb-3" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>About</h2>
+                <p className="text-[14px] font-light whitespace-pre-line leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{provider.description}</p>
               </section>
             )}
 
             {/* Services */}
-            <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
-              <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Services</h2>
+            <section className="p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+              <h2 className="text-[18px] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Services</h2>
               {(provider.services?.length ?? 0) > 0 ? (
-                <div className="divide-y divide-gray-50">
+                <div>
                   {provider.services.map((svc) => (
-                    <div key={svc.id} className="py-4 flex items-start justify-between gap-4 group">
+                    <div key={svc.id} className="py-4 flex items-start justify-between gap-4" style={{ borderBottom: '1px solid var(--border)' }}>
                       <div>
-                        <h3 className="text-[15px] font-medium text-gray-900">{svc.name}</h3>
-                        {svc.description && <p className="text-[13px] text-gray-400 mt-1">{svc.description}</p>}
-                        <span className="text-[11px] text-gray-300 mt-1.5 flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                          {svc.durationMinutes} min
-                        </span>
+                        <h3 className="text-[15px] font-medium" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>{svc.name}</h3>
+                        {svc.description && <p className="text-[13px] font-light mt-1" style={{ color: 'var(--text-secondary)' }}>{svc.description}</p>}
+                        <span className="text-[11px] mt-1.5 inline-block" style={{ color: 'var(--text-muted)' }}>⏱ {svc.durationMinutes} min</span>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="font-semibold text-gray-900 text-[15px]">
-                          ${svc.priceFrom}
-                          {svc.priceTo && svc.priceTo !== svc.priceFrom ? <span className="text-gray-400 font-normal"> – ${svc.priceTo}</span> : ""}
+                        <span className="text-[15px] font-semibold" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+                          ${svc.priceFrom}{svc.priceTo && svc.priceTo !== svc.priceFrom ? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}> – ${svc.priceTo}</span> : ""}
                         </span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-[13px]">No services listed yet.</p>
+                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>No services listed yet.</p>
               )}
             </section>
 
             {/* Gallery */}
             {(provider.galleryImages?.length ?? 0) > 0 && (
-              <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
-                <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Gallery</h2>
+              <section className="p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+                <h2 className="text-[18px] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {provider.galleryImages.map((img) => (
-                    <div key={img.id} className="aspect-square rounded-xl overflow-hidden bg-gray-50 group">
+                    <div key={img.id} className="aspect-square overflow-hidden group" style={{ borderRadius: '8px', background: 'var(--bg-secondary)' }}>
                       <img
                         src={img.thumbnailUrl || img.imageUrl}
                         alt={img.altText || provider.businessName}
@@ -192,81 +183,78 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             )}
 
             {/* Reviews */}
-            <section className="bg-white rounded-2xl border border-gray-100/80 p-6">
-              <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Reviews</h2>
+            <section className="p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+              <h2 className="text-[18px] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Reviews</h2>
               {reviews.length > 0 ? (
                 <div className="space-y-6">
                   {reviews.map((review) => (
-                    <div key={review.id} className="border-b border-gray-50 pb-6 last:border-0 last:pb-0">
+                    <div key={review.id} className="pb-6" style={{ borderBottom: '1px solid var(--border)' }}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-br from-primary/15 to-primary/5 rounded-full flex items-center justify-center text-[13px] font-semibold text-primary">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)' }}>
                             {(review.userName ?? 'U').charAt(0)}
                           </div>
                           <div>
-                            <p className="text-[13px] font-medium text-gray-900">{review.userName ?? 'Anonymous'}</p>
-                            <p className="text-[11px] text-gray-300">{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
+                            <p className="text-[14px] font-medium" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>{review.userName ?? 'Anonymous'}</p>
+                            <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{new Date(review.createdAt).toLocaleDateString("en-AU")}</p>
                           </div>
                         </div>
                         <StarRating rating={review.rating} />
                       </div>
-                      <p className="text-[13px] text-gray-500 mt-3 leading-relaxed">{review.comment}</p>
+                      <p className="text-[14px] font-light mt-3 leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{review.comment}</p>
                       {review.providerReply && (
-                        <div className="mt-3 ml-6 p-3 bg-blush/50 rounded-xl">
-                          <p className="text-[11px] font-medium text-gray-500 mb-1">Response from {provider.businessName}</p>
-                          <p className="text-[13px] text-gray-600">{review.providerReply}</p>
+                        <div className="mt-3 ml-6 p-3" style={{ background: 'var(--bg-secondary)', borderRadius: '8px' }}>
+                          <p className="text-[11px] font-medium mb-1" style={{ color: 'var(--text-muted)' }}>Response from {provider.businessName}</p>
+                          <p className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>{review.providerReply}</p>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-[13px]">No reviews yet. Be the first to leave a review!</p>
+                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>No reviews yet. Be the first to leave a review!</p>
               )}
-              {/* TODO: Write review form (requires auth) */}
             </section>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Contact Info */}
-            <div className="bg-white rounded-2xl border border-gray-100/80 p-6 sticky top-24">
-              <h3 className="text-lg font-display font-bold text-gray-900 mb-4">Contact</h3>
-              <div className="space-y-3 text-[13px]">
+            <div className="p-6 sticky top-24" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+              <h3 className="text-[18px] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Contact</h3>
+              <div className="space-y-3 text-[13px]" style={{ fontFamily: 'var(--font-body)' }}>
                 {provider.address && (
                   <div className="flex items-start gap-3">
-                    <svg className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
-                    <span className="text-gray-500">{provider.address}</span>
+                    <span className="text-[16px] shrink-0 mt-0.5">📍</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{provider.address}</span>
                   </div>
                 )}
                 {provider.phone && (
                   <div className="flex items-center gap-3">
-                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                    <a href={`tel:${provider.phone}`} className="text-primary hover:underline">{provider.phone}</a>
+                    <span className="text-[16px] shrink-0">📞</span>
+                    <a href={`tel:${provider.phone}`} className="hover:underline" style={{ color: 'var(--brand-rose)' }}>{provider.phone}</a>
                   </div>
                 )}
                 {provider.email && (
                   <div className="flex items-center gap-3">
-                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    <a href={`mailto:${provider.email}`} className="text-primary hover:underline">{provider.email}</a>
+                    <span className="text-[16px] shrink-0">✉️</span>
+                    <a href={`mailto:${provider.email}`} className="hover:underline" style={{ color: 'var(--brand-rose)' }}>{provider.email}</a>
                   </div>
                 )}
                 {provider.website && (
                   <div className="flex items-center gap-3">
-                    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                    <a href={provider.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{provider.website.replace(/^https?:\/\//, "")}</a>
+                    <span className="text-[16px] shrink-0">🌐</span>
+                    <a href={provider.website} target="_blank" rel="noopener noreferrer" className="hover:underline truncate" style={{ color: 'var(--brand-rose)' }}>{provider.website.replace(/^https?:\/\//, "")}</a>
                   </div>
                 )}
                 {provider.instagramUrl && (
-                  <div className="flex items-start gap-3">
-                    <svg className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <a href={provider.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{provider.instagramUrl.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@')}</a>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[16px] shrink-0">📷</span>
+                    <a href={provider.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:underline truncate" style={{ color: 'var(--brand-rose)' }}>{provider.instagramUrl.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@')}</a>
                   </div>
                 )}
               </div>
 
-              {/* TODO: Booking/Contact CTA button */}
-              <button className="w-full mt-6 px-4 py-3.5 bg-gray-900 text-white rounded-xl text-[15px] font-semibold hover:bg-gray-800 transition-all active:scale-[0.98]">
+              <button className="w-full mt-6 px-4 py-3.5 text-[14px] font-medium text-white transition-all" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
                 Contact Provider
               </button>
             </div>
@@ -274,11 +262,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
 
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(providerJsonLd(provider)) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(providerJsonLd(provider)) }} />
     </>
   );
 }

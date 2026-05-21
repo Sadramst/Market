@@ -9,11 +9,11 @@ export const metadata: Metadata = generatePageMeta({
 
 export default function TermsPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">Terms of Service</h1>
-      <p className="text-sm text-gray-400 mb-10">Effective Date: January 2026 · Last Updated: May 2026</p>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>Terms of Service</h1>
+      <p className="text-[13px] mb-10" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>Effective Date: January 2026 · Last Updated: May 2026</p>
 
-      <div className="prose prose-gray max-w-none prose-headings:font-display prose-headings:text-gray-900 prose-a:text-primary">
+      <div className="prose prose-gray max-w-none" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)', lineHeight: 1.75 }}>
         <p>
           Welcome to Appilico Beauty (&ldquo;Platform&rdquo;), operated by Appilico Pty Ltd (&ldquo;Appilico&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;). By accessing or using our Platform at beauty.appilico.com.au, you agree to be bound by these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree, please do not use the Platform.
         </p>

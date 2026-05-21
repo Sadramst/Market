@@ -49,7 +49,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Breadcrumbs items={[
           { label: "Home", href: "/" },
           { label: suburb.name, href: `/${suburb.slug}` },
@@ -58,21 +58,21 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
 
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blush to-primary-light/50 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-secondary)' }}>
               <span className="text-xl">{cat.icon}</span>
             </div>
             <div>
-              <span className="text-[11px] font-semibold text-primary uppercase tracking-[0.2em]">{suburb.name}</span>
-              <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900">
-                {cat.displayName} in {suburb.name}
+              <p className="text-[12px] font-medium uppercase tracking-[0.15em]" style={{ fontFamily: 'var(--font-body)', color: 'var(--brand-rose)' }}>{suburb.name}</p>
+              <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>
+                <em>{cat.displayName}</em> in {suburb.name}
               </h1>
             </div>
           </div>
-          <p className="text-gray-400 text-[15px]">{totalCount} provider{totalCount !== 1 ? "s" : ""} found</p>
+          <p className="text-[15px] font-light" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{totalCount} provider{totalCount !== 1 ? "s" : ""} found</p>
         </div>
 
         {providers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {providers.map((p) => (
               <ProviderCard key={p.slug} {...p} />
             ))}

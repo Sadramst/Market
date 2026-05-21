@@ -41,7 +41,7 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Breadcrumbs items={[
           { label: "Home", href: "/" },
           { label: "Suburbs", href: "/suburbs" },
@@ -49,9 +49,11 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
         ]} />
 
         <div className="mb-12">
-          <span className="text-[11px] font-semibold text-primary uppercase tracking-[0.2em]">Local</span>
-          <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900 mt-2">Beauty Services in {suburb.name}</h1>
-          <p className="text-gray-400 mt-2 text-[15px]">{suburb.postCode}, {suburb.state}</p>
+          <p className="text-[12px] font-medium uppercase tracking-[0.15em] mb-2" style={{ fontFamily: 'var(--font-body)', color: 'var(--brand-rose)' }}>Local</p>
+          <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>
+            Beauty Services in <em>{suburb.name}</em>
+          </h1>
+          <p className="text-[15px] font-light mt-2" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{suburb.postCode}, {suburb.state}</p>
         </div>
 
         {/* Category links for this suburb */}
@@ -60,7 +62,8 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
             <Link
               key={cat.slug}
               href={`/${slug}/${cat.slug}`}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-600 rounded-xl text-[13px] font-medium border border-gray-100/80 hover:border-primary/20 hover:text-primary transition-all"
+              className="flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium transition-all"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
             >
               <span>{cat.icon}</span>
               <span>{cat.name}</span>
@@ -70,7 +73,7 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
 
         {/* Providers */}
         {providers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {providers.map((p) => (
               <ProviderCard key={p.slug} {...p} />
             ))}
@@ -85,8 +88,8 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
 
         {/* SEO Content */}
         {suburb.seoDescription && (
-          <div className="mt-16 prose prose-lg max-w-3xl text-gray-400">
-            <p>{suburb.seoDescription}</p>
+          <div className="mt-16 max-w-3xl">
+            <p className="text-[15px] font-light leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{suburb.seoDescription}</p>
           </div>
         )}
       </div>

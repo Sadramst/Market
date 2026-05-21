@@ -35,10 +35,11 @@
   --brand-rose-dark: #A35560;
   --brand-gold: #C9A96E;
   --brand-gold-light: #E8D5B0;
+  --brand-gold-dark: #8A6A36;
   --brand-mauve: #9B7B84;
 
   /* Text */
-  --text-primary: #1C1410;
+  --text-primary: #8A6A36;
   --text-secondary: #6B5B52;
   --text-muted: #A89890;
   --text-on-dark: #FAF7F4;
@@ -66,7 +67,7 @@
 
 body {
   background-color: var(--bg-primary);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   font-family: var(--font-body);
 }
 

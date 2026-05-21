@@ -44,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-AU" className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable}`}>
-      <body className="font-sans min-h-screen antialiased flex flex-col" style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <body className="font-sans min-h-screen antialiased flex flex-col" style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>
         <Analytics />
         <Header />
         <main className="flex-1">{children}</main>

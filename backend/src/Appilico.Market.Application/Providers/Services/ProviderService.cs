@@ -505,6 +505,7 @@ public class ProviderService : IProviderService
         State = p.State,
         Tagline = p.Tagline,
         IsClaimed = p.IsClaimed,
+        HasRealData = p.HasRealData,
         Categories = p.Services?.Select(s => s.Category?.Name ?? "").Distinct().Where(n => n != "").ToList() ?? [],
         PrimaryImageUrl = p.GalleryImages?.FirstOrDefault(g => g.IsPrimary)?.ImageUrl
             ?? p.GalleryImages?.FirstOrDefault()?.ImageUrl,

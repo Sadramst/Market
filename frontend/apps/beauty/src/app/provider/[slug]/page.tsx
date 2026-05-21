@@ -132,7 +132,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Claim This Listing Banner — only for unclaimed real-data providers */}
-        {!provider.isClaimed && (
+        {!provider.isClaimed && provider.hasRealData && (
           <div className="mt-6 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={{ background: 'linear-gradient(135deg, #1C1410 0%, #2a1f1a 100%)', borderRadius: '8px', border: '1px solid rgba(201,169,110,0.2)' }}>
             <div>
               <h3 className="text-[16px] font-medium text-white" style={{ fontFamily: 'var(--font-heading)' }}>Is this your business?</h3>

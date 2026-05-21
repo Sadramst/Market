@@ -4,6 +4,7 @@ using Appilico.Market.Api.Middleware;
 using Appilico.Market.Application.Admin.Services;
 using Appilico.Market.Application.Auth.Services;
 using Appilico.Market.Application.Categories.Services;
+using Appilico.Market.Application.Providers.Importing;
 using Appilico.Market.Application.Providers.Services;
 using Appilico.Market.Application.Reports.Services;
 using Appilico.Market.Application.Reviews.Services;
@@ -112,6 +113,9 @@ builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IAppSettingService, AppSettingService>();
+builder.Services.AddScoped<IProviderImportParser, CsvProviderImportParser>();
+builder.Services.AddScoped<IProviderImportValidator, ProviderImportValidator>();
+builder.Services.AddScoped<IProviderImportService, ProviderImportService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // --- Infrastructure Services ---

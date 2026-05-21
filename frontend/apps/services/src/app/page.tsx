@@ -1,28 +1,12 @@
 import Link from "next/link";
-
-const itCategories = [
-  { name: "Web Development", desc: "Websites, web apps & portals", icon: "🌐", slug: "web-development" },
-  { name: "Mobile Apps", desc: "iOS, Android & cross-platform", icon: "📱", slug: "mobile-apps" },
-  { name: "Cloud & DevOps", desc: "AWS, Azure, CI/CD pipelines", icon: "☁️", slug: "cloud-devops" },
-  { name: "Cybersecurity", desc: "Audits, pen testing & compliance", icon: "🔒", slug: "cybersecurity" },
-  { name: "Data & Analytics", desc: "BI, dashboards & data pipelines", icon: "📊", slug: "data-analytics" },
-  { name: "IT Support", desc: "Managed services & helpdesk", icon: "🖥️", slug: "it-support" },
-  { name: "AI & ML", desc: "Machine learning & automation", icon: "🤖", slug: "ai-ml" },
-  { name: "UI/UX Design", desc: "User research & interface design", icon: "🎨", slug: "ui-ux-design" },
-  { name: "Consulting", desc: "Strategy, architecture & advisory", icon: "💼", slug: "consulting" },
-  { name: "Networking", desc: "Infrastructure & connectivity", icon: "🔌", slug: "networking" },
-  { name: "E-Commerce", desc: "Online stores & marketplaces", icon: "🛒", slug: "ecommerce" },
-  { name: "Digital Marketing", desc: "SEO, PPC & social media", icon: "📣", slug: "digital-marketing" },
-];
+import { serviceCategories } from "../lib/serviceCategories";
 
 export default function HomePage() {
   return (
     <>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-cyan-50/50 to-white pointer-events-none" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,#eef6ff_0%,#ffffff_58%,#eefdfb_100%)] pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto text-center py-24 px-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full text-sm text-blue-600 font-medium mb-6 animate-fade-in-up">
@@ -61,14 +45,14 @@ export default function HomePage() {
           <p className="text-gray-400 mt-2">Find the right tech professional for your project</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
-          {itCategories.map((cat, i) => (
+          {serviceCategories.map((cat, i) => (
             <Link
               key={cat.slug}
               href={`/category/${cat.slug}`}
               className="service-card flex flex-col items-center p-5 rounded-2xl bg-white border border-gray-100 hover:border-blue-200 group animate-fade-in-up"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <span className="text-3xl mb-3 group-hover:scale-110 transition-transform">{cat.icon}</span>
+              <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-sm font-bold text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">{cat.short}</span>
               <span className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 text-center transition-colors">{cat.name}</span>
               <span className="text-xs text-gray-400 text-center mt-1">{cat.desc}</span>
             </Link>

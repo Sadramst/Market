@@ -59,6 +59,7 @@ public class ProviderListDto
     public string? State { get; set; }
     public string? Tagline { get; set; }
     public bool IsClaimed { get; set; }
+    public bool HasRealData { get; set; }
     public List<string> Categories { get; set; } = [];
     public string? PrimaryImageUrl { get; set; }
     public DateTime CreatedAt { get; set; }

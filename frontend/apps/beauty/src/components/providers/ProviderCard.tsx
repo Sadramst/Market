@@ -12,6 +12,8 @@ type ProviderCardProps = {
   logoUrl?: string;
   categories?: string[];
   priceFrom?: number;
+  isVerified?: boolean;
+  hasRealData?: boolean;
 };
 
 function StarIcon({ className }: { className?: string }) {
@@ -31,6 +33,8 @@ export function ProviderCard({
   totalReviews,
   logoUrl,
   categories,
+  isVerified,
+  hasRealData,
 }: ProviderCardProps) {
   const categorySlug = categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || '';
   const gradientMap: Record<string, string> = {
@@ -45,6 +49,7 @@ export function ProviderCard({
     wellness: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)',
   };
   const coverGradient = gradientMap[categorySlug] || 'linear-gradient(135deg, var(--brand-rose-light), var(--brand-rose))';
+  const trustLabel = isVerified ? "Verified" : hasRealData ? "Source checked" : "New listing";
 
   return (
     <Link
@@ -111,7 +116,7 @@ export function ProviderCard({
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <span className="text-[12px]" style={{ color: 'var(--brand-gold)' }}>✓ Verified</span>
+          <span className="text-[12px]" style={{ color: 'var(--brand-gold)' }}>{trustLabel}</span>
           <span className="text-[12px] transition-colors" style={{ color: 'var(--text-muted)' }}>
             View Profile →
           </span>

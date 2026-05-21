@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/dashboard/", "/_next/"],
+        disallow: ["/api/", "/dashboard/", "/_next/", "/claim/"],
       },
     ],
     sitemap: "https://beauty.appilico.com.au/sitemap.xml",

@@ -30,6 +30,10 @@ public class ProviderDto
     public string? LinkedInUrl { get; set; }
     public string? GitHubUrl { get; set; }
     public string? BusinessHoursJson { get; set; }
+    public bool IsClaimed { get; set; }
+    public bool HasRealData { get; set; }
+    public string? FullAddress { get; set; }
+    public string? Tagline { get; set; }
     public DateTime CreatedAt { get; set; }
     public List<ProviderServiceDto> Services { get; set; } = [];
     public List<GalleryImageDto> GalleryImages { get; set; } = [];
@@ -52,6 +56,8 @@ public class ProviderListDto
     public int FollowerCount { get; set; }
     public string? City { get; set; }
     public string? State { get; set; }
+    public string? Tagline { get; set; }
+    public bool IsClaimed { get; set; }
     public List<string> Categories { get; set; } = [];
     public string? PrimaryImageUrl { get; set; }
 }
@@ -154,4 +160,13 @@ public class ProviderSearchRequest
     public int PageSize { get; set; } = 12;
     public string? SortBy { get; set; } // "rating", "reviews", "newest", "name"
     public bool SortDescending { get; set; } = true;
+}
+
+public class ClaimListingRequest
+{
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty; // "owner", "manager", "authorized"
+    public string? Message { get; set; }
 }

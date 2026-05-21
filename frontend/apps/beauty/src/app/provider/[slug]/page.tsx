@@ -14,6 +14,7 @@ type Provider = {
   city?: string;
   state?: string;
   address?: string;
+  fullAddress?: string;
   phone?: string;
   email?: string;
   website?: string;
@@ -25,6 +26,8 @@ type Provider = {
   logoUrl?: string;
   coverImageUrl?: string;
   businessHoursJson?: string;
+  isClaimed?: boolean;
+  hasRealData?: boolean;
   services: Array<{
     id: string;
     name: string;
@@ -126,6 +129,45 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           </div>
         </div>
 
+        {/* Claim This Listing Banner — only for unclaimed real-data providers */}
+        {!provider.isClaimed && (
+          <div className="mt-6 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={{ background: 'linear-gradient(135deg, #1C1410 0%, #2a1f1a 100%)', borderRadius: '8px', border: '1px solid rgba(201,169,110,0.2)' }}>
+            <div>
+              <h3 className="text-[16px] font-medium text-white" style={{ fontFamily: 'var(--font-heading)' }}>Is this your business?</h3>
+              <p className="text-[13px] font-light mt-1" style={{ fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.7)' }}>Claim this listing to update your details, respond to reviews, and unlock premium features.</p>
+            </div>
+            <Link href={`/claim/${provider.slug}`} className="shrink-0 px-6 py-3 text-[13px] font-medium text-white transition-all hover:opacity-90" style={{ background: 'var(--brand-gold)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
+              Claim This Listing
+            </Link>
+          </div>
+        )}
+
+        {/* External Links Bar */}
+        {(provider.website || provider.instagramUrl || provider.facebookUrl || provider.phone) && (
+          <div className="mt-4 flex flex-wrap gap-3">
+            {provider.website && (
+              <a href={provider.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-medium transition-all hover:opacity-80" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+                🌐 Visit Website
+              </a>
+            )}
+            {provider.instagramUrl && (
+              <a href={provider.instagramUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-medium transition-all hover:opacity-80" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+                📷 Instagram
+              </a>
+            )}
+            {provider.facebookUrl && (
+              <a href={provider.facebookUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-medium transition-all hover:opacity-80" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+                📘 Facebook
+              </a>
+            )}
+            {provider.phone && (
+              <a href={`tel:${provider.phone}`} className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-medium transition-all hover:opacity-80" style={{ background: 'var(--brand-rose)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'white' }}>
+                📞 Call Now
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* Main */}
@@ -222,10 +264,10 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             <div className="p-6 sticky top-24" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
               <h3 className="text-[18px] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Contact</h3>
               <div className="space-y-3 text-[13px]" style={{ fontFamily: 'var(--font-body)' }}>
-                {provider.address && (
+                {(provider.fullAddress || provider.address) && (
                   <div className="flex items-start gap-3">
                     <span className="text-[16px] shrink-0 mt-0.5">📍</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>{provider.address}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{provider.fullAddress || provider.address}</span>
                   </div>
                 )}
                 {provider.phone && (

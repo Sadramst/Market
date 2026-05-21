@@ -132,6 +132,22 @@ public class ProviderService : IProviderService
         });
     }
 
+    public async Task<ApiResponse<bool>> ClaimListingAsync(string slug, ClaimListingRequest request)
+    {
+        var provider = await _context.Providers.FirstOrDefaultAsync(p => p.Slug == slug);
+        if (provider == null)
+            return ApiResponse<bool>.Fail("Business not found");
+
+        if (provider.IsClaimed)
+            return ApiResponse<bool>.Fail("This listing has already been claimed");
+
+        // Store claim request as admin note for manual review
+        provider.AdminNotes = $"CLAIM REQUEST: {request.FullName} ({request.Email}, {request.Phone}) - Role: {request.Role} - Message: {request.Message ?? "N/A"} - Date: {DateTime.UtcNow:u}";
+        await _context.SaveChangesAsync();
+
+        return ApiResponse<bool>.Ok(true, "Your claim request has been submitted. Our team will verify your ownership and contact you within 2 business days.");
+    }
+
     public async Task<ApiResponse<ProviderDto>> CreateAsync(string userId, CreateProviderRequest request)
     {
         // Check if user already has a provider profile
@@ -440,6 +456,10 @@ public class ProviderService : IProviderService
         LinkedInUrl = p.LinkedInUrl,
         GitHubUrl = p.GitHubUrl,
         BusinessHoursJson = p.BusinessHoursJson,
+        IsClaimed = p.IsClaimed,
+        HasRealData = p.HasRealData,
+        FullAddress = p.FullAddress,
+        Tagline = p.Tagline,
         CreatedAt = p.CreatedAt,
         Services = p.Services?.Select(s => new ProviderServiceDto
         {
@@ -482,6 +502,8 @@ public class ProviderService : IProviderService
         FollowerCount = p.FollowerCount,
         City = p.City,
         State = p.State,
+        Tagline = p.Tagline,
+        IsClaimed = p.IsClaimed,
         Categories = p.Services?.Select(s => s.Category?.Name ?? "").Distinct().Where(n => n != "").ToList() ?? [],
         PrimaryImageUrl = p.GalleryImages?.FirstOrDefault(g => g.IsPrimary)?.ImageUrl
             ?? p.GalleryImages?.FirstOrDefault()?.ImageUrl

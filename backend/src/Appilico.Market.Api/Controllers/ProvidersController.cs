@@ -54,6 +54,15 @@ public class ProvidersController : ControllerBase
         return result.Success ? Ok(result) : NotFound(result);
     }
 
+    // --- Claim System ---
+
+    [HttpPost("{slug}/claim")]
+    public async Task<IActionResult> ClaimListing(string slug, [FromBody] ClaimListingRequest request)
+    {
+        var result = await _providerService.ClaimListingAsync(slug, request);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     // --- Provider Owner ---
 
     [Authorize]

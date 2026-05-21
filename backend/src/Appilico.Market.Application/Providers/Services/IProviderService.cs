@@ -10,6 +10,9 @@ public interface IProviderService
     Task<ApiResponse<ProviderDto>> GetByIdAsync(Guid id);
     Task<ApiResponse<PaginatedResponse<ProviderListDto>>> SearchAsync(ProviderSearchRequest request);
 
+    // Claim
+    Task<ApiResponse<bool>> ClaimListingAsync(string slug, ClaimListingRequest request);
+
     // Provider owner
     Task<ApiResponse<ProviderDto>> CreateAsync(string userId, CreateProviderRequest request);
     Task<ApiResponse<ProviderDto>> UpdateAsync(Guid providerId, string userId, UpdateProviderRequest request);

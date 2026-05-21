@@ -31,6 +31,7 @@ public static partial class DatabaseSeeder
         await SeedMissingSuburbs(context);
         await SeedBeautyProviders(context, userManager);
         await SeedMoreBeautyProviders(context, userManager);
+        await SeedRealProviders(context, userManager);
     }
 
     private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
@@ -305,6 +306,15 @@ public static partial class DatabaseSeeder
             ("Yangebup", "6164"),
             ("Waikiki", "6169"),
             ("Bertram", "6167"),
+            ("East Perth", "6004"),
+            ("Shenton Park", "6008"),
+            ("Eglinton", "6034"),
+            ("Highgate", "6003"),
+            ("Aubin Grove", "6164"),
+            ("Carlisle", "6101"),
+            ("Mount Hawthorn", "6016"),
+            ("South Perth", "6151"),
+            ("Cockburn Central", "6164"),
         };
 
         foreach (var (name, postCode) in missing)

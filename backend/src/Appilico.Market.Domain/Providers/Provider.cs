@@ -46,6 +46,19 @@ public class Provider : BaseEntity
     public DateTime? ApprovedAt { get; set; }
     public string? ApprovedBy { get; set; }
 
+    // Full address (for display)
+    public string? FullAddress { get; set; }
+
+    // Claim & data provenance
+    public bool IsClaimed { get; set; } = false;
+    public string? ClaimedByUserId { get; set; }
+    public DateTime? ClaimedAt { get; set; }
+    public string DataSource { get; set; } = "seeded";
+    public bool HasRealData { get; set; } = false;
+
+    // Tagline (short marketing line)
+    public string? Tagline { get; set; }
+
     // Navigation
     public AppUser User { get; set; } = null!;
     public ICollection<ProviderService> Services { get; set; } = [];

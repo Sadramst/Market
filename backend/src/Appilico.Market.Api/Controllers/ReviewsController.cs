@@ -22,6 +22,14 @@ public class ReviewsController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]
+    [HttpGet("admin/all")]
+    public async Task<IActionResult> AdminGetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 50, [FromQuery] string? status = null)
+    {
+        var result = await _reviewService.GetAllAsync(page, pageSize, status);
+        return Ok(result);
+    }
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateReviewRequest request)
@@ -50,9 +58,11 @@ public class ReviewsController : ControllerBase
 
     [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]
     [HttpPut("admin/{id:guid}/status")]
-    public async Task<IActionResult> AdminUpdateStatus(Guid id, [FromBody] ReviewStatus status)
+    public async Task<IActionResult> AdminUpdateStatus(Guid id, [FromBody] ReviewStatusUpdateRequest request)
     {
-        var result = await _reviewService.AdminUpdateStatusAsync(id, status);
+        var result = await _reviewService.AdminUpdateStatusAsync(id, request.Status);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 }
+
+public record ReviewStatusUpdateRequest(ReviewStatus Status);

@@ -93,6 +93,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
         builder.Entity<Notification>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<SeoPage>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Report>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<Enquiry>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ServiceRequest>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ServiceOffer>().HasQueryFilter(e => !e.IsDeleted);
     }

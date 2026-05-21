@@ -36,6 +36,7 @@ public interface IEnquiryService
 {
     Task<ApiResponse<EnquiryDto>> CreateAsync(CreateEnquiryRequest request);
     Task<ApiResponse<PaginatedResponse<EnquiryDto>>> GetByProviderAsync(Guid providerId, string userId, int page, int pageSize);
+    Task<ApiResponse<PaginatedResponse<EnquiryDto>>> GetAllAsync(int page, int pageSize, string? status);
     Task<ApiResponse<EnquiryDto>> MarkAsReadAsync(Guid enquiryId, string userId);
     Task<ApiResponse<EnquiryDto>> ReplyAsync(Guid enquiryId, string userId, string reply);
     Task<ApiResponse<EnquiryDto>> ArchiveAsync(Guid enquiryId, string userId);
@@ -96,6 +97,32 @@ public class EnquiryService : IEnquiryService
         var totalCount = await query.CountAsync();
         var enquiries = await query
             .Skip((page - 1) * pageSize).Take(pageSize)
+            .ToListAsync();
+
+        return ApiResponse<PaginatedResponse<EnquiryDto>>.Ok(new PaginatedResponse<EnquiryDto>
+        {
+            Items = enquiries.Select(e => MapToDto(e, e.Provider.BusinessName)).ToList(),
+            Pagination = new PaginationMeta(page, pageSize, totalCount)
+        });
+    }
+
+    public async Task<ApiResponse<PaginatedResponse<EnquiryDto>>> GetAllAsync(int page, int pageSize, string? status)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = _context.Enquiries
+            .Include(e => e.Provider)
+            .AsQueryable();
+
+        if (Enum.TryParse<EnquiryStatus>(status, true, out var parsedStatus))
+            query = query.Where(e => e.Status == parsedStatus);
+
+        var totalCount = await query.CountAsync();
+        var enquiries = await query
+            .OrderByDescending(e => e.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
         return ApiResponse<PaginatedResponse<EnquiryDto>>.Ok(new PaginatedResponse<EnquiryDto>

@@ -137,7 +137,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Domain.Reviews.Revie
 {
     public void Configure(EntityTypeBuilder<Domain.Reviews.Review> builder)
     {
-        builder.HasIndex(r => new { r.UserId, r.ProviderId }).IsUnique();
+        builder.HasIndex(r => new { r.UserId, r.ProviderId });
         builder.HasIndex(r => r.Status);
 
         builder.Property(r => r.Title).HasMaxLength(200);
@@ -147,6 +147,26 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Domain.Reviews.Revie
 
         builder.HasOne(r => r.User).WithMany(u => u.Reviews).HasForeignKey(r => r.UserId);
         builder.HasOne(r => r.Provider).WithMany(p => p.Reviews).HasForeignKey(r => r.ProviderId);
+    }
+}
+
+public class EnquiryConfiguration : IEntityTypeConfiguration<Domain.Enquiries.Enquiry>
+{
+    public void Configure(EntityTypeBuilder<Domain.Enquiries.Enquiry> builder)
+    {
+        builder.HasIndex(e => e.ProviderId);
+        builder.HasIndex(e => e.Status);
+        builder.HasIndex(e => e.CreatedAt);
+        builder.HasIndex(e => new { e.ProviderId, e.Status });
+
+        builder.Property(e => e.CustomerName).HasMaxLength(120).IsRequired();
+        builder.Property(e => e.CustomerEmail).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.CustomerPhone).HasMaxLength(40);
+        builder.Property(e => e.Message).HasMaxLength(1000).IsRequired();
+        builder.Property(e => e.ServiceInterest).HasMaxLength(160);
+        builder.Property(e => e.ProviderReply).HasMaxLength(2000);
+
+        builder.HasOne(e => e.Provider).WithMany().HasForeignKey(e => e.ProviderId);
     }
 }
 

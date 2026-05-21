@@ -494,6 +494,7 @@ public class ProviderService : IProviderService
         Description = p.Description?.Length > 150 ? p.Description[..150] + "..." : p.Description,
         LogoUrl = p.LogoUrl,
         CoverImageUrl = p.CoverImageUrl,
+        Status = p.Status,
         ProviderType = p.ProviderType,
         IsVerified = p.IsVerified,
         IsFeatured = p.IsFeatured,
@@ -506,7 +507,8 @@ public class ProviderService : IProviderService
         IsClaimed = p.IsClaimed,
         Categories = p.Services?.Select(s => s.Category?.Name ?? "").Distinct().Where(n => n != "").ToList() ?? [],
         PrimaryImageUrl = p.GalleryImages?.FirstOrDefault(g => g.IsPrimary)?.ImageUrl
-            ?? p.GalleryImages?.FirstOrDefault()?.ImageUrl
+            ?? p.GalleryImages?.FirstOrDefault()?.ImageUrl,
+        CreatedAt = p.CreatedAt
     };
 
     private string GenerateSlug(string name)

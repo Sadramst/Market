@@ -48,6 +48,7 @@ public class ProviderListDto
     public string? Description { get; set; }
     public string? LogoUrl { get; set; }
     public string? CoverImageUrl { get; set; }
+    public ProviderStatus Status { get; set; }
     public ProviderType ProviderType { get; set; }
     public bool IsVerified { get; set; }
     public bool IsFeatured { get; set; }
@@ -60,6 +61,7 @@ public class ProviderListDto
     public bool IsClaimed { get; set; }
     public List<string> Categories { get; set; } = [];
     public string? PrimaryImageUrl { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class CreateProviderRequest

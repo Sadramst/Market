@@ -1,4 +1,5 @@
 using Appilico.Market.Domain.Common;
+using Appilico.Market.Domain.Auth;
 using Appilico.Market.Domain.Reviews;
 using Appilico.Market.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class ReviewDto
     public string UserName { get; set; } = string.Empty;
     public string? UserAvatar { get; set; }
     public Guid ProviderId { get; set; }
+    public string ProviderName { get; set; } = string.Empty;
     public int Rating { get; set; }
     public string? Title { get; set; }
     public string? Comment { get; set; }
@@ -40,6 +42,7 @@ public class CreatePublicReviewRequest
 public interface IReviewService
 {
     Task<ApiResponse<PaginatedResponse<ReviewDto>>> GetByProviderAsync(Guid providerId, int page, int pageSize);
+    Task<ApiResponse<PaginatedResponse<ReviewDto>>> GetAllAsync(int page, int pageSize, string? status);
     Task<ApiResponse<ReviewDto>> CreateAsync(string userId, CreateReviewRequest request);
     Task<ApiResponse<ReviewDto>> CreatePublicAsync(CreatePublicReviewRequest request);
     Task<ApiResponse<ReviewDto>> ReplyAsync(Guid reviewId, string userId, string reply);
@@ -48,6 +51,7 @@ public interface IReviewService
 
 public class ReviewService : IReviewService
 {
+    private const string AnonymousReviewUserId = "anonymous";
     private readonly AppDbContext _context;
 
     public ReviewService(AppDbContext context) => _context = context;
@@ -74,6 +78,33 @@ public class ReviewService : IReviewService
                 PageSize = pageSize,
                 TotalCount = totalCount
             }
+        });
+    }
+
+    public async Task<ApiResponse<PaginatedResponse<ReviewDto>>> GetAllAsync(int page, int pageSize, string? status)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = _context.Reviews
+            .Include(r => r.User)
+            .Include(r => r.Provider)
+            .AsQueryable();
+
+        if (Enum.TryParse<ReviewStatus>(status, true, out var parsedStatus))
+            query = query.Where(r => r.Status == parsedStatus);
+
+        var totalCount = await query.CountAsync();
+        var reviews = await query
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return ApiResponse<PaginatedResponse<ReviewDto>>.Ok(new PaginatedResponse<ReviewDto>
+        {
+            Items = reviews.Select(MapToDto).ToList(),
+            Pagination = new PaginationMeta(page, pageSize, totalCount)
         });
     }
 
@@ -122,6 +153,8 @@ public class ReviewService : IReviewService
         if (provider == null)
             return ApiResponse<ReviewDto>.Fail("Provider not found");
 
+        await EnsureAnonymousReviewUserAsync();
+
         // Auto-approve: 3-5 stars, >30 chars, no URLs
         var hasUrl = request.Comment.Contains("http://") || request.Comment.Contains("https://") || request.Comment.Contains("www.");
         var autoApprove = request.Rating >= 3 && request.Comment.Trim().Split(' ').Length > 5 && !hasUrl;
@@ -129,7 +162,7 @@ public class ReviewService : IReviewService
         // Create a system user for anonymous review
         var review = new Review
         {
-            UserId = "anonymous",
+            UserId = AnonymousReviewUserId,
             ProviderId = request.ProviderId,
             Rating = Math.Clamp(request.Rating, 1, 5),
             Title = request.AuthorName.Trim(),
@@ -197,13 +230,38 @@ public class ReviewService : IReviewService
         await _context.SaveChangesAsync();
     }
 
+    private async Task EnsureAnonymousReviewUserAsync()
+    {
+        var exists = await _context.Users.AnyAsync(u => u.Id == AnonymousReviewUserId);
+        if (exists)
+            return;
+
+        _context.Users.Add(new AppUser
+        {
+            Id = AnonymousReviewUserId,
+            UserName = "anonymous-reviews@appilico.internal",
+            NormalizedUserName = "ANONYMOUS-REVIEWS@APPILICO.INTERNAL",
+            Email = "anonymous-reviews@appilico.internal",
+            NormalizedEmail = "ANONYMOUS-REVIEWS@APPILICO.INTERNAL",
+            FirstName = "Guest",
+            LastName = "Reviewer",
+            EmailConfirmed = true,
+            IsActive = false
+        });
+
+        await _context.SaveChangesAsync();
+    }
+
     private static ReviewDto MapToDto(Review r) => new()
     {
         Id = r.Id,
         UserId = r.UserId,
-        UserName = r.User != null ? $"{r.User.FirstName} {r.User.LastName}" : "Anonymous",
+        UserName = r.UserId == AnonymousReviewUserId && !string.IsNullOrWhiteSpace(r.Title)
+            ? r.Title
+            : r.User != null ? $"{r.User.FirstName} {r.User.LastName}" : "Anonymous",
         UserAvatar = r.User?.Avatar,
         ProviderId = r.ProviderId,
+        ProviderName = r.Provider?.BusinessName ?? string.Empty,
         Rating = r.Rating,
         Title = r.Title,
         Comment = r.Comment,

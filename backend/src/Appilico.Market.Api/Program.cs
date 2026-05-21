@@ -1,10 +1,14 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Appilico.Market.Api.Middleware;
+using Appilico.Market.Application.Admin.Services;
 using Appilico.Market.Application.Auth.Services;
 using Appilico.Market.Application.Categories.Services;
 using Appilico.Market.Application.Providers.Services;
+using Appilico.Market.Application.Reports.Services;
 using Appilico.Market.Application.Reviews.Services;
 using Appilico.Market.Application.Enquiries.Services;
+using Appilico.Market.Application.Settings.Services;
 using Appilico.Market.Application.Social.Services;
 using Appilico.Market.Application.Validators;
 using Appilico.Market.Domain.Auth;
@@ -104,6 +108,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ISocialService, SocialService>();
 builder.Services.AddScoped<IEnquiryService, EnquiryService>();
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IAppSettingService, AppSettingService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // --- Infrastructure Services ---
@@ -111,7 +119,11 @@ builder.Services.AddSingleton<IStorageService>(new LocalStorageService());
 builder.Services.AddSingleton<IEmailService, ConsoleEmailService>();
 
 // --- Controllers + Swagger ---
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

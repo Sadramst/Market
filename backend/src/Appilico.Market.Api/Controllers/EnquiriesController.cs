@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Appilico.Market.Application.Enquiries.Services;
+using Appilico.Market.Domain.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,14 @@ public class EnquiriesController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _enquiryService.GetByProviderAsync(providerId, userId, page, pageSize);
         return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]
+    [HttpGet("admin/all")]
+    public async Task<IActionResult> AdminGetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 50, [FromQuery] string? status = null)
+    {
+        var result = await _enquiryService.GetAllAsync(page, pageSize, status);
+        return Ok(result);
     }
 
     /// <summary>Mark an enquiry as read</summary>

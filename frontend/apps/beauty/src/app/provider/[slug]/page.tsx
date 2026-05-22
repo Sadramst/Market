@@ -292,9 +292,20 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
               <h3 className="text-[18px] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Contact</h3>
               <div className="space-y-3 text-[13px]" style={{ fontFamily: 'var(--font-body)' }}>
                 {(provider.fullAddress || provider.address) && (
-                  <div className="flex items-start gap-3">
-                    <span className="text-[16px] shrink-0 mt-0.5">📍</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>{provider.fullAddress || provider.address}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-start gap-3">
+                      <span className="text-[16px] shrink-0 mt-0.5">📍</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>{provider.fullAddress || provider.address}</span>
+                    </div>
+                    <a 
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(provider.businessName + ' ' + (provider.fullAddress || provider.address))}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[12px] underline transition-opacity hover:opacity-70 ml-8"
+                      style={{ color: 'var(--brand-rose)' }}
+                    >
+                      View on Map
+                    </a>
                   </div>
                 )}
                 {provider.phone && (

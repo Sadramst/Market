@@ -128,6 +128,16 @@ export function ProviderCard({
           <div className="text-[12px] mt-2 flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
             <span className="shrink-0 mt-0.5">📍</span>
             <span className="truncate">{fullAddress}</span>
+            <a 
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessName + ' ' + fullAddress)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] underline ml-auto shrink-0 transition-opacity hover:opacity-70"
+              style={{ color: 'var(--brand-rose)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              Map
+            </a>
           </div>
         )}
 

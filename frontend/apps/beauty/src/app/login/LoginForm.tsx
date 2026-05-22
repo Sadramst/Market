@@ -65,7 +65,7 @@ export function LoginForm() {
         <label htmlFor="password" className="block text-[12px] font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>Password</label>
         <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required className="w-full px-4 py-3.5 text-[15px] bg-transparent focus:outline-none" style={{ border: '1px solid var(--border)', borderRadius: '2px', color: 'var(--text-primary)' }} />
       </div>
-      <button disabled={loading} className="w-full px-6 py-3.5 text-[14px] font-medium text-white transition-all disabled:opacity-50" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
+      <button type="submit" disabled={loading} className="w-full px-6 py-3.5 text-[14px] font-medium text-white transition-all disabled:opacity-50" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
         {loading ? "Signing in..." : "Sign in"}
       </button>
       <div className="flex items-center justify-between text-[13px]" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>

@@ -99,22 +99,34 @@ public class ProviderService : IProviderService
             var term = request.SearchTerm.ToLower();
             query = query.Where(p =>
                 p.BusinessName.ToLower().Contains(term) ||
-                (p.Description != null && p.Description.ToLower().Contains(term)));
+                (p.Description != null && p.Description.ToLower().Contains(term)) ||
+                (p.Tagline != null && p.Tagline.ToLower().Contains(term)) ||
+                p.Services.Any(s => s.Name.ToLower().Contains(term)));
         }
 
-        // Sorting
+        // Sorting with weighted ranking
         query = request.SortBy?.ToLower() switch
         {
-            "rating" => request.SortDescending
-                ? query.OrderByDescending(p => p.AverageRating)
-                : query.OrderBy(p => p.AverageRating),
-            "reviews" => request.SortDescending
-                ? query.OrderByDescending(p => p.TotalReviews)
-                : query.OrderBy(p => p.TotalReviews),
+            "rating" => query.OrderByDescending(p => p.AverageRating)
+                .ThenByDescending(p => p.TotalReviews),
+            "reviews" => query.OrderByDescending(p => p.TotalReviews)
+                .ThenByDescending(p => p.AverageRating),
             "name" => request.SortDescending
                 ? query.OrderByDescending(p => p.BusinessName)
                 : query.OrderBy(p => p.BusinessName),
-            _ => query.OrderByDescending(p => p.IsFeatured).ThenByDescending(p => p.AverageRating)
+            "newest" => query.OrderByDescending(p => p.CreatedAt),
+            _ => query
+                .OrderByDescending(p => p.IsFeatured)
+                .ThenByDescending(p => p.IsVerified)
+                .ThenByDescending(p =>
+                    p.AverageRating * 0.4 +
+                    Math.Min(p.TotalReviews / 100.0, 1.0) * 0.3 +
+                    (p.Description != null && p.Description.Length > 50 ? 0.1 : 0) +
+                    (p.Phone != null ? 0.05 : 0) +
+                    (p.Website != null ? 0.05 : 0) +
+                    (p.InstagramUrl != null ? 0.05 : 0) +
+                    (p.Services.Count > 0 ? 0.05 : 0)
+                )
         };
 
         var totalCount = await query.CountAsync();
@@ -152,6 +164,84 @@ public class ProviderService : IProviderService
         await _context.SaveChangesAsync();
 
         return ApiResponse<bool>.Ok(true, "Your claim request has been submitted. Our team will verify your ownership and contact you within 2 business days.");
+    }
+
+    public async Task<ApiResponse<List<ProviderListDto>>> GetRelatedAsync(string slug, int count = 6)
+    {
+        var provider = await _context.Providers
+            .Include(p => p.Services)
+            .FirstOrDefaultAsync(p => p.Slug == slug && p.Status == ProviderStatus.Approved);
+        if (provider == null)
+            return ApiResponse<List<ProviderListDto>>.Fail("Provider not found");
+
+        var categoryIds = provider.Services.Select(s => s.CategoryId).Distinct().ToList();
+        if (!categoryIds.Any())
+            return ApiResponse<List<ProviderListDto>>.Ok([]);
+
+        // Find all parent category IDs for these services
+        var parentCatIds = await _context.Categories
+            .Where(c => categoryIds.Contains(c.Id) && c.ParentCategoryId != null)
+            .Select(c => c.ParentCategoryId!.Value)
+            .Distinct()
+            .ToListAsync();
+        var allCatIds = categoryIds.Union(parentCatIds).ToList();
+        // Also get subcategories of those parents
+        var subCatIds = await _context.Categories
+            .Where(c => c.ParentCategoryId != null && allCatIds.Contains(c.ParentCategoryId.Value))
+            .Select(c => c.Id)
+            .ToListAsync();
+        allCatIds = allCatIds.Union(subCatIds).Distinct().ToList();
+
+        var related = await _context.Providers
+            .Include(p => p.Services).ThenInclude(s => s.Category)
+            .Include(p => p.GalleryImages)
+            .Where(p => p.Id != provider.Id
+                && p.Status == ProviderStatus.Approved
+                && p.ProviderType == provider.ProviderType
+                && p.Services.Any(s => allCatIds.Contains(s.CategoryId)))
+            .OrderByDescending(p => p.AverageRating)
+            .ThenByDescending(p => p.TotalReviews)
+            .Take(count)
+            .ToListAsync();
+
+        return ApiResponse<List<ProviderListDto>>.Ok(related.Select(MapToListDto).ToList());
+    }
+
+    public async Task<ApiResponse<List<ProviderListDto>>> GetNearbyAsync(string slug, int count = 6)
+    {
+        var provider = await _context.Providers
+            .Include(p => p.ServiceAreas)
+            .FirstOrDefaultAsync(p => p.Slug == slug && p.Status == ProviderStatus.Approved);
+        if (provider == null)
+            return ApiResponse<List<ProviderListDto>>.Fail("Provider not found");
+
+        var suburbIds = provider.ServiceAreas.Select(sa => sa.SuburbId).ToList();
+        if (!suburbIds.Any() && !string.IsNullOrEmpty(provider.PostalCode))
+        {
+            // Fallback: match by postcode proximity
+            if (int.TryParse(provider.PostalCode, out var pc))
+            {
+                suburbIds = await _context.Suburbs
+                    .Where(s => s.IsActive && EF.Functions.Like(s.PostCode, $"{pc / 10}%"))
+                    .Select(s => s.Id)
+                    .ToListAsync();
+            }
+        }
+
+        var nearby = await _context.Providers
+            .Include(p => p.Services).ThenInclude(s => s.Category)
+            .Include(p => p.GalleryImages)
+            .Include(p => p.ServiceAreas)
+            .Where(p => p.Id != provider.Id
+                && p.Status == ProviderStatus.Approved
+                && p.ProviderType == provider.ProviderType
+                && p.ServiceAreas.Any(sa => suburbIds.Contains(sa.SuburbId)))
+            .OrderByDescending(p => p.AverageRating)
+            .ThenByDescending(p => p.TotalReviews)
+            .Take(count)
+            .ToListAsync();
+
+        return ApiResponse<List<ProviderListDto>>.Ok(nearby.Select(MapToListDto).ToList());
     }
 
     public async Task<ApiResponse<ProviderDto>> CreateAsync(string userId, CreateProviderRequest request)

@@ -9,6 +9,8 @@ public interface IProviderService
     Task<ApiResponse<ProviderDto>> GetBySlugAsync(string slug);
     Task<ApiResponse<ProviderDto>> GetByIdAsync(Guid id);
     Task<ApiResponse<PaginatedResponse<ProviderListDto>>> SearchAsync(ProviderSearchRequest request);
+    Task<ApiResponse<List<ProviderListDto>>> GetRelatedAsync(string slug, int count = 6);
+    Task<ApiResponse<List<ProviderListDto>>> GetNearbyAsync(string slug, int count = 6);
 
     // Claim
     Task<ApiResponse<bool>> ClaimListingAsync(string slug, ClaimListingRequest request);

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { fetchApi } from "@/lib/api";
-import { generatePageMeta } from "@/lib/seo";
+import { generatePageMeta, breadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
@@ -188,6 +188,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           </div>
         </div>
       )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
+        { name: "Home", url: "/" },
+        { name: "Search" },
+      ])) }} />
     </div>
   );
 }

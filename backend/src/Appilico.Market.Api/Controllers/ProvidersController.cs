@@ -47,6 +47,20 @@ public class ProvidersController : ControllerBase
         return result.Success ? Ok(result) : NotFound(result);
     }
 
+    [HttpGet("{slug}/related")]
+    public async Task<IActionResult> GetRelated(string slug, [FromQuery] int count = 6)
+    {
+        var result = await _providerService.GetRelatedAsync(slug, Math.Min(count, 12));
+        return result.Success ? Ok(result) : NotFound(result);
+    }
+
+    [HttpGet("{slug}/nearby")]
+    public async Task<IActionResult> GetNearby(string slug, [FromQuery] int count = 6)
+    {
+        var result = await _providerService.GetNearbyAsync(slug, Math.Min(count, 12));
+        return result.Success ? Ok(result) : NotFound(result);
+    }
+
     [HttpGet("id/{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

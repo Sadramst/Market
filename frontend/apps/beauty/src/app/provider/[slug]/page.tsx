@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchApi } from "@/lib/api";
-import { providerJsonLd } from "@/lib/seo";
+import { providerJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs, StarRating } from "@/components/ui";
 import { ContactProviderButton } from "@/components/providers/ContactProviderButton";
 import { ReviewForm } from "@/components/providers/ReviewForm";
@@ -83,6 +83,13 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   const reviewsData = await fetchApi<{ items: Review[] }>(`/reviews/provider/${provider.id}?pageSize=10`, { revalidate: 300, tags: ["reviews", slug] });
   const reviews = reviewsData?.items ?? [];
+
+  const [relatedData, nearbyData] = await Promise.all([
+    fetchApi<Array<{ id: string; slug: string; businessName: string; logoUrl?: string; coverImageUrl?: string; averageRating: number; totalReviews: number; city?: string; categories?: string[]; primaryImageUrl?: string; tagline?: string }>>(`/providers/${slug}/related?count=6`, { revalidate: 600 }),
+    fetchApi<Array<{ id: string; slug: string; businessName: string; logoUrl?: string; coverImageUrl?: string; averageRating: number; totalReviews: number; city?: string; categories?: string[]; primaryImageUrl?: string; tagline?: string }>>(`/providers/${slug}/nearby?count=6`, { revalidate: 600 }),
+  ]);
+  const relatedProviders = relatedData ?? [];
+  const nearbyProviders = nearbyData ?? [];
 
   const categoryGradients: Record<string, string> = {
     nails: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
@@ -342,9 +349,74 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             </div>
           </div>
         </div>
+        {/* Related Providers */}
+        {relatedProviders.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-[20px] mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Similar Providers</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedProviders.map((rp) => (
+                <Link key={rp.id} href={`/provider/${rp.slug}`} className="group block transition-all hover:-translate-y-0.5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+                  <div className="h-32 overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
+                    {(rp.primaryImageUrl || rp.coverImageUrl || rp.logoUrl) ? (
+                      <img src={rp.primaryImageUrl || rp.coverImageUrl || rp.logoUrl} alt={rp.businessName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
+                        <span className="text-2xl font-bold text-white">{rp.businessName.charAt(0)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-[14px] font-medium truncate" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>{rp.businessName}</h3>
+                    {rp.city && <p className="text-[12px] mt-1" style={{ color: 'var(--text-muted)' }}>📍 {rp.city}</p>}
+                    <div className="flex items-center gap-2 mt-2">
+                      <StarRating rating={rp.averageRating} size="sm" />
+                      <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{rp.averageRating.toFixed(1)} ({rp.totalReviews})</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Nearby Providers */}
+        {nearbyProviders.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-[20px] mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Nearby in {provider.city || 'Your Area'}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {nearbyProviders.map((np) => (
+                <Link key={np.id} href={`/provider/${np.slug}`} className="group block transition-all hover:-translate-y-0.5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+                  <div className="h-32 overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
+                    {(np.primaryImageUrl || np.coverImageUrl || np.logoUrl) ? (
+                      <img src={np.primaryImageUrl || np.coverImageUrl || np.logoUrl} alt={np.businessName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
+                        <span className="text-2xl font-bold text-white">{np.businessName.charAt(0)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-[14px] font-medium truncate" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>{np.businessName}</h3>
+                    {np.city && <p className="text-[12px] mt-1" style={{ color: 'var(--text-muted)' }}>📍 {np.city}</p>}
+                    <div className="flex items-center gap-2 mt-2">
+                      <StarRating rating={np.averageRating} size="sm" />
+                      <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{np.averageRating.toFixed(1)} ({np.totalReviews})</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(providerJsonLd(provider)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
+        { name: "Home", url: "/" },
+        { name: "Search", url: "/search" },
+        ...(provider.categories?.[0] ? [{ name: provider.categories[0], url: `/search?category=${provider.categories[0].toLowerCase().replace(/\s+/g, '-')}` }] : []),
+        { name: provider.businessName },
+      ])) }} />
     </>
   );
 }

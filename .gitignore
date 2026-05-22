@@ -42,3 +42,8 @@ postgres_data/
 *.swo
 *~
 .turbo
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/

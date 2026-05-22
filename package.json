@@ -1,0 +1,22 @@
+{
+  "name": "market",
+  "version": "1.0.0",
+  "description": "**Multi-brand marketplace ecosystem for Perth, Western Australia.**",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "npx playwright test",
+    "test:beauty": "npx playwright test --project=beauty",
+    "test:admin": "npx playwright test --project=admin",
+    "test:services": "npx playwright test --project=services",
+    "test:report": "npx playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}

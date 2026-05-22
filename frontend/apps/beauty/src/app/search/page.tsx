@@ -147,7 +147,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           {pagination.totalPages > 1 && (
             <div className="flex justify-center items-center gap-3 mt-14">
               {page > 1 && (
-                <Link href={`/search?${new URLSearchParams({ ...params, page: String(page - 1) }).toString()}`}
+                <Link href={`/search?${new URLSearchParams({ ...(query ? { q: query } : {}), ...(suburb ? { suburb } : {}), ...(category ? { category } : {}), sort, page: String(page - 1) }).toString()}`}
                   className="px-5 py-2.5 text-[13px] font-medium transition-all"
                   style={{ border: '1px solid var(--border)', borderRadius: '2px', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
                 >
@@ -158,7 +158,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 Page {pagination.currentPage} of {pagination.totalPages}
               </span>
               {page < pagination.totalPages && (
-                <Link href={`/search?${new URLSearchParams({ ...params, page: String(page + 1) }).toString()}`}
+                <Link href={`/search?${new URLSearchParams({ ...(query ? { q: query } : {}), ...(suburb ? { suburb } : {}), ...(category ? { category } : {}), sort, page: String(page + 1) }).toString()}`}
                   className="px-5 py-2.5 text-[13px] font-medium transition-all"
                   style={{ border: '1px solid var(--border)', borderRadius: '2px', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
                 >

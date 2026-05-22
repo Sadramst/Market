@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,7 +15,7 @@ type ProviderCardProps = {
   averageRating: number;
   totalReviews: number;
   logoUrl?: string;
-  categories?: string[];
+  categories?: string[] | string;
   priceFrom?: number;
   isVerified?: boolean;
   hasRealData?: boolean;
@@ -40,10 +42,11 @@ const CATEGORY_META: Record<string, { icon: string; gradient: string }> = {
   wellness: { icon: '🧘', gradient: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)' },
 };
 
-function getCategoryMeta(categories?: string[]) {
-  if (!categories?.[0]) return { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
-  const slug = categories[0].toLowerCase().replace(/\s+/g, '-');
-  return CATEGORY_META[slug] || CATEGORY_META[categories[0].toLowerCase()] || { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
+function getCategoryMeta(categories?: string[] | string) {
+  const cats = Array.isArray(categories) ? categories : categories ? [categories] : [];
+  if (!cats[0]) return { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
+  const slug = cats[0].toLowerCase().replace(/\s+/g, '-');
+  return CATEGORY_META[slug] || CATEGORY_META[cats[0].toLowerCase()] || { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
 }
 
 export function ProviderCard({
@@ -61,7 +64,8 @@ export function ProviderCard({
   isVerified,
   hasRealData,
 }: ProviderCardProps) {
-  const { icon, gradient } = getCategoryMeta(categories);
+  const cats = Array.isArray(categories) ? categories : categories ? [categories] : [];
+  const { icon, gradient } = getCategoryMeta(cats);
   const trustLabel = isVerified ? "Verified" : hasRealData ? "Source checked" : "New listing";
 
   return (
@@ -90,9 +94,9 @@ export function ProviderCard({
       <div className="p-4">
         {/* Pills */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {categories && categories.length > 0 && (
+          {cats.length > 0 && (
             <span className="text-[11px] font-medium px-2.5 py-0.5" style={{ background: 'rgba(200,115,122,0.12)', color: 'var(--brand-rose-dark)', borderRadius: '50px' }}>
-              {categories[0]}
+              {cats[0]}
             </span>
           )}
           {city && (

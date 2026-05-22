@@ -2,6 +2,7 @@ import Link from "next/link";
 import { fetchApi } from "@/lib/api";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
+import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
 
 const popularSuburbs = [
   { name: "Perth CBD", slug: "perth" },
@@ -37,7 +38,8 @@ export default async function HomePage() {
   ]);
 
   const totalProviders = countData?.pagination?.totalCount ?? 0;
-  const featuredProviders = providers?.items ?? [];
+  const apiFeatured = providers?.items ?? [];
+  const featuredProviders = apiFeatured.length > 0 ? apiFeatured : FALLBACK_FEATURED_PROVIDERS;
 
   return (
     <>
@@ -91,7 +93,7 @@ export default async function HomePage() {
 
               {/* Stats */}
               <div className="animate-fade-in-up animation-delay-500 mt-8 flex items-center gap-6 text-[13px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
-                <span>{totalProviders > 0 ? `${totalProviders}+` : '500+'} Providers</span>
+                <span>{totalProviders > 0 ? `${totalProviders.toLocaleString()}+` : '1,000+'} Providers</span>
                 <span style={{ color: 'var(--border)' }}>·</span>
                 <span>70+ Suburbs</span>
                 <span style={{ color: 'var(--border)' }}>·</span>

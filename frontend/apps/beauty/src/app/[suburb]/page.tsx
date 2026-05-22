@@ -6,6 +6,7 @@ import { Breadcrumbs, EmptyState } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { PERTH_SUBURBS, findSuburb } from "@/lib/suburbs";
+import { getFallbackProviders } from "@/lib/fallback-providers";
 
 export function generateStaticParams() {
   return PERTH_SUBURBS.map((s) => ({ suburb: s.slug }));
@@ -32,7 +33,8 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
     pagination: { totalCount: number };
   }>(`/providers/search?suburb=${slug}&marketplaceType=0&pageSize=12`, { revalidate: 300, tags: ["providers", slug] });
 
-  const providers = providersData?.items ?? [];
+  const apiProviders = providersData?.items ?? [];
+  const providers = apiProviders.length > 0 ? apiProviders : getFallbackProviders(slug);
 
   return (
     <>

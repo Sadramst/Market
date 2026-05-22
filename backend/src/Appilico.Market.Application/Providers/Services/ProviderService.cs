@@ -71,12 +71,16 @@ public class ProviderService : IProviderService
             query = query.Where(p => p.Services.Any(s => subCatIds.Contains(s.CategoryId)));
         }
 
-        // Resolve suburb slug or name to ID
+        // Resolve suburb slug, name, or postcode to ID
         if (!request.SuburbId.HasValue && !string.IsNullOrEmpty(request.Suburb))
         {
-            var suburbInput = request.Suburb.Trim().ToLower().Replace(" ", "-");
-            var sub = await _context.Suburbs.FirstOrDefaultAsync(s => s.Slug == suburbInput)
-                      ?? await _context.Suburbs.FirstOrDefaultAsync(s => s.Name.ToLower() == request.Suburb.Trim().ToLower());
+            var input = request.Suburb.Trim();
+            var slugInput = input.ToLower().Replace(" ", "-");
+
+            // Try slug match, then name match, then postcode match
+            var sub = await _context.Suburbs.FirstOrDefaultAsync(s => s.Slug == slugInput)
+                      ?? await _context.Suburbs.FirstOrDefaultAsync(s => s.Name.ToLower() == input.ToLower())
+                      ?? await _context.Suburbs.FirstOrDefaultAsync(s => s.PostCode == input);
             if (sub != null)
                 request.SuburbId = sub.Id;
         }

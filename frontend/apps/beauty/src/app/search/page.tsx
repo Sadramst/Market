@@ -4,6 +4,7 @@ import { fetchApi } from "@/lib/api";
 import { generatePageMeta } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
+import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
 
 export const metadata: Metadata = generatePageMeta({
   title: "Browse Beauty Providers in Perth",
@@ -57,8 +58,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     pagination: { currentPage: number; totalPages: number; totalCount: number };
   }>(`/providers/search?${apiParams.toString()}`, { revalidate: 60, tags: ["providers"] });
 
-  const items = data?.items ?? [];
-  const pagination = data?.pagination ?? { currentPage: 1, totalPages: 1, totalCount: 0 };
+  const apiItems = data?.items ?? [];
+  const items = apiItems.length > 0 ? apiItems : FALLBACK_FEATURED_PROVIDERS;
+  const pagination = data?.pagination ?? { currentPage: 1, totalPages: 1, totalCount: items.length };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

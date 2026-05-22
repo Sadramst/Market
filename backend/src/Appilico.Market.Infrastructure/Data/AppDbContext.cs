@@ -13,6 +13,7 @@ using Appilico.Market.Domain.Reviews;
 using Appilico.Market.Domain.Seo;
 using Appilico.Market.Domain.Settings;
 using Appilico.Market.Domain.Social;
+using Appilico.Market.Domain.Subscriptions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<ProviderService> ProviderServices => Set<ProviderService>();
     public DbSet<ProviderGalleryImage> ProviderGalleryImages => Set<ProviderGalleryImage>();
     public DbSet<ProviderServiceArea> ProviderServiceAreas => Set<ProviderServiceArea>();
+    public DbSet<ProviderSubscription> ProviderSubscriptions => Set<ProviderSubscription>();
 
     // Categories
     public DbSet<Category> Categories => Set<Category>();
@@ -84,6 +86,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
         builder.Entity<Provider>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ProviderService>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ProviderGalleryImage>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<ProviderSubscription>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Category>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Review>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Follow>().HasQueryFilter(e => !e.IsDeleted);

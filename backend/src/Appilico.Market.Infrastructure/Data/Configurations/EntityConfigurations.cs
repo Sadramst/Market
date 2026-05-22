@@ -99,6 +99,23 @@ public class ProviderServiceAreaConfiguration : IEntityTypeConfiguration<Provide
     }
 }
 
+public class ProviderSubscriptionConfiguration : IEntityTypeConfiguration<Domain.Subscriptions.ProviderSubscription>
+{
+    public void Configure(EntityTypeBuilder<Domain.Subscriptions.ProviderSubscription> builder)
+    {
+        builder.HasIndex(s => s.ProviderId);
+        builder.HasIndex(s => s.StripeCustomerId);
+        builder.HasIndex(s => s.StripeSubscriptionId).IsUnique().HasFilter("\"StripeSubscriptionId\" IS NOT NULL");
+        builder.HasIndex(s => new { s.ProviderId, s.Status });
+
+        builder.Property(s => s.StripeCustomerId).HasMaxLength(120);
+        builder.Property(s => s.StripeSubscriptionId).HasMaxLength(120);
+        builder.Property(s => s.StripePriceId).HasMaxLength(120);
+
+        builder.HasOne(s => s.Provider).WithMany(p => p.Subscriptions).HasForeignKey(s => s.ProviderId);
+    }
+}
+
 public class CategoryConfiguration : IEntityTypeConfiguration<Domain.Categories.Category>
 {
     public void Configure(EntityTypeBuilder<Domain.Categories.Category> builder)

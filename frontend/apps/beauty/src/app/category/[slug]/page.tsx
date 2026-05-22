@@ -7,7 +7,19 @@ import { Breadcrumbs } from "@/components/ui";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 
-export async function generateStaticParams() {
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  nails: "linear-gradient(135deg, #E8A8AD, #C8737A)",
+  hair: "linear-gradient(135deg, #E8D5B0, #C9A96E)",
+  lashes: "linear-gradient(135deg, #C4A8C8, #9B7B84)",
+  brows: "linear-gradient(135deg, #E8A8AD, #C8737A)",
+  "skin-care": "linear-gradient(135deg, #A8C8B0, #7B9B84)",
+  makeup: "linear-gradient(135deg, #D4A0A8, #A35560)",
+  body: "linear-gradient(135deg, #E8A8C0, #C8737A)",
+  cosmetic: "linear-gradient(135deg, #C4A8C8, #9B7B84)",
+  wellness: "linear-gradient(135deg, #A8C8B8, #7B9B8C)",
+};
+
+export function generateStaticParams() {
   return BEAUTY_CATEGORIES.map((cat) => ({ slug: cat.slug }));
 }
 
@@ -16,8 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const cat = findCategory(slug);
   if (!cat) return { title: "Category Not Found" };
   return {
-    title: `${cat.name} — Beauty Services in Perth`,
-    description: `Find the best ${cat.name.toLowerCase()} services in Perth, WA. Browse providers, compare prices, and read reviews.`,
+    title: `${cat.displayName} in Perth, WA | Appilico Beauty`,
+    description: `Find the best ${cat.displayName.toLowerCase()} in Perth, Western Australia. ${cat.description}. Compare providers, read reviews and get in touch.`,
     alternates: { canonical: `https://beauty.appilico.com.au/category/${slug}` },
   };
 }
@@ -38,7 +50,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   return (
     <>
       {/* Hero */}
-      <section className={`py-16 bg-gradient-to-br ${cat.gradient}`}>
+      <section className="py-16" style={{ background: CATEGORY_GRADIENTS[cat.slug] || "var(--bg-secondary)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Categories", href: "/categories" }, { label: cat.name }]} />
           <div className="mt-6 flex items-center gap-4">

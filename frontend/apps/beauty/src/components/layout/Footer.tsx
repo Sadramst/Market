@@ -16,6 +16,7 @@ const footerLinks = {
   ],
   business: [
     { label: "List Your Business", href: "/join" },
+    { label: "Pricing", href: "/pricing" },
     { label: "About Us", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],

@@ -104,9 +104,9 @@ export default async function HomePage() {
             {/* Right — decorative cards (desktop) */}
             <div className="hidden lg:flex lg:col-span-2 relative h-[400px] items-center justify-center">
               {[
-                { name: 'Luxe Nails Subiaco', cat: 'Nails', rating: '4.9', rotate: '-3deg', bg: 'linear-gradient(135deg, #E8A8AD, #C8737A)', delay: '0.5s', top: '10%', left: '10%' },
-                { name: 'Hair by Sarah', cat: 'Hair', rating: '4.8', rotate: '0deg', bg: 'linear-gradient(135deg, #E8D5B0, #C9A96E)', delay: '0.7s', top: '25%', left: '25%' },
-                { name: 'Lash Studio Perth', cat: 'Lashes', rating: '5.0', rotate: '4deg', bg: 'linear-gradient(135deg, #C4A8C8, #9B7B84)', delay: '0.9s', top: '40%', left: '5%' },
+                { name: 'Fountain of Youth', cat: 'Skin Care', rating: '4.9', rotate: '-3deg', bg: 'linear-gradient(135deg, #A8C8B0, #7B9B84)', delay: '0.5s', top: '10%', left: '10%' },
+                { name: 'Breathe Beauty', cat: 'Lashes', rating: '4.8', rotate: '0deg', bg: 'linear-gradient(135deg, #C4A8C8, #9B7B84)', delay: '0.7s', top: '25%', left: '25%' },
+                { name: 'Ellie Dunne Collective', cat: 'Hair', rating: '5.0', rotate: '4deg', bg: 'linear-gradient(135deg, #E8D5B0, #C9A96E)', delay: '0.9s', top: '40%', left: '5%' },
               ].map((card) => (
                 <div key={card.name} className="absolute animate-fade-in-up w-[220px]" style={{ top: card.top, left: card.left, transform: `rotate(${card.rotate})`, animationDelay: card.delay }}>
                   <div className="overflow-hidden" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: 'var(--shadow-md)' }}>

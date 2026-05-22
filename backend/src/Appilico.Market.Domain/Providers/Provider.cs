@@ -1,5 +1,6 @@
 using Appilico.Market.Domain.Auth;
 using Appilico.Market.Domain.Common;
+using Appilico.Market.Domain.Subscriptions;
 
 namespace Appilico.Market.Domain;
 
@@ -67,9 +68,9 @@ public class Provider : BaseEntity
     public ICollection<Reviews.Review> Reviews { get; set; } = [];
     public ICollection<Social.Follow> Followers { get; set; } = [];
     public ICollection<Messaging.Conversation> Conversations { get; set; } = [];
+    public ICollection<ProviderSubscription> Subscriptions { get; set; } = [];
 
     // TODO: Stripe Connect account ID for future payments
-    // TODO: Subscription tier for future monetization
     // TODO: Analytics/insights for provider dashboard
     // TODO: AI-generated profile summary
     // TODO: Verification documents

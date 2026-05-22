@@ -6,37 +6,34 @@ import { categoryJsonLd } from "@/lib/seo";
 import { Breadcrumbs, EmptyState } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
+import { PERTH_SUBURBS, findSuburb } from "@/lib/suburbs";
 
-type Suburb = { name: string; slug: string; state: string; postCode: string };
-
-export async function generateMetadata({ params }: { params: Promise<{ suburb: string; category: string }> }): Promise<Metadata> {
-  const { suburb: suburbSlug, category: catSlug } = await params;
-  const suburb = await fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 });
-  const cat = findCategory(catSlug);
-  if (!suburb || !cat) return { title: "Not Found" };
-  return {
-    title: `${cat.displayName} in ${suburb.name}, Perth WA`,
-    description: `Find the best ${cat.displayName.toLowerCase()} in ${suburb.name}. Compare providers, read reviews and get in touch. Updated ${new Date().getFullYear()}.`,
-    alternates: { canonical: `https://beauty.appilico.com.au/${suburbSlug}/${catSlug}` },
-  };
-}
-
-export async function generateStaticParams() {
-  const suburbs = await fetchApi<Array<{ slug: string }>>("/locations/suburbs", { revalidate: 86400 });
+export function generateStaticParams() {
   const params: Array<{ suburb: string; category: string }> = [];
-  const suburbSlugs = suburbs?.map((s) => s.slug) ?? [];
-  for (const suburb of suburbSlugs.slice(0, 50)) {
-    for (const cat of BEAUTY_CATEGORIES) {
-      params.push({ suburb, category: cat.slug });
+  for (const s of PERTH_SUBURBS) {
+    for (const c of BEAUTY_CATEGORIES) {
+      params.push({ suburb: s.slug, category: c.slug });
     }
   }
   return params;
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ suburb: string; category: string }> }): Promise<Metadata> {
+  const { suburb: suburbSlug, category: catSlug } = await params;
+  const suburb = findSuburb(suburbSlug);
+  const cat = findCategory(catSlug);
+  if (!suburb || !cat) return { title: "Not Found" };
+  return {
+    title: `${cat.displayName} in ${suburb.name}, Perth WA | Appilico`,
+    description: `Find the best ${cat.displayName.toLowerCase()} in ${suburb.name}, ${suburb.postCode}. ${cat.description}. Compare providers, read reviews and get in touch.`,
+    alternates: { canonical: `https://beauty.appilico.com.au/${suburbSlug}/${catSlug}` },
+  };
+}
+
 export default async function SuburbCategoryPage({ params }: { params: Promise<{ suburb: string; category: string }> }) {
   const { suburb: suburbSlug, category: catSlug } = await params;
   const cat = findCategory(catSlug);
-  const suburb = await fetchApi<Suburb>(`/locations/suburbs/${suburbSlug}`, { revalidate: 3600 });
+  const suburb = findSuburb(suburbSlug);
   if (!suburb || !cat) notFound();
 
   const providersData = await fetchApi<{
@@ -84,11 +81,26 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
             description="Try browsing nearby suburbs or check back soon!"
           />
         )}
+
+        {/* SEO content block */}
+        <div className="mt-16 max-w-3xl">
+          <h2 className="text-[1.25rem] mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>
+            {cat.displayName} in {suburb.name}
+          </h2>
+          <p className="text-[15px] font-light leading-relaxed mb-3" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+            Looking for {cat.name.toLowerCase()} services in {suburb.name}, Perth? Appilico makes it easy to find and compare
+            the best {cat.displayName.toLowerCase()} near you. {cat.description}.
+          </p>
+          <p className="text-[15px] font-light leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+            Browse verified professionals, read real customer reviews, and connect directly — no middleman, no commission.
+            All {cat.name.toLowerCase()} providers in {suburb.name} ({suburb.postCode}) are listed with up-to-date information.
+          </p>
+        </div>
       </div>
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd({ name: cat.name, slug: cat.slug }, suburb)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd({ name: cat.name, slug: cat.slug }, { name: suburb.name, slug: suburb.slug })) }}
       />
     </>
   );

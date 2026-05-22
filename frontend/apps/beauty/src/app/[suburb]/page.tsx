@@ -5,35 +5,30 @@ import { fetchApi } from "@/lib/api";
 import { Breadcrumbs, EmptyState } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
+import { PERTH_SUBURBS, findSuburb } from "@/lib/suburbs";
 
-type Suburb = {
-  id: string;
-  name: string;
-  slug: string;
-  state: string;
-  postCode: string;
-  seoDescription?: string;
-  providerCount: number;
-};
+export function generateStaticParams() {
+  return PERTH_SUBURBS.map((s) => ({ suburb: s.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ suburb: string }> }): Promise<Metadata> {
   const { suburb: slug } = await params;
-  const suburb = await fetchApi<Suburb>(`/locations/suburbs/${slug}`, { revalidate: 3600 });
+  const suburb = findSuburb(slug);
   if (!suburb) return { title: "Suburb Not Found" };
   return {
-    title: `Beauty Services in ${suburb.name}, ${suburb.state}`,
-    description: suburb.seoDescription || `Find the best beauty salons, spas, and professionals in ${suburb.name}, ${suburb.postCode}. Compare prices, read reviews, and book appointments.`,
+    title: `Beauty Services in ${suburb.name}, Perth WA | Appilico`,
+    description: `Find the best beauty salons, spas, and professionals in ${suburb.name}, ${suburb.postCode}. Compare prices, read reviews, and connect directly.`,
     alternates: { canonical: `https://beauty.appilico.com.au/${slug}` },
   };
 }
 
 export default async function SuburbPage({ params }: { params: Promise<{ suburb: string }> }) {
   const { suburb: slug } = await params;
-  const suburb = await fetchApi<Suburb>(`/locations/suburbs/${slug}`, { revalidate: 3600, tags: ["suburb", slug] });
+  const suburb = findSuburb(slug);
   if (!suburb) notFound();
 
   const providersData = await fetchApi<{
-    items: Array<{ slug: string; businessName: string; city?: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string }>;
+    items: Array<{ slug: string; businessName: string; city?: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string; categories?: string[] }>;
     pagination: { totalCount: number };
   }>(`/providers/search?suburb=${slug}&marketplaceType=0&pageSize=12`, { revalidate: 300, tags: ["providers", slug] });
 
@@ -53,7 +48,7 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
           <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>
             Beauty Services in <em>{suburb.name}</em>
           </h1>
-          <p className="text-[15px] font-light mt-2" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{suburb.postCode}, {suburb.state}</p>
+          <p className="text-[15px] font-light mt-2" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{suburb.postCode}, WA</p>
         </div>
 
         {/* Category links for this suburb */}
@@ -87,11 +82,12 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
         )}
 
         {/* SEO Content */}
-        {suburb.seoDescription && (
-          <div className="mt-16 max-w-3xl">
-            <p className="text-[15px] font-light leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{suburb.seoDescription}</p>
-          </div>
-        )}
+        <div className="mt-16 max-w-3xl">
+          <p className="text-[15px] font-light leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+            Discover top-rated beauty professionals in {suburb.name}, Perth. Browse local salons, spas, and freelance beauty experts offering services
+            in nails, hair, lashes, brows, skin care, makeup, body treatments, cosmetic procedures, and wellness therapies.
+          </p>
+        </div>
       </div>
 
       <script
@@ -104,7 +100,7 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
             address: {
               "@type": "PostalAddress",
               addressLocality: suburb.name,
-              addressRegion: suburb.state,
+              addressRegion: "WA",
               postalCode: suburb.postCode,
               addressCountry: "AU",
             },

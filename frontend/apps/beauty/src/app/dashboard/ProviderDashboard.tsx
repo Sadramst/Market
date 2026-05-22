@@ -64,7 +64,7 @@ interface Enquiry {
   isRead: boolean;
 }
 
-type Tab = "overview" | "profile" | "services" | "gallery" | "enquiries";
+type Tab = "overview" | "profile" | "services" | "gallery" | "enquiries" | "billing";
 
 export function ProviderDashboard() {
   const [token, setToken] = useState<string | null>(null);
@@ -133,6 +133,7 @@ export function ProviderDashboard() {
     { id: "services", label: "Services", icon: "💅" },
     { id: "gallery", label: "Gallery", icon: "📸" },
     { id: "enquiries", label: "Enquiries", icon: "💬" },
+    { id: "billing", label: "Billing", icon: "💳" },
   ];
 
   return (
@@ -177,6 +178,7 @@ export function ProviderDashboard() {
       {activeTab === "services" && <ServicesTab provider={provider} token={token} onUpdate={() => token && loadData(token)} />}
       {activeTab === "gallery" && <GalleryTab provider={provider} />}
       {activeTab === "enquiries" && <EnquiriesTab provider={provider} token={token} />}
+      {activeTab === "billing" && <BillingTab provider={provider} />}
     </div>
   );
 }
@@ -564,6 +566,60 @@ function Panel({ label, value, meta }: { label: string; value: string; meta: str
       <p className="text-[12px] uppercase tracking-wide" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>{label}</p>
       <p className="mt-3 text-[18px] font-medium truncate" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>{value}</p>
       <p className="mt-1 text-[13px]" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{meta}</p>
+    </div>
+  );
+}
+
+/* ─── Billing Tab ─────────────────────────────────────────────── */
+function BillingTab({ provider }: { provider: ProviderProfile | null }) {
+  const providerQuery = provider ? `&providerId=${provider.id}` : "";
+
+  return (
+    <div className="space-y-6">
+      <div className="p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+        <h3 className="text-[16px] font-medium mb-4" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>Current Plan</h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[20px] font-semibold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>Free</p>
+            <p className="text-[13px] mt-1" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>Basic listing with core features</p>
+          </div>
+          {provider ? (
+            <Link href="/pricing" className="px-5 py-2.5 text-[13px] font-medium text-white transition-all" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
+              Upgrade Plan
+            </Link>
+          ) : (
+            <Link href="/join" className="px-5 py-2.5 text-[13px] font-medium text-white transition-all" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
+              Create Listing
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div className="p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+        <h3 className="text-[16px] font-medium mb-4" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>Plan Comparison</h3>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          {[
+            { id: 'free', name: 'Free', price: '$0', features: ['Basic listing', '5 photos', 'Enquiry form'] },
+            { id: 'pro', name: 'Pro', price: '$29/mo', features: ['Featured placement', 'Unlimited photos', 'Priority search'] },
+            { id: 'premium', name: 'Premium', price: '$59/mo', features: ['Homepage feature', 'Verified badge', 'Performance reports'] },
+          ].map((plan) => (
+            <div key={plan.name} className="p-4" style={{ background: 'var(--bg-secondary)', borderRadius: '8px' }}>
+              <p className="text-[15px] font-semibold mb-1" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>{plan.name}</p>
+              <p className="text-[18px] font-medium mb-3" style={{ color: 'var(--brand-rose)', fontFamily: 'var(--font-body)' }}>{plan.price}</p>
+              {plan.features.map((f) => (
+                <p key={f} className="text-[12px] py-1" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{f}</p>
+              ))}
+              {plan.id !== 'free' && provider && (
+                <form action={`/api/checkout?plan=${plan.id}${providerQuery}`} method="POST" className="mt-4">
+                  <button type="submit" className="w-full py-2 text-[12px] font-medium text-white" style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
+                    Choose {plan.name}
+                  </button>
+                </form>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

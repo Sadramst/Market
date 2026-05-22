@@ -218,7 +218,7 @@ public static partial class DatabaseSeeder
         // Perth metropolitan and key WA suburbs for SEO
         var suburbs = new (string Name, string PostCode)[]
         {
-            ("Perth CBD", "6000"), ("Northbridge", "6003"), ("West Perth", "6005"),
+            ("Perth", "6000"), ("Northbridge", "6003"), ("West Perth", "6005"),
             ("East Perth", "6004"), ("South Perth", "6151"), ("Subiaco", "6008"),
             ("Leederville", "6007"), ("Mount Lawley", "6050"), ("Highgate", "6003"),
             ("Inglewood", "6052"), ("Maylands", "6051"), ("Bayswater", "6053"),
@@ -315,6 +315,9 @@ public static partial class DatabaseSeeder
             ("Mount Hawthorn", "6016"),
             ("South Perth", "6151"),
             ("Cockburn Central", "6164"),
+            ("West Leederville", "6007"),
+            ("Malaga", "6090"),
+            ("Wembley", "6014"),
         };
 
         foreach (var (name, postCode) in missing)
@@ -334,5 +337,14 @@ public static partial class DatabaseSeeder
         }
 
         await context.SaveChangesAsync();
+
+        // Fix Perth CBD → Perth for frontend slug consistency
+        var perthCbd = await context.Suburbs.FirstOrDefaultAsync(s => s.Slug == "perth-cbd");
+        if (perthCbd != null)
+        {
+            perthCbd.Name = "Perth";
+            perthCbd.Slug = "perth";
+            await context.SaveChangesAsync();
+        }
     }
 }

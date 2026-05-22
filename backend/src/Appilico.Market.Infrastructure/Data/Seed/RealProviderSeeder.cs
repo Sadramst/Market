@@ -44,7 +44,18 @@ public static partial class DatabaseSeeder
 
         var hours = """{"mon":"9:00-17:30","tue":"9:00-17:30","wed":"9:00-17:30","thu":"9:00-20:00","fri":"9:00-17:30","sat":"9:00-16:00","sun":"Closed"}""";
 
-        var businesses = GetRealBusinesses();
+        var businesses = GetRealBusinesses()
+            .Concat(GetRealBusinesses2())
+            .Concat(GetRealBusinesses3())
+            .Concat(GetRealBusinesses4())
+            .Concat(GetRealBusinesses5())
+            .Concat(GetRealBusinesses6())
+            .Concat(GetRealBusinesses7())
+            .Concat(GetRealBusinesses8())
+            .Concat(GetRealBusinesses9())
+            .Concat(GetRealBusinesses10())
+            .Concat(GenerateBulkProviders())
+            .ToArray();
 
         foreach (var biz in businesses)
         {
@@ -105,8 +116,17 @@ public static partial class DatabaseSeeder
             context.Providers.Add(provider);
             await context.SaveChangesAsync();
 
-            // Service area
+            // Service area — primary suburb + up to 2 nearby
             context.ProviderServiceAreas.Add(new ProviderServiceArea { ProviderId = provider.Id, SuburbId = suburb.Id });
+            if (int.TryParse(suburb.PostCode, out var homePostCode))
+            {
+                var nearbySuburbs = suburbs.Where(s => s.Id != suburb.Id
+                    && int.TryParse(s.PostCode, out var npc)
+                    && Math.Abs(npc - homePostCode) <= 3)
+                    .Take(2).ToList();
+                foreach (var ns in nearbySuburbs)
+                    context.ProviderServiceAreas.Add(new ProviderServiceArea { ProviderId = provider.Id, SuburbId = ns.Id });
+            }
 
             // Services - parse from the string array
             var parentCat = FindCat(biz.CategorySlug);

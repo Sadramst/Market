@@ -16,37 +16,43 @@ public static partial class DatabaseSeeder
 
     public static async Task SeedRealProviders(AppDbContext context, UserManager<AppUser> userManager)
     {
-        // Delete all fake/demo providers
-        var fakeProviders = await context.Providers.Where(p => !p.HasRealData).ToListAsync();
-        if (fakeProviders.Any())
+        // Delete ALL existing providers to start fresh with clean Google data
+        var existingProviders = await context.Providers.ToListAsync();
+        if (existingProviders.Any())
         {
+            var existingIds = existingProviders.Select(p => p.Id).ToList();
+
             // Delete related entities first
-            var fakeIds = fakeProviders.Select(p => p.Id).ToList();
-            var fakeReviews = await context.Reviews.Where(r => fakeIds.Contains(r.ProviderId)).ToListAsync();
-            context.Reviews.RemoveRange(fakeReviews);
-            var fakeServices = await context.ProviderServices.Where(s => fakeIds.Contains(s.ProviderId)).ToListAsync();
-            context.ProviderServices.RemoveRange(fakeServices);
-            var fakeGallery = await context.ProviderGalleryImages.Where(g => fakeIds.Contains(g.ProviderId)).ToListAsync();
-            context.ProviderGalleryImages.RemoveRange(fakeGallery);
-            var fakeAreas = await context.ProviderServiceAreas.Where(a => fakeIds.Contains(a.ProviderId)).ToListAsync();
-            context.ProviderServiceAreas.RemoveRange(fakeAreas);
+            var reviews = await context.Reviews.Where(r => existingIds.Contains(r.ProviderId)).ToListAsync();
+            context.Reviews.RemoveRange(reviews);
+            var services = await context.ProviderServices.Where(s => existingIds.Contains(s.ProviderId)).ToListAsync();
+            context.ProviderServices.RemoveRange(services);
+            var gallery = await context.ProviderGalleryImages.Where(g => existingIds.Contains(g.ProviderId)).ToListAsync();
+            context.ProviderGalleryImages.RemoveRange(gallery);
+            var areas = await context.ProviderServiceAreas.Where(a => existingIds.Contains(a.ProviderId)).ToListAsync();
+            context.ProviderServiceAreas.RemoveRange(areas);
             
-            var fakeSubs = await context.Set<Domain.Subscriptions.ProviderSubscription>().Where(s => fakeIds.Contains(s.ProviderId)).ToListAsync();
-            context.Set<Domain.Subscriptions.ProviderSubscription>().RemoveRange(fakeSubs);
+            try {
+                var subs = await context.Set<Domain.Subscriptions.ProviderSubscription>().Where(s => existingIds.Contains(s.ProviderId)).ToListAsync();
+                context.Set<Domain.Subscriptions.ProviderSubscription>().RemoveRange(subs);
+            } catch { /* table may not exist */ }
 
-            var fakeFollows = await context.Set<Domain.Social.Follow>().Where(f => fakeIds.Contains(f.ProviderId)).ToListAsync();
-            context.Set<Domain.Social.Follow>().RemoveRange(fakeFollows);
+            try {
+                var follows = await context.Set<Domain.Social.Follow>().Where(f => existingIds.Contains(f.ProviderId)).ToListAsync();
+                context.Set<Domain.Social.Follow>().RemoveRange(follows);
+            } catch { /* table may not exist */ }
 
-            // Also clean up any conversations where these providers were involved
-            var fakeConvos = await context.Set<Domain.Messaging.Conversation>().Where(c => fakeIds.Contains(c.ProviderId)).ToListAsync();
-            context.Set<Domain.Messaging.Conversation>().RemoveRange(fakeConvos);
+            try {
+                var convos = await context.Set<Domain.Messaging.Conversation>().Where(c => existingIds.Contains(c.ProviderId)).ToListAsync();
+                context.Set<Domain.Messaging.Conversation>().RemoveRange(convos);
+            } catch { /* table may not exist */ }
 
-            context.Providers.RemoveRange(fakeProviders);
+            context.Providers.RemoveRange(existingProviders);
             await context.SaveChangesAsync();
         }
 
         var categories = await context.Categories.Where(c => c.MarketplaceType == ProviderType.Beauty).ToListAsync();
-        var subs = categories.Where(c => c.ParentCategoryId != null).ToList();
+        var subCategories = categories.Where(c => c.ParentCategoryId != null).ToList();
         var parents = categories.Where(c => c.ParentCategoryId == null).ToList();
         var suburbs = await context.Suburbs.Where(s => s.IsActive).ToListAsync();
         if (!categories.Any() || !suburbs.Any()) return;
@@ -55,17 +61,7 @@ public static partial class DatabaseSeeder
 
         var hours = """{"mon":"9:00-17:30","tue":"9:00-17:30","wed":"9:00-17:30","thu":"9:00-20:00","fri":"9:00-17:30","sat":"9:00-16:00","sun":"Closed"}""";
 
-        var businesses = GetRealBusinesses()
-            .Concat(GetRealBusinesses2())
-            .Concat(GetRealBusinesses3())
-            .Concat(GetRealBusinesses4())
-            .Concat(GetRealBusinesses5())
-            .Concat(GetRealBusinesses6())
-            .Concat(GetRealBusinesses7())
-            .Concat(GetRealBusinesses8())
-            .Concat(GetRealBusinesses9())
-            .Concat(GetRealBusinesses10())
-            .Concat(GenerateBulkProviders())
+        var businesses = GenerateBulkProviders()
             .ToArray();
 
         foreach (var biz in businesses)

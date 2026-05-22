@@ -48,11 +48,21 @@ public static partial class DatabaseSeeder
 
             var categorySlug = place.categories.FirstOrDefault()?.ToLower() ?? "nails";
             
-            // Map category exact to what's expected if needed, e.g. "brows" -> "brows", "lashes" -> "lashes", "skin" -> "skin-care", "nails" -> "nails"
-            if (categorySlug == "skin") categorySlug = "skin-care";
-            else if (categorySlug == "brows") categorySlug = "brows";
-            else if (categorySlug == "lashes") categorySlug = "lashes";
-            else categorySlug = "nails"; // default to nails
+            // Map Google category names to database category slugs
+            categorySlug = categorySlug switch
+            {
+                "skin" => "skin-care",
+                "skin care" => "skin-care",
+                "brows" => "brows",
+                "lashes" => "lashes",
+                "nails" => "nails",
+                "hair" => "hair",
+                "makeup" => "makeup",
+                "body" => "body",
+                "wellness" => "wellness",
+                "cosmetic" => "cosmetic",
+                _ => "nails"
+            };
 
             businesses.Add(new RealBiz(
                 Name: string.IsNullOrWhiteSpace(place.businessName) ? "Unknown Business" : place.businessName,

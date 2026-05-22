@@ -7,6 +7,9 @@ import { Breadcrumbs } from "@/components/ui";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 
+// Force dynamic rendering so category pages always fetch fresh data
+export const dynamic = "force-dynamic";
+
 const CATEGORY_GRADIENTS: Record<string, string> = {
   nails: "linear-gradient(135deg, #E8A8AD, #C8737A)",
   hair: "linear-gradient(135deg, #E8D5B0, #C9A96E)",
@@ -18,10 +21,6 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   cosmetic: "linear-gradient(135deg, #C4A8C8, #9B7B84)",
   wellness: "linear-gradient(135deg, #A8C8B8, #7B9B8C)",
 };
-
-export function generateStaticParams() {
-  return BEAUTY_CATEGORIES.map((cat) => ({ slug: cat.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -42,7 +41,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const providersData = await fetchApi<{
     items: Array<{ slug: string; businessName: string; city?: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string; categories?: string[] }>;
     pagination: { totalCount: number };
-  }>(`/providers/search?category=${slug}&marketplaceType=0&pageSize=12`, { revalidate: 300, tags: ["providers", slug] });
+  }>(`/providers/search?category=${slug}&marketplaceType=0&pageSize=24`, { revalidate: 60, tags: ["providers", slug] });
 
   const providers = providersData?.items ?? [];
   const totalCount = providersData?.pagination?.totalCount ?? 0;
@@ -67,11 +66,20 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       {/* Providers */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {providers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {providers.map((p) => (
-              <ProviderCard key={p.slug} {...p} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {providers.map((p) => (
+                <ProviderCard key={p.slug} {...p} />
+              ))}
+            </div>
+            {totalCount > providers.length && (
+              <div className="text-center mt-10">
+                <Link href={`/search?category=${slug}`} className="inline-block px-8 py-3 text-[14px] font-medium transition-all" style={{ border: '1px solid var(--brand-rose)', color: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}>
+                  View All {totalCount} {cat.name} Providers →
+                </Link>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px' }}>
             <span className="text-[48px] block mb-4">{cat.icon}</span>

@@ -133,24 +133,60 @@ test.describe("Beauty – Categories Page", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("shows category links", async ({ page }) => {
+  test("shows all 9 category links", async ({ page }) => {
     await page.goto("/categories");
-    // Should have links to individual categories
     const categoryLinks = page.locator('a[href*="/category/"]');
-    await expect(categoryLinks.first()).toBeVisible();
+    const count = await categoryLinks.count();
+    expect(count).toBeGreaterThanOrEqual(9);
+  });
+
+  test("each category link is clickable", async ({ page }) => {
+    await page.goto("/categories");
+    const firstLink = page.locator('a[href*="/category/"]').first();
+    await expect(firstLink).toBeVisible();
+    const href = await firstLink.getAttribute("href");
+    expect(href).toBeTruthy();
   });
 });
 
-test.describe("Beauty – Category Detail", () => {
-  test("loads a category page", async ({ page }) => {
-    const response = await page.goto("/category/nails");
-    expect(response?.status()).toBe(200);
-    await expect(page.locator("body")).toBeVisible();
+test.describe("Beauty – Category Detail (all categories)", () => {
+  const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "cosmetic", "wellness"];
+
+  for (const cat of categories) {
+    test(`${cat} category page loads with providers`, async ({ page }) => {
+      const response = await page.goto(`/category/${cat}`);
+      expect(response?.status()).toBe(200);
+      await expect(page.locator("h1")).toBeVisible();
+      // Should show provider count
+      await expect(page.locator("body")).toContainText(/provider/i);
+      // Should show provider cards OR "no providers" message
+      const hasProviders = await page.locator('a[href^="/provider/"]').count();
+      const hasEmptyMsg = await page.locator("text=/No .+ providers yet/i").count();
+      expect(hasProviders + hasEmptyMsg).toBeGreaterThan(0);
+    });
+  }
+
+  test("nails category shows provider cards", async ({ page }) => {
+    await page.goto("/category/nails");
+    const cards = page.locator('a[href^="/provider/"]');
+    const count = await cards.count();
+    expect(count).toBeGreaterThan(0);
   });
 
-  test("shows providers for category", async ({ page }) => {
+  test("category page has breadcrumbs", async ({ page }) => {
     await page.goto("/category/nails");
-    await expect(page.locator("body")).toContainText(/nail/i);
+    // Should have a nav with breadcrumb
+    const breadcrumbNav = page.locator('nav[aria-label="Breadcrumb"]');
+    await expect(breadcrumbNav).toBeVisible();
+    // Should contain Home and Categories links
+    await expect(breadcrumbNav.locator('a[href="/"]')).toBeVisible();
+    await expect(breadcrumbNav.locator('a[href="/categories"]')).toBeVisible();
+  });
+
+  test("category page has JSON-LD", async ({ page }) => {
+    await page.goto("/category/nails");
+    const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
+    expect(jsonLd).toBeTruthy();
   });
 });
 

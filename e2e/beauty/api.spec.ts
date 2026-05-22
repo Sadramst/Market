@@ -205,3 +205,22 @@ test.describe("API – Health & Core Endpoints", () => {
     expect(hasChildren).toBe(true);
   });
 });
+
+test.describe("API – Category Provider Counts", () => {
+  const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "wellness"];
+
+  for (const cat of categories) {
+    test(`${cat} category returns providers`, async ({ request }) => {
+      const res = await request.get(`${API}/providers/search?category=${cat}&marketplaceType=0&pageSize=3`, { timeout: 15_000 });
+      if (res.status() === 503) {
+        test.skip(true, "API temporarily unavailable");
+        return;
+      }
+      expect(res.status()).toBe(200);
+      const body = await res.json();
+      expect(body.success).toBe(true);
+      expect(body.data.pagination.totalCount).toBeGreaterThan(0);
+      expect(body.data.items.length).toBeGreaterThan(0);
+    });
+  }
+});

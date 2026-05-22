@@ -30,6 +30,7 @@ public static partial class DatabaseSeeder
         await SeedAppSettings(context);
         await SeedMissingSuburbs(context);
         await SeedRealProviders(context, userManager);
+        await SeedDetailedProviders(context, userManager);
     }
 
     private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)

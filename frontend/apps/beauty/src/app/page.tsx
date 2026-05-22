@@ -3,6 +3,7 @@ import { fetchApi } from "@/lib/api";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
+import { HeroSearchForm } from "@/components/search/HeroSearchForm";
 
 const popularSuburbs = [
   { name: "Perth CBD", slug: "perth" },
@@ -64,20 +65,7 @@ export default async function HomePage() {
                 Compare reviews, browse portfolios, and connect directly with top-rated salons, spas, and beauty experts across Perth.
               </p>
 
-              {/* Search */}
-              <form action="/search" method="GET" className="animate-fade-in-up animation-delay-300 mt-10 max-w-[540px]">
-                <div className="flex gap-0" style={{ border: '1px solid var(--border)', background: 'var(--bg-card)' }}>
-                  <div className="flex-1 relative">
-                    <input type="text" name="q" placeholder="Service or salon name" className="w-full px-4 py-4 border-0 bg-transparent focus:outline-none text-[15px]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }} />
-                  </div>
-                  <div className="flex-1 relative" style={{ borderLeft: '1px solid var(--border)' }}>
-                    <input type="text" name="suburb" placeholder="Suburb" className="w-full px-4 py-4 border-0 bg-transparent focus:outline-none text-[15px]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }} />
-                  </div>
-                  <button type="submit" className="px-6 py-4 text-[14px] font-medium text-white shrink-0 transition-all duration-200" style={{ background: 'var(--brand-rose)', fontFamily: 'var(--font-body)', borderRadius: 0 }}>
-                    Search
-                  </button>
-                </div>
-              </form>
+              <HeroSearchForm />
 
               {/* Trending pills */}
               <div className="animate-fade-in-up animation-delay-400 mt-5 flex flex-wrap items-center gap-2">

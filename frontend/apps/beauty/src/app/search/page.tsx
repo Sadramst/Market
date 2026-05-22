@@ -5,6 +5,7 @@ import { generatePageMeta } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
+import { SuburbAutocomplete } from "@/components/search/SuburbAutocomplete";
 
 export const metadata: Metadata = generatePageMeta({
   title: "Browse Beauty Providers in Perth",
@@ -86,12 +87,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               style={{ border: '1px solid var(--border)', borderRadius: '2px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}
             />
           </div>
-          <div className="sm:w-48">
-            <input type="text" name="suburb" defaultValue={suburb} placeholder="Suburb"
-              className="w-full px-4 py-3.5 text-[15px] bg-transparent focus:outline-none"
-              style={{ border: '1px solid var(--border)', borderRadius: '2px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}
-            />
-          </div>
+          <SuburbAutocomplete defaultValue={suburb} />
           <select name="sort" defaultValue={sort}
             className="px-4 py-3.5 text-[13px] bg-transparent focus:outline-none sm:w-44"
             style={{ border: '1px solid var(--border)', borderRadius: '2px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
@@ -173,14 +169,21 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <span className="text-[48px] block mb-4">🔍</span>
           <h3 className="text-[20px]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>No providers found</h3>
           <p className="text-[14px] mt-2 max-w-md mx-auto" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
-            {query ? `No results for "${query}". Try different search terms or browse by category.` : "No beauty providers are listed yet. Check back soon!"}
+            {query
+              ? `We couldn't find results for "${query}"${suburb ? ` in ${suburb}` : ""}. Try a different search term, remove the suburb filter, or browse by category below.`
+              : suburb
+              ? `No providers found in ${suburb} yet. Try searching nearby suburbs or browse all providers.`
+              : "No beauty providers match your current filters. Try adjusting your search or browse by category."}
           </p>
-          <div className="flex justify-center gap-3 mt-6">
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Link href="/search" className="px-6 py-3 text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}>
-              Clear Filters
+              Browse All Providers
             </Link>
             <Link href="/categories" className="px-6 py-3 text-[14px] font-medium" style={{ border: '1px solid var(--border)', borderRadius: '2px', color: 'var(--text-secondary)' }}>
               Browse Categories
+            </Link>
+            <Link href="/suburbs" className="px-6 py-3 text-[14px] font-medium" style={{ border: '1px solid var(--brand-gold)', borderRadius: '2px', color: 'var(--brand-gold)' }}>
+              Browse Suburbs
             </Link>
           </div>
         </div>

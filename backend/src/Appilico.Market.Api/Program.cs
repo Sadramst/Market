@@ -167,7 +167,8 @@ app.UseExceptionHandling();
 app.UseSerilogRequestLogging();
 app.UseIpRateLimiting();
 
-if (app.Environment.IsDevelopment())
+var swaggerEnabled = app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Swagger:Enabled");
+if (swaggerEnabled)
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Appilico Market API v1"));

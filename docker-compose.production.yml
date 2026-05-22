@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   api:
     build:
@@ -9,20 +7,23 @@ services:
     restart: always
     ports:
       - "127.0.0.1:5000:5000"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=appilico_market;Username=${DB_USER};Password=${DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
       - Jwt__Key=${JWT_SECRET_KEY}
       - Jwt__Issuer=appilico-market-api
       - Jwt__Audience=appilico-market-clients
       - Jwt__ExpiryMinutes=60
+      - Swagger__Enabled=${SWAGGER_ENABLED:-false}
+      - Billing__WebhookSecret=${BILLING_WEBHOOK_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - api_logs:/var/log/appilico
-      - api_uploads:/app/wwwroot/uploads
     networks:
       - appilico-net
 
@@ -86,7 +87,6 @@ services:
 volumes:
   postgres_data:
   api_logs:
-  api_uploads:
 
 networks:
   appilico-net:

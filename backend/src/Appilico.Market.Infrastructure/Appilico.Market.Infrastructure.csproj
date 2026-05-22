@@ -20,9 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Data\Seed\google_providers.json">
+    <Content Include="Data\Seed\google_providers.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>

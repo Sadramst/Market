@@ -50,6 +50,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       tagline?: string;
       city?: string;
       state?: string;
+      fullAddress?: string;
+      phone?: string;
+      website?: string;
       averageRating: number;
       totalReviews: number;
       logoUrl?: string;

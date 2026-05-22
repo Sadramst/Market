@@ -7,6 +7,9 @@ type ProviderCardProps = {
   tagline?: string;
   city?: string;
   state?: string;
+  fullAddress?: string;
+  phone?: string;
+  website?: string;
   averageRating: number;
   totalReviews: number;
   logoUrl?: string;
@@ -48,6 +51,9 @@ export function ProviderCard({
   businessName,
   tagline,
   city,
+  fullAddress,
+  phone,
+  website,
   averageRating,
   totalReviews,
   logoUrl,
@@ -117,6 +123,30 @@ export function ProviderCard({
             <span className="text-[12px] font-medium" style={{ color: 'var(--brand-gold)' }}>New listing</span>
           )}
         </div>
+
+        {fullAddress && (
+          <div className="text-[12px] mt-2 flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+            <span className="shrink-0 mt-0.5">📍</span>
+            <span className="truncate">{fullAddress}</span>
+          </div>
+        )}
+
+        {(phone || website) && (
+          <div className="flex items-center gap-3 mt-1.5 overflow-hidden">
+            {phone && (
+              <div className="text-[12px] flex items-center gap-1 shrink-0" style={{ color: 'var(--text-secondary)' }}>
+                <span>📞</span>
+                <span>{phone}</span>
+              </div>
+            )}
+            {website && (
+              <div className="text-[12px] flex items-center gap-1 truncate" style={{ color: 'var(--text-secondary)' }}>
+                <span>🌐</span>
+                <span className="truncate">{website.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Description */}
         {tagline && (

@@ -58,6 +58,9 @@ public class ProviderListDto
     public string? City { get; set; }
     public string? State { get; set; }
     public string? Tagline { get; set; }
+    public string? FullAddress { get; set; }
+    public string? Phone { get; set; }
+    public string? Website { get; set; }
     public bool IsClaimed { get; set; }
     public bool HasRealData { get; set; }
     public List<string> Categories { get; set; } = [];

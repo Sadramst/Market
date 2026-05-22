@@ -30,6 +30,17 @@ public static partial class DatabaseSeeder
             context.ProviderGalleryImages.RemoveRange(fakeGallery);
             var fakeAreas = await context.ProviderServiceAreas.Where(a => fakeIds.Contains(a.ProviderId)).ToListAsync();
             context.ProviderServiceAreas.RemoveRange(fakeAreas);
+            
+            var fakeSubs = await context.Set<Domain.Subscriptions.ProviderSubscription>().Where(s => fakeIds.Contains(s.ProviderId)).ToListAsync();
+            context.Set<Domain.Subscriptions.ProviderSubscription>().RemoveRange(fakeSubs);
+
+            var fakeFollows = await context.Set<Domain.Social.Follow>().Where(f => fakeIds.Contains(f.ProviderId)).ToListAsync();
+            context.Set<Domain.Social.Follow>().RemoveRange(fakeFollows);
+
+            // Also clean up any conversations where these providers were involved
+            var fakeConvos = await context.Set<Domain.Messaging.Conversation>().Where(c => fakeIds.Contains(c.ProviderId)).ToListAsync();
+            context.Set<Domain.Messaging.Conversation>().RemoveRange(fakeConvos);
+
             context.Providers.RemoveRange(fakeProviders);
             await context.SaveChangesAsync();
         }

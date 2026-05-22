@@ -278,7 +278,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                   ))}
                 </div>
               ) : (
-                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>No reviews yet. Be the first to leave a review!</p>
+                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>{provider.totalReviews > 0 ? `This provider has  reviews via Google. Detailed reviews coming soon.` : `No reviews yet. Be the first to leave a review!`}</p>
               )}
             </section>
 

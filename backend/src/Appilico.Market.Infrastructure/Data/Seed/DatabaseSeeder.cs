@@ -29,8 +29,6 @@ public static partial class DatabaseSeeder
         await SeedPerthSuburbs(context);
         await SeedAppSettings(context);
         await SeedMissingSuburbs(context);
-        await SeedBeautyProviders(context, userManager);
-        await SeedMoreBeautyProviders(context, userManager);
         await SeedRealProviders(context, userManager);
     }
 

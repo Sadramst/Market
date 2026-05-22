@@ -58,39 +58,34 @@ test.describe("Beauty – Search Page", () => {
   });
 
   test("search form works", async ({ page }) => {
-    await page.goto("/search");
+    await page.goto("/search", { waitUntil: "networkidle" });
     const searchInput = page.locator('input[name="q"]');
     await expect(searchInput).toBeVisible();
     await searchInput.fill("nails");
-    // Verify the input has the value before submitting
     await expect(searchInput).toHaveValue("nails");
-    await Promise.all([
-      page.waitForURL(/q=nails/, { timeout: 15_000 }),
-      page.locator('button[type="submit"]').click(),
-    ]);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/q=nails/, { timeout: 15_000 });
     await expect(page.locator("body")).toContainText(/result|provider|nails/i);
   });
 
   test("suburb filter works", async ({ page }) => {
-    await page.goto("/search");
+    await page.goto("/search", { waitUntil: "networkidle" });
     const suburbInput = page.locator('input[name="suburb"]');
     await expect(suburbInput).toBeVisible();
     await suburbInput.fill("Perth");
+    await expect(suburbInput).toHaveValue("Perth");
     await page.locator('button[type="submit"]').click();
-    await page.waitForURL(/suburb=Perth/);
+    await expect(page).toHaveURL(/suburb=Perth/, { timeout: 15_000 });
   });
 
   test("sort dropdown works", async ({ page }) => {
-    await page.goto("/search");
+    await page.goto("/search", { waitUntil: "networkidle" });
     const sortSelect = page.locator('select[name="sort"]');
     await expect(sortSelect).toBeVisible();
     await sortSelect.selectOption("newest");
-    // Ensure value is set before submitting
     await expect(sortSelect).toHaveValue("newest");
-    await Promise.all([
-      page.waitForURL(/sort=newest/, { timeout: 15_000 }),
-      page.locator('button[type="submit"]').click(),
-    ]);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/sort=newest/, { timeout: 15_000 });
   });
 
   test("category filter pills are visible", async ({ page }) => {

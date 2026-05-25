@@ -26,7 +26,8 @@ public static partial class DatabaseSeeder
         var suburbs = await context.Suburbs.Where(s => s.IsActive).ToListAsync();
         if (!categories.Any() || !suburbs.Any()) return;
 
-        Category? FindCat(string slug) => parents.FirstOrDefault(c => c.Slug == slug);
+        Category? FindCat(string slug) => parents.FirstOrDefault(c => c.Slug == slug)
+            ?? categories.FirstOrDefault(c => c.Slug == slug); // Fallback to subcategories (e.g. "massage" under Body)
 
         var hours = """{"mon":"9:00-17:30","tue":"9:00-17:30","wed":"9:00-17:30","thu":"9:00-20:00","fri":"9:00-17:30","sat":"9:00-16:00","sun":"Closed"}""";
 

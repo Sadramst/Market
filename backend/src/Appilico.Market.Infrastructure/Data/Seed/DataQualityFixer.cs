@@ -16,7 +16,9 @@ public static partial class DatabaseSeeder
             .ToListAsync();
 
         // --- BULK FIX: Reassign all massage_providers.json providers to the Massage category ---
-        var massageCat = categories.FirstOrDefault(c => c.Slug == "massage");
+        // Massage may exist as parent OR subcategory (under Body) depending on seed history
+        var massageCat = categories.FirstOrDefault(c => c.Slug == "massage")
+            ?? await context.Categories.FirstOrDefaultAsync(c => c.Slug == "massage");
         if (massageCat != null)
         {
             // Find all providers from massage_providers.json — they have HasRealData, ProviderType=Beauty,

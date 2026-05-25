@@ -24,7 +24,7 @@ public static partial class DatabaseSeeder
 
         await SeedRoles(roleManager);
         await SeedUsers(userManager);
-        await SeedBeautyCategories(context);
+        try { await SeedBeautyCategories(context); } catch { /* slug conflicts handled gracefully */ }
         await SeedITCategories(context);
         await SeedPerthSuburbs(context);
         await SeedAppSettings(context);
@@ -80,7 +80,11 @@ public static partial class DatabaseSeeder
 
     private static async Task SeedBeautyCategories(AppDbContext context)
     {
-        var existingSlugs = await context.Categories
+        var allExistingSlugs = await context.Categories
+            .Where(c => c.MarketplaceType == ProviderType.Beauty)
+            .Select(c => c.Slug)
+            .ToListAsync();
+        var existingParentSlugs = await context.Categories
             .Where(c => c.MarketplaceType == ProviderType.Beauty && c.ParentCategoryId == null)
             .Select(c => c.Slug)
             .ToListAsync();
@@ -158,7 +162,7 @@ public static partial class DatabaseSeeder
 
         foreach (var (name, slug, icon, subs) in beautyCategories)
         {
-            if (existingSlugs.Contains(slug)) continue; // Skip already-existing categories
+            if (allExistingSlugs.Contains(slug)) continue; // Skip if slug exists (as parent or sub)
 
             var parent = new Category
             {
@@ -173,6 +177,8 @@ public static partial class DatabaseSeeder
 
             foreach (var (subName, subSlug) in subs)
             {
+                if (allExistingSlugs.Contains(subSlug)) continue; // Skip existing sub slugs
+
                 context.Categories.Add(new Category
                 {
                     Name = subName,

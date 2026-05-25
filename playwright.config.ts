@@ -22,7 +22,7 @@ export default defineConfig({
     {
       name: "services",
       testDir: "./e2e/services",
-      use: { baseURL: "https://services.appilico.com.au" },
+      use: { baseURL: "https://service.appilico.com.au" },
     },
     {
       name: "admin",

@@ -46,7 +46,26 @@ export function LoginForm() {
       localStorage.setItem("beauty_access_token", json.data.accessToken);
       localStorage.setItem("beauty_refresh_token", json.data.refreshToken);
       localStorage.setItem("beauty_user", JSON.stringify(json.data.user));
-      router.push("/dashboard");
+
+      // Eagerly fetch full profile to sync suburb → location chip
+      try {
+        const meRes = await fetch(`${API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${json.data.accessToken}` },
+        });
+        const meJson = await meRes.json().catch(() => null);
+        if (meJson?.success && meJson?.data?.suburb && meJson?.data?.postCode) {
+          const { suburb, postCode, state } = meJson.data;
+          localStorage.setItem("appilico_preferred_suburb", JSON.stringify({
+            id: "profile", name: suburb, slug: suburb.toLowerCase().replace(/\s+/g, "-"),
+            state: state || "WA", postCode, providerCount: 0, distanceKm: 0,
+          }));
+        }
+      } catch { /* non-critical — location chip can stay unset */ }
+
+      // Customers go to their profile; providers/admins go to the dashboard
+      const roles: string[] = json.data.user.roles ?? [];
+      const isProviderOrAdmin = roles.some((r) => r === "Provider" || r === "SuperAdmin" || r === "Moderator");
+      router.push(isProviderOrAdmin ? "/dashboard" : "/profile");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to sign in");
     } finally {

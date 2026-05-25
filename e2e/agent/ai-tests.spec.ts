@@ -22,7 +22,7 @@ try {
 }
 
 const BEAUTY_URL = process.env.BEAUTY_URL || "https://beauty.appilico.com.au";
-const SERVICES_URL = process.env.SERVICES_URL || "https://services.appilico.com.au";
+const SERVICES_URL = process.env.SERVICES_URL || "https://service.appilico.com.au";
 const API_URL = process.env.API_URL || "https://api.appilico.com.au/api";
 const API_ROOT = process.env.API_ROOT || "https://api.appilico.com.au"; // root (no /api prefix)
 

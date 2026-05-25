@@ -4,7 +4,7 @@
 
 | Status | Count |
 |--------|-------|
-| 🔴 Open | 7 |
+| 🔴 Open | 9 |
 | ✅ Resolved | 2 |
 
 ---
@@ -85,6 +85,24 @@
 - **Area**: services
 - **First seen**: 2026-05-25
 - **Test**: ui-services-logo
+
+> page.goto: net::ERR_NAME_NOT_RESOLVED at https://services.appilico.com.au/
+> Call log:
+> [2m  - navigating to "https://services.appilico.com.au/", waiting until "load"[22m
+
+## BUG-010 User signup flow works end-to-end `open`
+
+- **Area**: auth
+- **First seen**: 2026-05-25
+- **Test**: ui-signup-flow
+
+> The ai() function is missing the required `{ page, test }` argument.
+
+## BUG-011 Services homepage loads `open`
+
+- **Area**: services
+- **First seen**: 2026-05-25
+- **Test**: ui-services-home
 
 > page.goto: net::ERR_NAME_NOT_RESOLVED at https://services.appilico.com.au/
 > Call log:

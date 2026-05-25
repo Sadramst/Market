@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/api";
 
 interface UserProfile {
@@ -72,13 +73,22 @@ export function ProviderDashboard() {
   const [provider, setProvider] = useState<ProviderProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const router = useRouter();
 
   const loadData = useCallback(async (storedToken: string) => {
     const profileResponse = await fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${storedToken}` } });
     const profileJson = await profileResponse.json().catch(() => null) as { success?: boolean; data?: UserProfile } | null;
     if (!profileResponse.ok || !profileJson?.success || !profileJson.data) {
       localStorage.removeItem("beauty_access_token");
-      setLoading(false);
+      router.push("/login");
+      return;
+    }
+
+    // Customers don't have a provider dashboard — send them to their profile
+    const roles: string[] = profileJson.data.roles ?? [];
+    const isProviderOrAdmin = roles.some((r) => r === "Provider" || r === "SuperAdmin" || r === "Moderator");
+    if (!isProviderOrAdmin) {
+      router.push("/profile");
       return;
     }
 
@@ -92,7 +102,7 @@ export function ProviderDashboard() {
     }
 
     setLoading(false);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("beauty_access_token");

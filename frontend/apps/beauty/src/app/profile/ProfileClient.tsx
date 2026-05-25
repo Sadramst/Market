@@ -77,6 +77,19 @@ export function ProfileClient() {
         if (json?.success && json?.data) {
           setProfile(json.data);
           setForm(json.data);
+          // Sync profile suburb/postCode to location chip in header
+          const { suburb, postCode } = json.data;
+          if (suburb && postCode) {
+            const stored = localStorage.getItem("appilico_preferred_suburb");
+            const current = stored ? JSON.parse(stored) : null;
+            // Only update if postCode changed (avoid overwriting GPS-detected suburb)
+            if (!current || current.postCode !== postCode) {
+              localStorage.setItem("appilico_preferred_suburb", JSON.stringify({
+                id: "profile", name: suburb, slug: suburb.toLowerCase().replace(/\s+/g, "-"),
+                state: json.data.state || "WA", postCode, providerCount: 0, distanceKm: 0,
+              }));
+            }
+          }
         } else {
           router.push("/login");
         }
@@ -111,13 +124,21 @@ export function ProfileClient() {
       if (json?.success && json?.data) {
         setProfile(json.data);
         setForm(json.data);
-        // Also update localStorage user object
+        // Update stored user name
         const stored = localStorage.getItem("beauty_user");
         if (stored) {
           const user = JSON.parse(stored);
           user.firstName = json.data.firstName;
           user.lastName = json.data.lastName;
           localStorage.setItem("beauty_user", JSON.stringify(user));
+        }
+        // Sync suburb/postCode to location chip
+        const { suburb, postCode, state } = json.data;
+        if (suburb && postCode) {
+          localStorage.setItem("appilico_preferred_suburb", JSON.stringify({
+            id: "profile", name: suburb, slug: suburb.toLowerCase().replace(/\s+/g, "-"),
+            state: state || "WA", postCode, providerCount: 0, distanceKm: 0,
+          }));
         }
         setSuccess(true);
         setEditing(false);

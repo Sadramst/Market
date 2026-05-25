@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-const SERVICES_URL = "https://services.appilico.com.au";
 const API = "https://api.appilico.com.au/api";
+// Note: services Vercel deployment is at service.appilico.com.au (no trailing 's')
 
 // ──────────────────────────────────────────────
 // Core Pages

@@ -38,6 +38,7 @@ const CATEGORY_META: Record<string, { icon: string; gradient: string }> = {
   'skin care': { icon: '🧴', gradient: 'linear-gradient(135deg, #A8C8B0, #7B9B84)' },
   makeup: { icon: '💄', gradient: 'linear-gradient(135deg, #D4A0A8, #A35560)' },
   body: { icon: '🌸', gradient: 'linear-gradient(135deg, #E8A8C0, #C8737A)' },
+  massage: { icon: '💆', gradient: 'linear-gradient(135deg, #B8D4D4, #6B9B9B)' },
   cosmetic: { icon: '💉', gradient: 'linear-gradient(135deg, #C4A8C8, #9B7B84)' },
   wellness: { icon: '🧘', gradient: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)' },
 };
@@ -169,7 +170,7 @@ export function ProviderCard({
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <span className="text-[12px]" style={{ color: 'var(--brand-gold)' }}>{trustLabel}</span>
+          <span className="text-[12px]" style={{ color: 'var(--brand-gold)' }} title="This provider's address and contact details were verified against Google Maps">{trustLabel}</span>
           <span className="text-[12px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: 'var(--brand-rose)' }}>
             View Profile →
           </span>

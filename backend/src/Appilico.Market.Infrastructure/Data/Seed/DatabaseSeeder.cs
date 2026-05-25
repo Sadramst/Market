@@ -31,6 +31,8 @@ public static partial class DatabaseSeeder
         await SeedMissingSuburbs(context);
         await SeedRealProviders(context, userManager);
         await SeedDetailedProviders(context, userManager);
+        await SeedITProviders(context, userManager);
+        await FixDataQuality(context);
     }
 
     private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
@@ -141,6 +143,14 @@ public static partial class DatabaseSeeder
                 ("Aromatherapy", "aromatherapy"),
                 ("Reflexology", "reflexology"),
                 ("Float Therapy", "float-therapy")
+            ]),
+            ("Massage", "massage", "Hand", [
+                ("Remedial Massage", "remedial-massage"),
+                ("Relaxation Massage", "relaxation-massage"),
+                ("Deep Tissue Massage", "deep-tissue-massage"),
+                ("Hot Stone Massage", "hot-stone-massage"),
+                ("Sports Massage", "sports-massage"),
+                ("Thai Massage", "thai-massage")
             ])
         };
 

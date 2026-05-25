@@ -27,7 +27,7 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const [providers, countData] = await Promise.all([
+  const [providers, countData, statsData] = await Promise.all([
     fetchApi<{ items: Array<{ slug: string; businessName: string; city: string; averageRating: number; totalReviews: number; logoUrl?: string; tagline?: string; categories?: string[] }> }>(
       "/providers/search?pageSize=6&sortBy=rating&marketplaceType=0",
       { revalidate: 300, tags: ["featured-providers"] }
@@ -36,9 +36,15 @@ export default async function HomePage() {
       "/providers/search?pageSize=1&marketplaceType=0",
       { revalidate: 300, tags: ["provider-count"] }
     ),
+    fetchApi<{ providerCount: number; suburbCount: number; categoryCount: number }>(
+      "/providers/stats",
+      { revalidate: 300, tags: ["stats"] }
+    ),
   ]);
 
   const totalProviders = countData?.pagination?.totalCount ?? 0;
+  const suburbCount = statsData?.suburbCount ?? 70;
+  const categoryCount = statsData?.categoryCount ?? 10;
   const apiFeatured = providers?.items ?? [];
   const featuredProviders = apiFeatured.length > 0 ? apiFeatured : FALLBACK_FEATURED_PROVIDERS;
 
@@ -69,7 +75,7 @@ export default async function HomePage() {
 
               {/* Trending pills */}
               <div className="animate-fade-in-up animation-delay-400 mt-5 flex flex-wrap items-center gap-2">
-                {["Nail Art Perth", "Lash Extensions", "Balayage Subiaco", "Brow Lamination", "Facials"].map((term) => (
+                {["Nail Art Perth", "Lash Extensions", "Balayage Subiaco", "Massage Perth", "Brow Lamination", "Facials"].map((term) => (
                   <Link key={term} href={`/search?q=${encodeURIComponent(term)}`}
                     className="px-3 py-1.5 text-[12px] transition-all duration-200 hover:text-white"
                     style={{ border: '1px solid var(--border)', borderRadius: '50px', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
@@ -83,9 +89,9 @@ export default async function HomePage() {
               <div className="animate-fade-in-up animation-delay-500 mt-8 flex items-center gap-6 text-[13px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
                 <span>{totalProviders > 0 ? `${totalProviders.toLocaleString()}+` : '1,000+'} Providers</span>
                 <span style={{ color: 'var(--border)' }}>·</span>
-                <span>70+ Suburbs</span>
+                <span>{suburbCount}+ Suburbs</span>
                 <span style={{ color: 'var(--border)' }}>·</span>
-                <span>9 Categories</span>
+                <span>{categoryCount} Categories</span>
                 <span style={{ color: 'var(--border)' }}>·</span>
                 <span>Free to Start</span>
               </div>
@@ -210,7 +216,7 @@ export default async function HomePage() {
             ))}
           </div>
           <Link href="/suburbs" className="inline-block mt-8 text-[13px] transition-colors hover:underline" style={{ color: 'var(--brand-rose)', fontFamily: 'var(--font-body)' }}>
-            View all 70+ Perth suburbs →
+            View all {suburbCount}+ Perth suburbs →
           </Link>
         </div>
       </section>
@@ -286,7 +292,7 @@ export default async function HomePage() {
         <div className="max-w-[800px] mx-auto text-[16px] leading-[1.8]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
           <h2 className="text-center mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: 400 }}>Beauty Services in Perth</h2>
           <p>
-            Appilico Beauty is Perth&apos;s premier platform for discovering local beauty professionals. Whether you need a <Link href="/category/nails" style={{ color: 'var(--brand-rose)' }}>nail salon</Link>, <Link href="/category/hair" style={{ color: 'var(--brand-rose)' }}>hair stylist</Link>, <Link href="/category/lashes" style={{ color: 'var(--brand-rose)' }}>lash technician</Link>, or <Link href="/category/makeup" style={{ color: 'var(--brand-rose)' }}>makeup artist</Link>, our marketplace makes it easy to find, compare, and connect.
+            Appilico Beauty is Perth&apos;s premier platform for discovering local beauty professionals. Whether you need a <Link href="/category/nails" style={{ color: 'var(--brand-rose)' }}>nail salon</Link>, <Link href="/category/hair" style={{ color: 'var(--brand-rose)' }}>hair stylist</Link>, <Link href="/category/lashes" style={{ color: 'var(--brand-rose)' }}>lash technician</Link>, <Link href="/category/massage" style={{ color: 'var(--brand-rose)' }}>massage therapist</Link>, or <Link href="/category/makeup" style={{ color: 'var(--brand-rose)' }}>makeup artist</Link>, our marketplace makes it easy to find, compare, and connect.
           </p>
           <p className="mt-4">
             Browse verified professionals across Perth suburbs including <Link href="/subiaco" style={{ color: 'var(--brand-rose)' }}>Subiaco</Link>, <Link href="/fremantle" style={{ color: 'var(--brand-rose)' }}>Fremantle</Link>, <Link href="/joondalup" style={{ color: 'var(--brand-rose)' }}>Joondalup</Link>, <Link href="/claremont" style={{ color: 'var(--brand-rose)' }}>Claremont</Link>, and <Link href="/scarborough" style={{ color: 'var(--brand-rose)' }}>Scarborough</Link>. Every provider is reviewed by real customers.

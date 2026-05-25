@@ -22,6 +22,7 @@ const categoryFilters = [
   { label: "Skin Care", value: "skin-care" },
   { label: "Makeup", value: "makeup" },
   { label: "Body", value: "body" },
+  { label: "Massage", value: "massage" },
   { label: "Wellness", value: "wellness" },
 ];
 

@@ -1,9 +1,12 @@
 using System.Security.Claims;
 using Appilico.Market.Application.Providers.DTOs;
 using Appilico.Market.Application.Providers.Services;
+using Appilico.Market.Domain;
 using Appilico.Market.Domain.Auth;
+using Appilico.Market.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Appilico.Market.Api.Controllers;
 
@@ -12,10 +15,24 @@ namespace Appilico.Market.Api.Controllers;
 public class ProvidersController : ControllerBase
 {
     private readonly IProviderService _providerService;
+    private readonly AppDbContext _context;
 
-    public ProvidersController(IProviderService providerService) => _providerService = providerService;
+    public ProvidersController(IProviderService providerService, AppDbContext context)
+    {
+        _providerService = providerService;
+        _context = context;
+    }
 
     // --- Public ---
+
+    [HttpGet("stats")]
+    public async Task<IActionResult> GetPublicStats()
+    {
+        var providerCount = await _context.Providers.CountAsync(p => p.Status == ProviderStatus.Approved && p.ProviderType == ProviderType.Beauty);
+        var suburbCount = await _context.Suburbs.CountAsync(s => s.IsActive);
+        var categoryCount = await _context.Categories.CountAsync(c => c.IsActive && c.ParentCategoryId == null && c.MarketplaceType == ProviderType.Beauty);
+        return Ok(new { success = true, data = new { providerCount, suburbCount, categoryCount } });
+    }
 
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] ProviderSearchRequest request)

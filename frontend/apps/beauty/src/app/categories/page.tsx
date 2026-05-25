@@ -17,6 +17,7 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   "skin-care": "linear-gradient(135deg, #A8C8B0, #7B9B84)",
   makeup: "linear-gradient(135deg, #D4A0A8, #A35560)",
   body: "linear-gradient(135deg, #E8A8C0, #C8737A)",
+  massage: "linear-gradient(135deg, #B8D4D4, #6B9B9B)",
   cosmetic: "linear-gradient(135deg, #C4A8C8, #9B7B84)",
   wellness: "linear-gradient(135deg, #A8C8B8, #7B9B8C)",
 };

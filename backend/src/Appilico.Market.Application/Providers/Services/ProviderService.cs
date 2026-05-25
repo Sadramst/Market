@@ -101,7 +101,11 @@ public class ProviderService : IProviderService
                 p.BusinessName.ToLower().Contains(term) ||
                 (p.Description != null && p.Description.ToLower().Contains(term)) ||
                 (p.Tagline != null && p.Tagline.ToLower().Contains(term)) ||
-                p.Services.Any(s => s.Name.ToLower().Contains(term)));
+                (p.FullAddress != null && p.FullAddress.ToLower().Contains(term)) ||
+                (p.City != null && p.City.ToLower().Contains(term)) ||
+                p.Services.Any(s => s.Name.ToLower().Contains(term)) ||
+                p.Services.Any(s => s.Category.Name.ToLower().Contains(term)) ||
+                p.ServiceAreas.Any(sa => sa.Suburb.Name.ToLower().Contains(term)));
         }
 
         // Sorting with weighted ranking

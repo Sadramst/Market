@@ -61,6 +61,7 @@ public static partial class DatabaseSeeder
                 "body" => "body",
                 "wellness" => "wellness",
                 "cosmetic" => "cosmetic",
+                "massage" => "massage",
                 _ => "nails"
             };
 
@@ -78,6 +79,52 @@ public static partial class DatabaseSeeder
                 ReviewCount: place.totalReviews,
                 Description: place.description,
                 Services: new[] { "Consultation $50", "Signature Service $85" } // default placeholder
+            ));
+        }
+
+        return businesses.ToArray();
+    }
+
+    private static RealBiz[] GenerateMassageBulkProviders()
+    {
+        var jsonPath = Path.Combine(AppContext.BaseDirectory, "Data", "Seed", "massage_providers.json");
+        if (!File.Exists(jsonPath))
+        {
+            return Array.Empty<RealBiz>();
+        }
+
+        var jsonStr = File.ReadAllText(jsonPath);
+        var googlePlaces = JsonSerializer.Deserialize<List<GooglePlaceDto>>(jsonStr) ?? new List<GooglePlaceDto>();
+
+        var businesses = new List<RealBiz>();
+        var postcodeRegex = new Regex(@"WA\s+(\d{4})");
+
+        foreach (var place in googlePlaces)
+        {
+            var postCode = string.Empty;
+            if (!string.IsNullOrEmpty(place.address))
+            {
+                var match = postcodeRegex.Match(place.address);
+                if (match.Success)
+                {
+                    postCode = match.Groups[1].Value;
+                }
+            }
+
+            businesses.Add(new RealBiz(
+                Name: string.IsNullOrWhiteSpace(place.businessName) ? "Unknown Business" : place.businessName,
+                Slug: place.slug,
+                CategorySlug: "massage",
+                Suburb: place.suburb,
+                PostCode: postCode,
+                Address: place.address,
+                Phone: place.phoneNumber,
+                Website: place.website,
+                Instagram: null,
+                Rating: place.averageRating,
+                ReviewCount: place.totalReviews,
+                Description: place.description,
+                Services: new[] { "Remedial Massage 60min $95", "Relaxation Massage 60min $85", "Deep Tissue 60min $100" }
             ));
         }
 

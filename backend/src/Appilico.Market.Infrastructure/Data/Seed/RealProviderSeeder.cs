@@ -62,6 +62,7 @@ public static partial class DatabaseSeeder
         var hours = """{"mon":"9:00-17:30","tue":"9:00-17:30","wed":"9:00-17:30","thu":"9:00-20:00","fri":"9:00-17:30","sat":"9:00-16:00","sun":"Closed"}""";
 
         var businesses = GenerateBulkProviders()
+            .Concat(GenerateMassageBulkProviders())
             .ToArray();
 
         foreach (var biz in businesses)
@@ -634,5 +635,46 @@ public static partial class DatabaseSeeder
             null, null, null, "@bridgetblackbeauty",
             4.8, 155, "Bridget Black has earned Perth-wide recognition for expert lash extensions and beauty services. Known for a thoughtful, one-on-one approach and consistent results that look genuinely beautiful — not overdone — Bridget has built a loyal clientele who follow her wherever she sets up studio.",
             ["Classic Lash Set $125", "Hybrid $150", "Volume $168", "Lash Lift $88", "Brow Services from $45"]),
+
+        // ===== MASSAGE (8) =====
+        new("Relaxation Central Perth CBD", "relaxation-central-perth-cbd", "massage", "Perth", "6000",
+            "140 William Street, Perth WA 6000", null, "https://www.fresha.com", null,
+            4.8, 312, "One of the CBD's most frequented massage studios, Relaxation Central on William Street delivers expert remedial and relaxation massage to Perth's city workers. Heralded for their efficient booking system and consistently therapeutic results.",
+            ["Remedial 60min $95", "Relaxation 60min $85", "Deep Tissue 60min $100"]),
+
+        new("Oriental Massage Therapy Northbridge", "oriental-massage-therapy-northbridge", "massage", "Northbridge", "6003",
+            "248 William Street, Northbridge WA 6003", null, "https://www.fresha.com", null,
+            4.7, 445, "A long-established massage therapy studio in Northbridge with hundreds of loyal regulars. Specialising in traditional Eastern massage techniques including remedial, hot stone and deep tissue — affordable, consistent and therapeutic.",
+            ["Relaxation 60min $70", "Remedial 60min $85", "Hot Stone 60min $90"]),
+
+        new("Zing Remedial Massage Mount Lawley", "zing-remedial-massage-mount-lawley", "massage", "Mount Lawley", "6050",
+            "643 Beaufort Street, Mount Lawley WA 6050", null, "https://www.fresha.com", null,
+            4.9, 187, "Mount Lawley's go-to for expert remedial massage therapy. Zing's qualified team of remedial therapists address muscle tension, sports injuries and postural issues with thorough clinical technique and genuine care.",
+            ["Remedial 60min $100", "Sports Massage 60min $105", "Relaxation 60min $90"]),
+
+        new("The Bodywork Collective Leederville", "the-bodywork-collective-leederville", "massage", "Leederville", "6007",
+            "381 Oxford Street, Leederville WA 6007", null, "https://www.fresha.com", null,
+            4.9, 223, "A beloved Leederville collective of remedial massage therapists, myotherapists and allied health practitioners. The Bodywork Collective has built a reputation for thorough assessments and treatments that genuinely fix the problem.",
+            ["Remedial 60min $105", "Myotherapy 60min $110", "Deep Tissue 60min $100"]),
+
+        new("Head to Toe Beauty & Massage Fremantle", "head-to-toe-beauty-massage-fremantle", "massage", "Fremantle", "6160",
+            "79 Market Street, Fremantle WA 6160", null, "https://www.fresha.com", null,
+            4.8, 156, "A Fremantle staple combining beauty treatments with expert massage therapy under one roof. The warm, unpretentious Fremantle vibe extends to every treatment — professional, caring, and genuinely therapeutic.",
+            ["Relaxation 60min $85", "Remedial 60min $95", "Pregnancy Massage 60min $95"]),
+
+        new("Serenity Day Spa Claremont", "serenity-day-spa-claremont", "massage", "Claremont", "6010",
+            "22 Bay View Terrace, Claremont WA 6010", null, "https://www.fresha.com", null,
+            4.8, 198, "A refined Claremont day spa offering full massage and body treatment menus in a peaceful, beautifully appointed environment. Popular for couples packages, pregnancy massage and post-event recovery treatments.",
+            ["Relaxation 60min $95", "Hot Stone 75min $120", "Couples 60min $190"]),
+
+        new("Touch of Asia Massage Subiaco", "touch-of-asia-massage-subiaco", "massage", "Subiaco", "6008",
+            "374 Hay Street, Subiaco WA 6008", null, "https://www.fresha.com", null,
+            4.7, 289, "A well-established Subiaco massage studio specialising in traditional Thai massage, remedial, and relaxation treatments. A convenient Hay Street location and affordable pricing make this a Subiaco neighbourhood favourite.",
+            ["Thai Massage 60min $75", "Remedial 60min $88", "Relaxation 60min $80"]),
+
+        new("Revive Massage & Wellness Joondalup", "revive-massage-wellness-joondalup", "massage", "Joondalup", "6027",
+            "1/34 Davidson Terrace, Joondalup WA 6027", null, "https://www.fresha.com", null,
+            4.8, 143, "Joondalup's trusted remedial massage and wellness studio, offering qualified remedial therapy, relaxation massage and sports recovery treatments. Known for thorough assessments and results-focused treatments.",
+            ["Remedial 60min $98", "Sports 60min $105", "Relaxation 60min $88"]),
     ];
 }

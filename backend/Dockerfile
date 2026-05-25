@@ -22,5 +22,5 @@ RUN mkdir -p /var/log/appilico && chown -R appilico:appilico /var/log/appilico /
 USER appilico
 ENV ASPNETCORE_URLS=http://+:5000
 ENV ASPNETCORE_ENVIRONMENT=Production
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD wget -qO- http://localhost:5000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=300s --retries=5 CMD wget -qO- http://localhost:5000/health || exit 1
 ENTRYPOINT ["dotnet", "Appilico.Market.Api.dll"]

@@ -16,40 +16,9 @@ public static partial class DatabaseSeeder
 
     public static async Task SeedRealProviders(AppDbContext context, UserManager<AppUser> userManager)
     {
-        // Delete ALL existing providers to start fresh with clean Google data
-        var existingProviders = await context.Providers.ToListAsync();
-        if (existingProviders.Any())
-        {
-            var existingIds = existingProviders.Select(p => p.Id).ToList();
-
-            // Delete related entities first
-            var reviews = await context.Reviews.Where(r => existingIds.Contains(r.ProviderId)).ToListAsync();
-            context.Reviews.RemoveRange(reviews);
-            var services = await context.ProviderServices.Where(s => existingIds.Contains(s.ProviderId)).ToListAsync();
-            context.ProviderServices.RemoveRange(services);
-            var gallery = await context.ProviderGalleryImages.Where(g => existingIds.Contains(g.ProviderId)).ToListAsync();
-            context.ProviderGalleryImages.RemoveRange(gallery);
-            var areas = await context.ProviderServiceAreas.Where(a => existingIds.Contains(a.ProviderId)).ToListAsync();
-            context.ProviderServiceAreas.RemoveRange(areas);
-            
-            try {
-                var subs = await context.Set<Domain.Subscriptions.ProviderSubscription>().Where(s => existingIds.Contains(s.ProviderId)).ToListAsync();
-                context.Set<Domain.Subscriptions.ProviderSubscription>().RemoveRange(subs);
-            } catch { /* table may not exist */ }
-
-            try {
-                var follows = await context.Set<Domain.Social.Follow>().Where(f => existingIds.Contains(f.ProviderId)).ToListAsync();
-                context.Set<Domain.Social.Follow>().RemoveRange(follows);
-            } catch { /* table may not exist */ }
-
-            try {
-                var convos = await context.Set<Domain.Messaging.Conversation>().Where(c => existingIds.Contains(c.ProviderId)).ToListAsync();
-                context.Set<Domain.Messaging.Conversation>().RemoveRange(convos);
-            } catch { /* table may not exist */ }
-
-            context.Providers.RemoveRange(existingProviders);
-            await context.SaveChangesAsync();
-        }
+        // Idempotent: skip if we already have beauty providers from Google data
+        if (await context.Providers.AnyAsync(p => p.ProviderType == ProviderType.Beauty && p.HasRealData))
+            return;
 
         var categories = await context.Categories.Where(c => c.MarketplaceType == ProviderType.Beauty).ToListAsync();
         var subCategories = categories.Where(c => c.ParentCategoryId != null).ToList();

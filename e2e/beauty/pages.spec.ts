@@ -150,7 +150,7 @@ test.describe("Beauty – Categories Page", () => {
 });
 
 test.describe("Beauty – Category Detail (all categories)", () => {
-  const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "cosmetic", "wellness"];
+  const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "massage", "cosmetic", "wellness"];
 
   for (const cat of categories) {
     test(`${cat} category page loads with providers`, async ({ page }) => {

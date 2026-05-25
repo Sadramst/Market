@@ -207,7 +207,7 @@ test.describe("API – Health & Core Endpoints", () => {
 });
 
 test.describe("API – Category Provider Counts", () => {
-  const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "wellness"];
+  const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "massage", "wellness"];
 
   for (const cat of categories) {
     test(`${cat} category returns providers`, async ({ request }) => {

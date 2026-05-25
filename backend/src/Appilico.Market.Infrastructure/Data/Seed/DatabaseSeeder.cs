@@ -30,6 +30,7 @@ public static partial class DatabaseSeeder
         await SeedAppSettings(context);
         await SeedMissingSuburbs(context);
         await SeedRealProviders(context, userManager);
+        await SeedWellnessProviders(context, userManager);
         await SeedDetailedProviders(context, userManager);
         await SeedITProviders(context, userManager);
         await FixDataQuality(context);

@@ -130,4 +130,40 @@ public static partial class DatabaseSeeder
 
         return businesses.ToArray();
     }
+
+    private static RealBiz[] GenerateWellnessBulkProviders()
+    {
+        var jsonPath = Path.Combine(AppContext.BaseDirectory, "Data", "Seed", "wellness_providers.json");
+        if (!File.Exists(jsonPath))
+            return Array.Empty<RealBiz>();
+
+        var jsonStr = File.ReadAllText(jsonPath);
+        var places = JsonSerializer.Deserialize<List<GooglePlaceDto>>(jsonStr) ?? new();
+
+        var postcodeRegex = new Regex(@"WA\s+(\d{4})");
+        return places.Select(place =>
+        {
+            var postCode = string.Empty;
+            if (!string.IsNullOrEmpty(place.address))
+            {
+                var m = postcodeRegex.Match(place.address);
+                if (m.Success) postCode = m.Groups[1].Value;
+            }
+            return new RealBiz(
+                Name: string.IsNullOrWhiteSpace(place.businessName) ? "Wellness Studio" : place.businessName,
+                Slug: place.slug,
+                CategorySlug: "wellness",
+                Suburb: place.suburb,
+                PostCode: postCode,
+                Address: place.address,
+                Phone: place.phoneNumber,
+                Website: place.website,
+                Instagram: null,
+                Rating: place.averageRating,
+                ReviewCount: place.totalReviews,
+                Description: place.description,
+                Services: new[] { "Day Spa Package 90min $185", "Aromatherapy Treatment 60min $120", "Reflexology 60min $95" }
+            );
+        }).ToArray();
+    }
 }

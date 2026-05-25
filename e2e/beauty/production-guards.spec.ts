@@ -52,10 +52,10 @@ test.describe("Production Guards – Massage Category", () => {
 test.describe("Production Guards – All Categories Have Providers", () => {
   // Core categories that MUST have providers
   const requiredCategories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "massage"];
-  // Categories that may be empty depending on seed data
-  const optionalCategories = ["cosmetic", "wellness"];
+  // All categories should now have providers (wellness seeded with 31 dedicated entries)
+  const optionalCategories = ["cosmetic"]; // cosmetic may still be empty
 
-  for (const cat of requiredCategories) {
+  for (const cat of [...requiredCategories, "wellness"]) {
     test(`${cat} category has at least 1 provider`, async ({ request }) => {
       const res = await request.get(`${API}/providers/search?category=${cat}&marketplaceType=0&pageSize=1`);
       if (res.status() === 503) {
@@ -226,5 +226,41 @@ test.describe("Production Guards – Admin API Endpoints", () => {
   test("admin endpoints require auth", async ({ request }) => {
     const noAuthRes = await request.get(`${API}/providers/admin/list`);
     expect(noAuthRes.status()).toBe(401);
+  });
+});
+
+test.describe("Production Guards – New API Endpoints", () => {
+  test("nearest suburb endpoint returns a suburb for Perth coordinates", async ({ request }) => {
+    const res = await request.get(`${API}/locations/suburbs/nearest?lat=-31.9505&lng=115.8605`);
+    if (res.status() === 503) { test.skip(true, "API unavailable"); return; }
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.data).toHaveProperty("name");
+    expect(body.data).toHaveProperty("distanceKm");
+    expect(body.data.distanceKm).toBeLessThan(20); // Should be within 20km of Perth CBD
+  });
+
+  test("analytics event endpoint accepts anonymous tracking", async ({ request }) => {
+    const res = await request.post(`${API}/analytics/event`, {
+      data: {
+        eventType: "view_category",
+        entityType: "category",
+        entitySlug: "wellness",
+        categorySlug: "wellness",
+        marketplaceType: 0,
+        sessionId: "test-session-e2e"
+      }
+    });
+    if (res.status() === 503) { test.skip(true, "API unavailable"); return; }
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+  });
+
+  test("user preferences endpoint requires authentication", async ({ request }) => {
+    const res = await request.get(`${API}/userpreferences`);
+    if (res.status() === 503) { test.skip(true, "API unavailable"); return; }
+    expect(res.status()).toBe(401);
   });
 });

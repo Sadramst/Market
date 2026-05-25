@@ -153,6 +153,123 @@ public static partial class DatabaseSeeder
         }
     }
 
+    /// <summary>
+    /// Seeds wellness providers from wellness_providers.json.
+    /// Has its own idempotency check — runs even if SeedRealProviders already ran.
+    /// </summary>
+    public static async Task SeedWellnessProviders(AppDbContext context, UserManager<AppUser> userManager)
+    {
+        var wellnessBizList = GenerateWellnessBulkProviders();
+        if (wellnessBizList.Length == 0) return;
+
+        // Check by slug — only seed ones not yet in DB
+        var existingSlugs = new HashSet<string>(
+            await context.Providers.Select(p => p.Slug).ToListAsync());
+
+        var toSeed = wellnessBizList.Where(b => !existingSlugs.Contains(b.Slug)).ToArray();
+        if (toSeed.Length == 0) return;
+
+        var categories = await context.Categories.Where(c => c.MarketplaceType == ProviderType.Beauty).ToListAsync();
+        var parents = categories.Where(c => c.ParentCategoryId == null).ToList();
+        var suburbs = await context.Suburbs.Where(s => s.IsActive).ToListAsync();
+        if (!categories.Any() || !suburbs.Any()) return;
+
+        Category? FindCat(string slug) => parents.FirstOrDefault(c => c.Slug == slug)
+            ?? categories.FirstOrDefault(c => c.Slug == slug);
+
+        var hours = """{"mon":"9:00-17:30","tue":"9:00-17:30","wed":"9:00-17:30","thu":"9:00-20:00","fri":"9:00-17:30","sat":"9:00-16:00","sun":"Closed"}""";
+
+        foreach (var biz in toSeed)
+        {
+            var email = $"provider.{biz.Slug.Replace("-", "")}@appilico-seed.internal";
+            if (email.Length > 80)
+            {
+                var hash = Math.Abs(biz.Slug.GetHashCode()).ToString();
+                email = $"p{hash}@appilico-seed.internal";
+            }
+            var user = await userManager.FindByEmailAsync(email) ?? await userManager.FindByNameAsync(email);
+            if (user == null)
+            {
+                var nameParts = biz.Name.Split(' ');
+                user = new AppUser
+                {
+                    UserName = email, Email = email,
+                    FirstName = nameParts[0],
+                    LastName = nameParts.Length > 1 ? string.Join(" ", nameParts[1..Math.Min(3, nameParts.Length)]) : "Business",
+                    EmailConfirmed = true
+                };
+                var result = await userManager.CreateAsync(user, "SeedProvider@2026!");
+                if (!result.Succeeded) continue;
+                await userManager.AddToRoleAsync(user, UserRoles.Provider);
+            }
+
+            var suburb = suburbs.FirstOrDefault(s => s.Name.Equals(biz.Suburb, StringComparison.OrdinalIgnoreCase))
+                ?? suburbs.FirstOrDefault(s => s.Name.Contains(biz.Suburb, StringComparison.OrdinalIgnoreCase))
+                ?? suburbs.FirstOrDefault(s => s.PostCode == biz.PostCode)
+                ?? suburbs[0];
+
+            var provider = new Provider
+            {
+                UserId = user.Id,
+                BusinessName = biz.Name,
+                Slug = biz.Slug,
+                Description = biz.Description,
+                ProviderType = ProviderType.Beauty,
+                Status = ProviderStatus.Approved,
+                Phone = biz.Phone,
+                Website = biz.Website,
+                City = biz.Suburb,
+                State = "WA",
+                PostalCode = biz.PostCode,
+                FullAddress = biz.Address,
+                IsFeatured = biz.Rating >= 4.8 && biz.ReviewCount >= 200,
+                IsVerified = false,
+                AverageRating = biz.Rating,
+                TotalReviews = biz.ReviewCount,
+                ApprovedAt = DateTime.UtcNow,
+                ApprovedBy = "system-seed",
+                BusinessHoursJson = hours,
+                HasRealData = true,
+                IsClaimed = false,
+                DataSource = "seeded",
+            };
+            context.Providers.Add(provider);
+            await context.SaveChangesAsync();
+
+            context.ProviderServiceAreas.Add(new ProviderServiceArea { ProviderId = provider.Id, SuburbId = suburb.Id });
+
+            var wellnessCat = FindCat("wellness");
+            if (wellnessCat != null)
+            {
+                for (int i = 0; i < biz.Services.Length; i++)
+                {
+                    var svcStr = biz.Services[i];
+                    var lastDollar = svcStr.LastIndexOf('$');
+                    string svcName;
+                    decimal price = 0;
+                    if (lastDollar > 0)
+                    {
+                        svcName = svcStr[..lastDollar].Trim().TrimEnd(',');
+                        decimal.TryParse(svcStr[(lastDollar + 1)..].Trim(), out price);
+                    }
+                    else { svcName = svcStr.Trim(); }
+
+                    context.ProviderServices.Add(new ProviderService
+                    {
+                        ProviderId = provider.Id,
+                        CategoryId = wellnessCat.Id,
+                        Name = svcName,
+                        PriceFrom = price > 0 ? price : null,
+                        DurationMinutes = 60,
+                        IsActive = true,
+                        SortOrder = i
+                    });
+                }
+            }
+            await context.SaveChangesAsync();
+        }
+    }
+
     private static RealBiz[] GetRealBusinesses() =>
     [
         // ===== NAILS (18) =====

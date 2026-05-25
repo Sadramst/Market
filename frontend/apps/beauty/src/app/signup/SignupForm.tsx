@@ -50,10 +50,27 @@ export function SignupForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const json = await response.json().catch(() => null) as { success?: boolean; data?: AuthResponse; message?: string; errors?: string[] } | null;
+      const json = await response.json().catch(() => null) as {
+        success?: boolean; data?: AuthResponse; message?: string;
+        errors?: string[] | Record<string, string[]>;
+        title?: string;
+      } | null;
 
       if (!response.ok || !json?.success || !json.data) {
-        const msg = json?.errors?.join(", ") || json?.message || "Registration failed";
+        // Handle both our custom format (errors: string[]) and ASP.NET validation format (errors: {Field: string[]})
+        let msg = "Registration failed";
+        if (json?.errors) {
+          if (Array.isArray(json.errors)) {
+            msg = json.errors.join(", ") || json?.message || msg;
+          } else if (typeof json.errors === "object") {
+            const flat = Object.values(json.errors as Record<string, string[]>).flat();
+            msg = flat.join(", ") || json?.message || msg;
+          }
+        } else if (json?.message) {
+          msg = json.message;
+        } else if (json?.title) {
+          msg = json.title;
+        }
         throw new Error(msg);
       }
 

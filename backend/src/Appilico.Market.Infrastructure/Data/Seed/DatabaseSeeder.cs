@@ -29,6 +29,7 @@ public static partial class DatabaseSeeder
         await SeedPerthSuburbs(context);
         await SeedAppSettings(context);
         await SeedMissingSuburbs(context);
+        await UpdateSuburbCoordinates(context);
         await SeedRealProviders(context, userManager);
         await SeedWellnessProviders(context, userManager);
         await SeedDetailedProviders(context, userManager);
@@ -400,5 +401,164 @@ public static partial class DatabaseSeeder
             perthCbd.Slug = "perth";
             await context.SaveChangesAsync();
         }
+    }
+
+    /// <summary>
+    /// Idempotent: adds GPS coordinates to suburbs that are missing them.
+    /// Enables the nearest-suburb geolocation endpoint.
+    /// </summary>
+    private static async Task UpdateSuburbCoordinates(AppDbContext context)
+    {
+        // Only run if any suburb is still missing coordinates
+        if (!await context.Suburbs.AnyAsync(s => !s.Latitude.HasValue))
+            return;
+
+        var coords = new Dictionary<string, (double Lat, double Lng)>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["perth"]             = (-31.9505, 115.8605),
+            ["northbridge"]       = (-31.9436, 115.8577),
+            ["west-perth"]        = (-31.9530, 115.8480),
+            ["east-perth"]        = (-31.9481, 115.8700),
+            ["south-perth"]       = (-31.9840, 115.8660),
+            ["subiaco"]           = (-31.9492, 115.8261),
+            ["leederville"]       = (-31.9366, 115.8419),
+            ["mount-lawley"]      = (-31.9335, 115.8714),
+            ["highgate"]          = (-31.9400, 115.8664),
+            ["inglewood"]         = (-31.9193, 115.8758),
+            ["maylands"]          = (-31.9339, 115.8877),
+            ["bayswater"]         = (-31.9193, 115.9161),
+            ["morley"]            = (-31.8914, 115.9020),
+            ["dianella"]          = (-31.8929, 115.8750),
+            ["yokine"]            = (-31.9060, 115.8560),
+            ["scarborough"]       = (-31.8944, 115.7577),
+            ["doubleview"]        = (-31.8939, 115.7823),
+            ["innaloo"]           = (-31.8879, 115.7977),
+            ["karrinyup"]         = (-31.8758, 115.8044),
+            ["stirling"]          = (-31.9017, 115.8219),
+            ["balcatta"]          = (-31.8714, 115.8258),
+            ["osborne-park"]      = (-31.9033, 115.8251),
+            ["tuart-hill"]        = (-31.8997, 115.8530),
+            ["joondanna"]         = (-31.9080, 115.8453),
+            ["claremont"]         = (-31.9785, 115.7802),
+            ["cottesloe"]         = (-31.9993, 115.7548),
+            ["dalkeith"]          = (-31.9891, 115.8137),
+            ["nedlands"]          = (-31.9804, 115.8019),
+            ["mosman-park"]       = (-31.9890, 115.7699),
+            ["peppermint-grove"]  = (-32.0020, 115.7719),
+            ["fremantle"]         = (-32.0569, 115.7439),
+            ["north-fremantle"]   = (-32.0292, 115.7491),
+            ["east-fremantle"]    = (-32.0403, 115.7714),
+            ["south-fremantle"]   = (-32.0707, 115.7533),
+            ["beaconsfield"]      = (-32.0614, 115.7604),
+            ["hilton"]            = (-32.0438, 115.7850),
+            ["applecross"]        = (-32.0150, 115.8500),
+            ["ardross"]           = (-32.0135, 115.8300),
+            ["mount-pleasant"]    = (-32.0150, 115.8590),
+            ["booragoon"]         = (-32.0282, 115.8400),
+            ["myaree"]            = (-32.0211, 115.8245),
+            ["melville"]          = (-32.0329, 115.8004),
+            ["willetton"]         = (-32.0506, 115.8787),
+            ["canning-vale"]      = (-32.0714, 115.9086),
+            ["riverton"]          = (-32.0321, 115.8683),
+            ["joondalup"]         = (-31.7452, 115.7661),
+            ["currambine"]        = (-31.7168, 115.7497),
+            ["burns-beach"]       = (-31.6866, 115.7429),
+            ["hillarys"]          = (-31.8025, 115.7439),
+            ["sorrento"]          = (-31.8176, 115.7583),
+            ["padbury"]           = (-31.8323, 115.7725),
+            ["duncraig"]          = (-31.8455, 115.7808),
+            ["warwick"]           = (-31.8567, 115.8015),
+            ["greenwood"]         = (-31.8391, 115.8210),
+            ["rockingham"]        = (-32.2779, 115.7297),
+            ["mandurah"]          = (-32.5290, 115.7215),
+            ["bunbury"]           = (-33.3273, 115.6413),
+            ["victoria-park"]     = (-31.9811, 115.8828),
+            ["cannington"]        = (-31.9960, 115.9369),
+            ["belmont"]           = (-31.9563, 115.9308),
+            ["rivervale"]         = (-31.9574, 115.9103),
+            ["bentley"]           = (-32.0008, 115.9033),
+            ["karawara"]          = (-32.0093, 115.8671),
+            ["como"]              = (-31.9994, 115.8657),
+            ["manning"]           = (-32.0069, 115.8623),
+            ["salter-point"]      = (-32.0011, 115.8737),
+            ["armadale"]          = (-32.1488, 116.0120),
+            ["midland"]           = (-31.8898, 116.0142),
+            ["ellenbrook"]        = (-31.7640, 116.0059),
+            ["mundijong"]         = (-32.2923, 115.9737),
+            ["byford"]            = (-32.2241, 116.0005),
+            ["warnbro"]           = (-32.3154, 115.7537),
+            ["cockburn-central"]  = (-32.1178, 115.8424),
+            ["success"]           = (-32.1281, 115.8539),
+            ["hammond-park"]      = (-32.1417, 115.8501),
+            ["baldivis"]          = (-32.3087, 115.8089),
+            ["secret-harbour"]    = (-32.3982, 115.7539),
+            ["piara-waters"]      = (-32.1299, 115.9196),
+            ["harrisdale"]        = (-32.1129, 115.9076),
+            ["thornlie"]          = (-32.0441, 115.9560),
+            ["gosnells"]          = (-32.0741, 115.9938),
+            ["kalamunda"]         = (-31.9779, 116.0598),
+            ["mundaring"]         = (-31.9030, 116.1670),
+            ["wanneroo"]          = (-31.7500, 115.8058),
+            ["clarkson"]          = (-31.6902, 115.7993),
+            ["butler"]            = (-31.6373, 115.7930),
+            ["alkimos"]           = (-31.6143, 115.7667),
+            ["two-rocks"]         = (-31.4988, 115.5950),
+            ["yanchep"]           = (-31.5501, 115.7221),
+            ["geraldton"]         = (-28.7774, 114.6145),
+            ["kalgoorlie"]        = (-30.7490, 121.4661),
+            ["albany"]            = (-35.0275, 117.8840),
+            ["broome"]            = (-17.9619, 122.2361),
+            ["floreat"]           = (-31.9330, 115.7860),
+            ["swanbourne"]        = (-31.9724, 115.7720),
+            ["north-perth"]       = (-31.9258, 115.8530),
+            ["mirrabooka"]        = (-31.8742, 115.8643),
+            ["swan-view"]         = (-31.8686, 116.0481),
+            ["forrestfield"]      = (-31.9791, 116.0178),
+            ["east-victoria-park"]= (-31.9883, 115.8997),
+            ["palmyra"]           = (-32.0497, 115.7897),
+            ["bicton"]            = (-32.0394, 115.7776),
+            ["hamilton-hill"]     = (-32.0856, 115.7869),
+            ["spearwood"]         = (-32.0989, 115.7868),
+            ["bibra-lake"]        = (-32.1113, 115.8281),
+            ["beeliar"]           = (-32.1253, 115.8183),
+            ["yangebup"]          = (-32.1089, 115.8375),
+            ["waikiki"]           = (-32.3019, 115.7547),
+            ["bertram"]           = (-32.2600, 115.8028),
+            ["shenton-park"]      = (-31.9546, 115.8117),
+            ["eglinton"]          = (-31.5965, 115.6926),
+            ["aubin-grove"]       = (-32.1464, 115.8686),
+            ["carlisle"]          = (-31.9790, 115.9080),
+            ["mount-hawthorn"]    = (-31.9237, 115.8384),
+            ["west-leederville"]  = (-31.9397, 115.8311),
+            ["malaga"]            = (-31.8524, 115.8770),
+            ["wembley"]           = (-31.9280, 115.8110),
+            ["southern-river"]    = (-32.1026, 115.9612),
+            ["kelmscott"]         = (-32.1295, 116.0216),
+            ["bull-creek"]        = (-32.0735, 115.8593),
+            ["leeming"]           = (-32.0786, 115.8644),
+            ["kingsley"]          = (-31.8192, 115.8100),
+            ["woodvale"]          = (-31.8119, 115.8228),
+            ["beechboro"]         = (-31.8608, 115.9359),
+            ["girrawheen"]        = (-31.8449, 115.8490),
+            ["madeley"]           = (-31.7944, 115.8207),
+            ["churchlands"]       = (-31.9221, 115.8030),
+            ["huntingdale"]       = (-32.0672, 115.9679),
+            ["kenwick"]           = (-32.0267, 115.9730),
+            ["murdoch"]           = (-32.0630, 115.8380),
+            ["mindarie"]          = (-31.6829, 115.7161),
+            ["atwell"]            = (-32.1415, 115.8389),
+            ["south-lake"]        = (-32.1196, 115.8479),
+        };
+
+        var suburbs = await context.Suburbs.Where(s => !s.Latitude.HasValue).ToListAsync();
+        foreach (var suburb in suburbs)
+        {
+            if (coords.TryGetValue(suburb.Slug, out var c))
+            {
+                suburb.Latitude = c.Lat;
+                suburb.Longitude = c.Lng;
+            }
+        }
+        await context.SaveChangesAsync();
     }
 }

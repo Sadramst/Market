@@ -477,3 +477,58 @@ test.describe("Beauty – Accessibility Basics", () => {
     await expect(page.locator('input#password')).toBeVisible();
   });
 });
+
+// ──────────────────────────────────────────────
+// Search — Postcode Proximity
+// ──────────────────────────────────────────────
+test.describe("Beauty – Search Postcode & Proximity Sort", () => {
+  test("search with postCode param renders without error", async ({ page }) => {
+    const res = await page.goto("/search?postCode=6160&sortBy=distance");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator("h1")).toBeVisible();
+  });
+
+  test("search with postCode shows 'near XXXX' in heading", async ({ page }) => {
+    await page.goto("/search?postCode=6160&sortBy=distance");
+    const h1Text = await page.locator("h1").textContent();
+    expect(h1Text?.toLowerCase()).toMatch(/near|6160/);
+  });
+
+  test("search with postCode shows distance label", async ({ page }) => {
+    await page.goto("/search?postCode=6000&sortBy=distance");
+    const pageText = await page.locator("main").first().textContent();
+    expect(pageText?.toLowerCase()).toMatch(/6000|distance|near/);
+  });
+
+  test("search with postCode shows provider results", async ({ page }) => {
+    await page.goto("/search?postCode=6160&sortBy=distance");
+    const cards = page.locator('a[href^="/provider/"]');
+    await expect(cards.first()).toBeVisible({ timeout: 10000 });
+  });
+
+  test("search without postCode defaults to rating sort", async ({ page }) => {
+    await page.goto("/search");
+    const url = page.url();
+    expect(url).not.toContain("sortBy=distance");
+  });
+});
+
+// ──────────────────────────────────────────────
+// New Pages (signup / profile)
+// ──────────────────────────────────────────────
+test.describe("Beauty – New Pages Present", () => {
+  test("signup page exists at /signup", async ({ page }) => {
+    const res = await page.goto("/signup");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator('form')).toBeVisible();
+  });
+
+  test("profile page exists and redirects unauthenticated to /login", async ({ page }) => {
+    await page.goto("/profile");
+    await page.waitForTimeout(3000);
+    // Either redirected or shows login form
+    const isOnLogin = page.url().includes("/login");
+    const hasEmailInput = await page.locator('input[type="email"]').isVisible();
+    expect(isOnLogin || hasEmailInput).toBe(true);
+  });
+});

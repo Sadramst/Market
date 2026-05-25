@@ -60,6 +60,7 @@ public class ProviderListDto
     public string? Tagline { get; set; }
     public string? FullAddress { get; set; }
     public string? Phone { get; set; }
+    public string? Email { get; set; }
     public string? Website { get; set; }
     public bool IsClaimed { get; set; }
     public bool HasRealData { get; set; }
@@ -150,6 +151,24 @@ public class AdminProviderActionRequest
 {
     public ProviderStatus NewStatus { get; set; }
     public string? AdminNotes { get; set; }
+}
+
+public class AdminPromoteRequest
+{
+    public bool IsFeatured { get; set; }
+}
+
+public class AdminUpdateProviderRequest
+{
+    public string? BusinessName { get; set; }
+    public string? Description { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Website { get; set; }
+    public string? City { get; set; }
+    public string? Tagline { get; set; }
+    public bool? IsFeatured { get; set; }
+    public bool? IsVerified { get; set; }
 }
 
 public class ProviderSearchRequest

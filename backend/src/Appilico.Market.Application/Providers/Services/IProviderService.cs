@@ -30,5 +30,7 @@ public interface IProviderService
 
     // Admin
     Task<ApiResponse<ProviderDto>> AdminUpdateStatusAsync(Guid providerId, AdminProviderActionRequest request);
-    Task<ApiResponse<PaginatedResponse<ProviderListDto>>> AdminListAsync(int page, int pageSize, string? status);
+    Task<ApiResponse<PaginatedResponse<ProviderListDto>>> AdminListAsync(int page, int pageSize, string? status, int? marketplaceType = null);
+    Task<ApiResponse<ProviderDto>> AdminPromoteAsync(Guid providerId, bool isFeatured);
+    Task<ApiResponse<ProviderDto>> AdminUpdateAsync(Guid providerId, AdminUpdateProviderRequest request);
 }

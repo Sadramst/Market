@@ -15,7 +15,74 @@ public static partial class DatabaseSeeder
             .Where(c => c.ParentCategoryId == null)
             .ToListAsync();
 
-        // --- Fix category misassignments ---
+        // --- BULK FIX: Reassign all massage_providers.json providers to the Massage category ---
+        var massageCat = categories.FirstOrDefault(c => c.Slug == "massage");
+        if (massageCat != null)
+        {
+            // Find all providers from massage_providers.json — they have HasRealData, ProviderType=Beauty,
+            // and their descriptions or services relate to massage. Match by checking if they have
+            // services assigned to Body/Wellness/Skin Care categories but their business name or
+            // description strongly suggests massage.
+            var bodyCat = categories.FirstOrDefault(c => c.Slug == "body");
+            var wellnessCat = categories.FirstOrDefault(c => c.Slug == "wellness");
+            var skinCat = categories.FirstOrDefault(c => c.Slug == "skin-care");
+
+            var wrongCatIds = new List<Guid>();
+            if (bodyCat != null) wrongCatIds.Add(bodyCat.Id);
+            if (wellnessCat != null) wrongCatIds.Add(wellnessCat.Id);
+            if (skinCat != null) wrongCatIds.Add(skinCat.Id);
+
+            // Get all beauty providers that have massage-related content
+            var massageKeywords = new[] { "massage", "remedial", "deep tissue", "relaxation massage", "thai massage", "sports massage", "hot stone" };
+            var allBeautyProviders = await context.Providers
+                .Include(p => p.Services)
+                .Where(p => p.ProviderType == ProviderType.Beauty && p.HasRealData)
+                .ToListAsync();
+
+            var fixCount = 0;
+            foreach (var provider in allBeautyProviders)
+            {
+                var name = provider.BusinessName?.ToLower() ?? "";
+                var desc = provider.Description?.ToLower() ?? "";
+                var isMassage = massageKeywords.Any(k => name.Contains(k) || desc.Contains(k));
+
+                if (!isMassage) continue;
+
+                // Check if already correctly assigned
+                var hasCorrectCat = provider.Services.Any(s => s.CategoryId == massageCat.Id);
+                if (hasCorrectCat) continue;
+
+                // Fix: reassign all services to massage category
+                if (provider.Services.Any())
+                {
+                    foreach (var svc in provider.Services)
+                        svc.CategoryId = massageCat.Id;
+                }
+                else
+                {
+                    // Provider has NO services at all — add default massage services
+                    var defaultSvcs = new[] { ("Remedial Massage 60min", 95m), ("Relaxation Massage 60min", 85m), ("Deep Tissue 60min", 100m) };
+                    for (int i = 0; i < defaultSvcs.Length; i++)
+                    {
+                        context.ProviderServices.Add(new ProviderService
+                        {
+                            ProviderId = provider.Id,
+                            CategoryId = massageCat.Id,
+                            Name = defaultSvcs[i].Item1,
+                            PriceFrom = defaultSvcs[i].Item2,
+                            DurationMinutes = 60,
+                            IsActive = true,
+                            SortOrder = i
+                        });
+                    }
+                }
+                fixCount++;
+            }
+            if (fixCount > 0)
+                await context.SaveChangesAsync();
+        }
+
+        // --- Fix specific category misassignments ---
         var categoryFixes = new Dictionary<string, string>
         {
             // Sonya's Beauty — Eyelash Extensions Studio should be Lashes, not Nails
@@ -63,8 +130,8 @@ public static partial class DatabaseSeeder
             await context.SaveChangesAsync();
         }
 
-        // --- Re-categorise Body/Wellness providers to Massage ---
-        var massageCat = categories.FirstOrDefault(c => c.Slug == "massage");
+        // --- Re-categorise specific Body/Wellness providers to Massage ---
+        // (These are manual overrides for specific slugs that the bulk fix above may not catch)
         if (massageCat != null)
         {
             var massageSlugs = new[]

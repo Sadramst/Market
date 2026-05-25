@@ -80,8 +80,10 @@ public static partial class DatabaseSeeder
 
     private static async Task SeedBeautyCategories(AppDbContext context)
     {
-        if (await context.Categories.AnyAsync(c => c.MarketplaceType == ProviderType.Beauty))
-            return;
+        var existingSlugs = await context.Categories
+            .Where(c => c.MarketplaceType == ProviderType.Beauty && c.ParentCategoryId == null)
+            .Select(c => c.Slug)
+            .ToListAsync();
 
         var beautyCategories = new (string Name, string Slug, string Icon, (string Name, string Slug)[] Subs)[]
         {
@@ -156,6 +158,8 @@ public static partial class DatabaseSeeder
 
         foreach (var (name, slug, icon, subs) in beautyCategories)
         {
+            if (existingSlugs.Contains(slug)) continue; // Skip already-existing categories
+
             var parent = new Category
             {
                 Name = name,

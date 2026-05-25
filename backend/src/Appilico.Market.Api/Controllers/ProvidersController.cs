@@ -168,10 +168,26 @@ public class ProvidersController : ControllerBase
 
     [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]
     [HttpGet("admin/list")]
-    public async Task<IActionResult> AdminList([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? status = null)
+    public async Task<IActionResult> AdminList([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? status = null, [FromQuery] int? marketplaceType = null)
     {
-        var result = await _providerService.AdminListAsync(page, pageSize, status);
+        var result = await _providerService.AdminListAsync(page, pageSize, status, marketplaceType);
         return Ok(result);
+    }
+
+    [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]
+    [HttpPut("admin/{id:guid}/promote")]
+    public async Task<IActionResult> AdminPromote(Guid id, [FromBody] AdminPromoteRequest request)
+    {
+        var result = await _providerService.AdminPromoteAsync(id, request.IsFeatured);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]
+    [HttpPut("admin/{id:guid}")]
+    public async Task<IActionResult> AdminUpdate(Guid id, [FromBody] AdminUpdateProviderRequest request)
+    {
+        var result = await _providerService.AdminUpdateAsync(id, request);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     [Authorize(Roles = $"{UserRoles.SuperAdmin},{UserRoles.Moderator}")]

@@ -488,7 +488,7 @@ public class ProviderService : IProviderService
         return ApiResponse<ProviderDto>.Ok(MapToDto(provider));
     }
 
-    public async Task<ApiResponse<PaginatedResponse<ProviderListDto>>> AdminListAsync(int page, int pageSize, string? status)
+    public async Task<ApiResponse<PaginatedResponse<ProviderListDto>>> AdminListAsync(int page, int pageSize, string? status, int? marketplaceType = null)
     {
         var query = _context.Providers
             .Include(p => p.Services).ThenInclude(s => s.Category)
@@ -497,6 +497,9 @@ public class ProviderService : IProviderService
 
         if (Enum.TryParse<ProviderStatus>(status, true, out var parsedStatus))
             query = query.Where(p => p.Status == parsedStatus);
+
+        if (marketplaceType.HasValue && Enum.IsDefined(typeof(ProviderType), marketplaceType.Value))
+            query = query.Where(p => p.ProviderType == (ProviderType)marketplaceType.Value);
 
         var totalCount = await query.CountAsync();
         var providers = await query
@@ -516,6 +519,37 @@ public class ProviderService : IProviderService
                 TotalCount = totalCount
             }
         });
+    }
+
+    public async Task<ApiResponse<ProviderDto>> AdminPromoteAsync(Guid providerId, bool isFeatured)
+    {
+        var provider = await GetProviderQuery().FirstOrDefaultAsync(p => p.Id == providerId);
+        if (provider == null)
+            return ApiResponse<ProviderDto>.Fail("Provider not found");
+
+        provider.IsFeatured = isFeatured;
+        await _context.SaveChangesAsync();
+        return ApiResponse<ProviderDto>.Ok(MapToDto(provider));
+    }
+
+    public async Task<ApiResponse<ProviderDto>> AdminUpdateAsync(Guid providerId, AdminUpdateProviderRequest request)
+    {
+        var provider = await GetProviderQuery().FirstOrDefaultAsync(p => p.Id == providerId);
+        if (provider == null)
+            return ApiResponse<ProviderDto>.Fail("Provider not found");
+
+        if (request.BusinessName != null) provider.BusinessName = request.BusinessName;
+        if (request.Description != null) provider.Description = request.Description;
+        if (request.Phone != null) provider.Phone = request.Phone;
+        if (request.Email != null) provider.Email = request.Email;
+        if (request.Website != null) provider.Website = request.Website;
+        if (request.City != null) provider.City = request.City;
+        if (request.Tagline != null) provider.Tagline = request.Tagline;
+        if (request.IsFeatured.HasValue) provider.IsFeatured = request.IsFeatured.Value;
+        if (request.IsVerified.HasValue) provider.IsVerified = request.IsVerified.Value;
+
+        await _context.SaveChangesAsync();
+        return ApiResponse<ProviderDto>.Ok(MapToDto(provider));
     }
 
     // --- Private helpers ---
@@ -605,6 +639,7 @@ public class ProviderService : IProviderService
         State = p.State,
         FullAddress = p.FullAddress,
         Phone = p.Phone,
+        Email = p.Email,
         Website = p.Website,
         Tagline = p.Tagline,
         IsClaimed = p.IsClaimed,

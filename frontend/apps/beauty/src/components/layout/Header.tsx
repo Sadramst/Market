@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@appilico/shared/hooks";
+import { useSuburbPreference } from "@appilico/shared/hooks";
 
 const navLinks = [
   { label: "Browse", href: "/search" },
@@ -11,8 +14,12 @@ const navLinks = [
 ];
 
 export function Header() {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const { suburb, detecting, detectLocation } = useSuburbPreference();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -21,7 +28,7 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMobileOpen(false); setShowUserMenu(false); } };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
@@ -30,6 +37,12 @@ export function Header() {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  function handleLogout() {
+    logout();
+    setShowUserMenu(false);
+    router.push("/");
+  }
 
   return (
     <>
@@ -69,20 +82,61 @@ export function Header() {
 
             {/* Right actions */}
             <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="hidden sm:flex items-center px-4 py-2 text-[14px] font-normal transition-all duration-200"
+              {/* Location chip */}
+              <button
+                onClick={detectLocation}
+                disabled={detecting}
+                title={suburb ? `Showing results for ${suburb.name}` : "Detect my location"}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium transition-all rounded-full"
                 style={{
-                  fontFamily: 'var(--font-body)',
-                  color: 'var(--text-secondary)',
                   border: '1px solid var(--border)',
-                  borderRadius: '2px',
+                  color: suburb ? 'var(--brand-rose)' : 'var(--text-muted)',
+                  background: suburb ? 'rgba(190,18,60,0.05)' : 'transparent',
+                  fontFamily: 'var(--font-body)',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand-rose)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
               >
-                Log in
-              </Link>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {detecting ? "Detecting…" : suburb ? suburb.name : "Detect location"}
+              </button>
+
+              {isAuthenticated && user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-[14px] font-normal transition-all"
+                    style={{ border: '1px solid var(--border)', borderRadius: '2px', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
+                  >
+                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ background: 'var(--brand-rose)' }}>
+                      {user.firstName[0]?.toUpperCase()}
+                    </span>
+                    {user.firstName}
+                  </button>
+                  {showUserMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-44 py-1 z-50 rounded shadow-lg" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                      <Link href="/dashboard" onClick={() => setShowUserMenu(false)} className="block px-4 py-2.5 text-[13px] hover:bg-gray-50 transition-colors" style={{ color: 'var(--text-secondary)' }}>Dashboard</Link>
+                      <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-gray-50 transition-colors" style={{ color: 'var(--text-secondary)' }}>Sign out</button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hidden sm:flex items-center px-4 py-2 text-[14px] font-normal transition-all duration-200"
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '2px',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand-rose)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                >
+                  Log in
+                </Link>
+              )}
 
               <Link
                 href="/join"
@@ -139,18 +193,37 @@ export function Header() {
             ))}
           </div>
           <div className="p-4 space-y-2" style={{ borderTop: '1px solid var(--border)' }}>
-            <Link href="/login" onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center px-4 py-3 text-[15px] font-normal"
-              style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
-            >
-              Log in
-            </Link>
-            <Link href="/join" onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center px-4 py-3 text-[15px] font-medium text-white"
-              style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}
-            >
-              List Your Business →
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link href="/dashboard" onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center px-4 py-3 text-[15px] font-normal"
+                  style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
+                >
+                  Dashboard
+                </Link>
+                <button onClick={() => { handleLogout(); setMobileOpen(false); }}
+                  className="flex w-full items-center justify-center px-4 py-3 text-[15px] font-medium text-white"
+                  style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center px-4 py-3 text-[15px] font-normal"
+                  style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
+                >
+                  Log in
+                </Link>
+                <Link href="/join" onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center px-4 py-3 text-[15px] font-medium text-white"
+                  style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}
+                >
+                  List Your Business →
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

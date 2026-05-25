@@ -20,4 +20,5 @@ public class AppUser : IdentityUser
     public ICollection<Social.Favorite> Favorites { get; set; } = [];
     public ICollection<Reviews.Review> Reviews { get; set; } = [];
     public ICollection<Notifications.Notification> Notifications { get; set; } = [];
+    public Users.UserPreference? Preference { get; set; }
 }

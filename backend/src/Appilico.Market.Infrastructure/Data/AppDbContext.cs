@@ -1,6 +1,7 @@
 using Appilico.Market.Domain;
 using Appilico.Market.Domain.Audit;
 using Appilico.Market.Domain.Auth;
+using Appilico.Market.Domain.Users;
 using Appilico.Market.Domain.Categories;
 using Appilico.Market.Domain.Enquiries;
 using Appilico.Market.Domain.ITServices;
@@ -75,6 +76,10 @@ public class AppDbContext : IdentityDbContext<AppUser>
     // Enquiries
     public DbSet<Enquiry> Enquiries => Set<Enquiry>();
 
+    // User personalisation
+    public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
+    public DbSet<UserBehaviorEvent> UserBehaviorEvents => Set<UserBehaviorEvent>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -99,6 +104,22 @@ public class AppDbContext : IdentityDbContext<AppUser>
         builder.Entity<Enquiry>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ServiceRequest>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ServiceOffer>().HasQueryFilter(e => !e.IsDeleted);
+
+        // UserPreference — one per user
+        builder.Entity<UserPreference>()
+            .HasIndex(e => e.UserId).IsUnique();
+        builder.Entity<UserPreference>()
+            .HasOne(e => e.User)
+            .WithOne(u => u.Preference)
+            .HasForeignKey<UserPreference>(e => e.UserId);
+
+        // UserBehaviorEvent — append-only log, no soft delete
+        builder.Entity<UserBehaviorEvent>()
+            .HasIndex(e => new { e.UserId, e.OccurredAt });
+        builder.Entity<UserBehaviorEvent>()
+            .HasIndex(e => new { e.SessionId, e.OccurredAt });
+        builder.Entity<UserBehaviorEvent>()
+            .HasIndex(e => e.EventType);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

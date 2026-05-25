@@ -168,8 +168,68 @@ public static partial class DatabaseSeeder
         }
 
         // --- Improve descriptions for top providers ---
-        var descriptionUpdates = new Dictionary<string, string>
+
+        // --- WELLNESS category fix: Assign day-spa / holistic / float therapy providers ---
+        var wellnessCatFinal = categories.FirstOrDefault(c => c.Slug == "wellness")
+            ?? await context.Categories.FirstOrDefaultAsync(c => c.Slug == "wellness");
+
+        if (wellnessCatFinal != null)
         {
+            var wellnessKeywords = new[] { "day spa", "spa retreat", "float therapy", "float tank", "aromatherapy", "reflexology", "holistic", "wellness spa", "wellness centre", "wellness center", "bathhouse", "naturopath", "meditation", "endota" };
+            var wellnessSlugs = new[]
+            {
+                "ember-bathhouse-wellness-osborne-park",
+                "ember-bathhouse-osborne-park",
+                "palm-beach-wellness-nedlands",
+                "savasana-beauty-and-wellness-jurien-bay",
+                "djurra-day-spa-fremantle",
+                "the-head-spa-perth-south-perth",
+            };
+
+            // Manual slug overrides first
+            foreach (var slug in wellnessSlugs)
+            {
+                var provider = await context.Providers
+                    .Include(p => p.Services)
+                    .FirstOrDefaultAsync(p => p.Slug == slug);
+                if (provider != null)
+                {
+                    foreach (var svc in provider.Services)
+                        svc.CategoryId = wellnessCatFinal.Id;
+                }
+            }
+
+            // Bulk keyword-based wellness assignment
+            var allBeautyForWellness = await context.Providers
+                .Include(p => p.Services)
+                .Where(p => p.ProviderType == ProviderType.Beauty && p.HasRealData)
+                .ToListAsync();
+
+            var wellnessFixCount = 0;
+            foreach (var provider in allBeautyForWellness)
+            {
+                var name = provider.BusinessName?.ToLower() ?? "";
+                var desc = provider.Description?.ToLower() ?? "";
+                var isWellness = wellnessKeywords.Any(k => name.Contains(k) || desc.Contains(k));
+                // Don't reassign massage providers that already have massage category
+                var hasMassageSvc = massageCat != null && provider.Services.Any(s => s.CategoryId == massageCat.Id);
+                if (isWellness && !hasMassageSvc && provider.Services.Any())
+                {
+                    // Assign the primary service to wellness; leave others intact
+                    var primarySvc = provider.Services.OrderBy(s => s.SortOrder).First();
+                    if (primarySvc.CategoryId != wellnessCatFinal.Id)
+                    {
+                        primarySvc.CategoryId = wellnessCatFinal.Id;
+                        wellnessFixCount++;
+                    }
+                }
+            }
+            if (wellnessFixCount > 0)
+                await context.SaveChangesAsync();
+        }
+
+        // --- Improve descriptions for top providers ---
+        var descriptionUpdates = new Dictionary<string, string>        {
             { "her-on-oxford-mount-hawthorn",
               "HER on Oxford is Mount Hawthorn's celebrated skin sanctuary, delivering transformative facial treatments from their stunning Oxford Street studio. Specialising in advanced skin treatments, dermal therapies and corrective facials, their highly trained team has built an extraordinary 625-review following of devoted Perth clients." },
             { "ivy-reign-leederville",

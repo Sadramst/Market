@@ -6,6 +6,7 @@ import { providerJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs, StarRating } from "@/components/ui";
 import { ContactProviderButton } from "@/components/providers/ContactProviderButton";
 import { ReviewForm } from "@/components/providers/ReviewForm";
+import { ProviderViewTracker } from "@/components/providers/ProviderViewTracker";
 
 type Provider = {
   id: string;
@@ -108,6 +109,11 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
+      <ProviderViewTracker
+        providerSlug={provider.slug}
+        categorySlug={provider.categories?.[0]?.toLowerCase().replace(/\s+/g, '-')}
+        suburbSlug={provider.city?.toLowerCase().replace(/\s+/g, '-')}
+      />
       {/* Gradient Banner */}
       <div className="relative h-64" style={{ background: bannerGradient }}>
         {provider.coverImageUrl ? (

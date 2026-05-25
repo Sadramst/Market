@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
+import { ServicesHeader } from "@/components/ServicesHeader";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -32,27 +33,7 @@ export default function RootLayout({
     <html lang="en-AU" className={inter.variable}>
       <body className="font-sans min-h-screen antialiased flex flex-col bg-white text-gray-900">
         <Analytics />
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
-                <svg className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-bold text-gray-900 tracking-tight">Appilico</span>
-                <span className="text-xs text-blue-500 font-semibold tracking-wider uppercase">Services</span>
-              </div>
-            </Link>
-            <nav className="hidden md:flex items-center gap-8">
-              <Link href="/search" className="relative text-sm text-gray-500 hover:text-blue-600 transition-colors font-medium after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-blue-500 after:rounded-full hover:after:w-full after:transition-all">Browse</Link>
-              <Link href="/categories" className="relative text-sm text-gray-500 hover:text-blue-600 transition-colors font-medium after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-blue-500 after:rounded-full hover:after:w-full after:transition-all">Categories</Link>
-            </nav>
-            <Link href="/join" className="hidden sm:inline-flex px-5 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-all hover:shadow-md hover:shadow-blue-600/20 active:scale-[0.98]">
-              List Your Service
-            </Link>
-          </div>
-        </header>
+        <ServicesHeader />
 
         <main className="flex-1">{children}</main>
 

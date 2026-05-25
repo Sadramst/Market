@@ -39,8 +39,16 @@ public static partial class DatabaseSeeder
 
             // Create a system user for this provider
             var email = $"provider.{biz.Slug.Replace("-", "")}@appilico-seed.internal";
-            if (email.Length > 80) email = email[..80];
+            if (email.Length > 80)
+            {
+                var hash = Math.Abs(biz.Slug.GetHashCode()).ToString();
+                email = $"p{hash}@appilico-seed.internal";
+            }
             var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = await userManager.FindByNameAsync(email);
+            }
             if (user == null)
             {
                 var nameParts = biz.Name.Split(' ');
@@ -52,7 +60,8 @@ public static partial class DatabaseSeeder
                     LastName = nameParts.Length > 1 ? string.Join(" ", nameParts[1..Math.Min(3, nameParts.Length)]) : "Business",
                     EmailConfirmed = true
                 };
-                await userManager.CreateAsync(user, "SeedProvider@2026!");
+                var createResult = await userManager.CreateAsync(user, "SeedProvider@2026!");
+                if (!createResult.Succeeded) continue;
                 await userManager.AddToRoleAsync(user, UserRoles.Provider);
             }
 

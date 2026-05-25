@@ -66,18 +66,24 @@ export function Header() {
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className="relative nav-link-underline px-4 py-2 text-[14px] font-normal transition-colors duration-200"
-                  style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                >
-                  {l.label}
-                </Link>
-              ))}
+              {navLinks.map((l) => {
+                // "Browse" link auto-applies location postcode for proximity sorting
+                const href = l.label === "Browse" && suburb?.postCode
+                  ? `/search?postCode=${suburb.postCode}&sortBy=distance`
+                  : l.href;
+                return (
+                  <Link
+                    key={l.href}
+                    href={href}
+                    className="relative nav-link-underline px-4 py-2 text-[14px] font-normal transition-colors duration-200"
+                    style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                  >
+                    {l.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Right actions */}

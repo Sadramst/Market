@@ -322,3 +322,295 @@ test.describe("Beauty – Dashboard (authenticated)", () => {
     await expect(page.locator("body")).toContainText(/dashboard|welcome|profile/i);
   });
 });
+
+// ──────────────────────────────────────────────
+// Forgot Password Page
+// ──────────────────────────────────────────────
+test.describe("Beauty – Forgot Password", () => {
+  test("forgot-password page loads", async ({ page }) => {
+    const res = await page.goto("/forgot-password");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator('input[type="email"]').first()).toBeVisible();
+    await expect(page.locator('button[type="submit"]')).toBeVisible();
+  });
+
+  test("forgot-password shows reset form heading", async ({ page }) => {
+    await page.goto("/forgot-password");
+    const body = await page.locator("body").textContent();
+    expect(body?.toLowerCase()).toMatch(/reset|forgot|password/i);
+  });
+
+  test("login page has forgot password link", async ({ page }) => {
+    await page.goto("/login");
+    const link = page.locator('a[href="/forgot-password"], a:has-text("Forgot password")').first();
+    await expect(link).toBeVisible();
+  });
+
+  test("forgot-password accepts email and shows confirmation", async ({ page }) => {
+    await page.goto("/forgot-password");
+    await page.locator('input[type="email"]').fill("nonexistent@appilico-e2e.test");
+    await page.locator('button[type="submit"]').click();
+    // API always returns success (security — don't reveal whether email exists)
+    await page.waitForTimeout(4000);
+    const body = await page.locator("body").textContent();
+    expect(body?.toLowerCase()).toMatch(/check|sent|inbox|email|if/i);
+  });
+
+  test("forgot-password has link back to sign in", async ({ page }) => {
+    await page.goto("/forgot-password");
+    const link = page.locator('a[href="/login"]').first();
+    await expect(link).toBeVisible();
+  });
+});
+
+// ──────────────────────────────────────────────
+// Reset Password Page
+// ──────────────────────────────────────────────
+test.describe("Beauty – Reset Password", () => {
+  test("reset-password page loads", async ({ page }) => {
+    const res = await page.goto("/reset-password");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator("body")).toBeVisible();
+  });
+
+  test("reset-password shows new password and confirm fields", async ({ page }) => {
+    await page.goto("/reset-password");
+    await page.waitForTimeout(1000);
+    const body = await page.locator("body").textContent();
+    expect(body?.toLowerCase()).toMatch(/password|reset|code/i);
+    // Should have two password inputs
+    const pwdInputs = page.locator('input[type="password"]');
+    await expect(pwdInputs.first()).toBeVisible();
+  });
+
+  test("reset-password mismatch shows inline error", async ({ page }) => {
+    await page.goto("/reset-password");
+    const pwdInputs = await page.locator('input[type="password"]').all();
+    if (pwdInputs.length >= 2) {
+      await pwdInputs[0].fill("NewPass@123!");
+      await pwdInputs[1].fill("Different@456!");
+      await pwdInputs[1].blur();
+      await page.waitForTimeout(500);
+      const body = await page.locator("body").textContent();
+      expect(body?.toLowerCase()).toMatch(/match|mismatch/i);
+    }
+  });
+
+  test("reset-password has link to resend and back to sign in", async ({ page }) => {
+    await page.goto("/reset-password");
+    const forgotLink = page.locator('a[href="/forgot-password"]').first();
+    const loginLink  = page.locator('a[href="/login"]').first();
+    await expect(forgotLink).toBeVisible();
+    await expect(loginLink).toBeVisible();
+  });
+});
+
+// ──────────────────────────────────────────────
+// Customer role redirect
+// ──────────────────────────────────────────────
+test.describe("Beauty – Customer Role Redirect", () => {
+  test("customer login redirects to /profile not /dashboard", async ({ request, page }) => {
+    const unique = Date.now();
+    const regRes = await request.post(`${API}/auth/register`, {
+      data: {
+        firstName: "Customer",
+        lastName: "Redirect",
+        email: `custredir${unique}@appilico-e2e.test`,
+        password: "TestPass@123!",
+        confirmPassword: "TestPass@123!",
+      },
+    });
+    const regBody = await regRes.json();
+    test.skip(!regBody?.success, "Registration failed");
+
+    await page.goto("/login");
+    await page.locator('input[type="email"]').fill(`custredir${unique}@appilico-e2e.test`);
+    await page.locator('input[type="password"]').fill("TestPass@123!");
+    await page.locator('button:has-text("Sign in")').click();
+    await page.waitForURL(/\/profile/, { timeout: 12_000 });
+    expect(page.url()).toContain("/profile");
+    // Must NOT land on /dashboard
+    expect(page.url()).not.toContain("/dashboard");
+  });
+
+  test("navigating to /dashboard as a customer redirects to /profile", async ({ request, page }) => {
+    const unique = Date.now();
+    const regRes = await request.post(`${API}/auth/register`, {
+      data: {
+        firstName: "CustDash",
+        lastName: "Guard",
+        email: `custdash${unique}@appilico-e2e.test`,
+        password: "TestPass@123!",
+        confirmPassword: "TestPass@123!",
+      },
+    });
+    const regBody = await regRes.json();
+    const token = regBody?.data?.accessToken;
+    const user = regBody?.data?.user;
+    test.skip(!token, "Registration failed");
+
+    await injectAuth(page, token, user);
+    await page.goto("/dashboard");
+    await page.waitForURL(/\/profile/, { timeout: 10_000 });
+    expect(page.url()).toContain("/profile");
+  });
+});
+
+// ──────────────────────────────────────────────
+// Profile Edit & Address Save
+// ──────────────────────────────────────────────
+test.describe("Beauty – Profile Edit & Address", () => {
+  test("profile edit button appears and opens form", async ({ request, page }) => {
+    const unique = Date.now();
+    const regRes = await request.post(`${API}/auth/register`, {
+      data: {
+        firstName: "Edit",
+        lastName: "Test",
+        email: `editprofile${unique}@appilico-e2e.test`,
+        password: "TestPass@123!",
+        confirmPassword: "TestPass@123!",
+      },
+    });
+    const regBody = await regRes.json();
+    const token = regBody?.data?.accessToken;
+    const user = regBody?.data?.user;
+    test.skip(!token, "Registration failed");
+
+    await injectAuth(page, token, user);
+    await page.goto("/profile");
+    await page.waitForTimeout(3000);
+
+    // Click edit
+    const editBtn = page.locator('button:has-text("Edit"), button:has-text("edit profile")').first();
+    await expect(editBtn).toBeVisible({ timeout: 8_000 });
+    await editBtn.click();
+
+    // Should show input fields for the address
+    const inputs = page.locator('input[type="text"], input[type="tel"]');
+    await expect(inputs.first()).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("profile address fields save via API", async ({ request }) => {
+    const unique = Date.now();
+    const regRes = await request.post(`${API}/auth/register`, {
+      data: {
+        firstName: "SaveAddr",
+        lastName: "Test",
+        email: `saveaddr${unique}@appilico-e2e.test`,
+        password: "TestPass@123!",
+        confirmPassword: "TestPass@123!",
+      },
+    });
+    const regBody = await regRes.json();
+    const token = regBody?.data?.accessToken;
+    test.skip(!token, "Registration failed");
+
+    // Update profile via API
+    const updateRes = await request.put(`${API}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        firstName: "SaveAddr",
+        lastName: "Test",
+        suburb: "Fremantle",
+        postCode: "6160",
+        state: "WA",
+        addressLine1: "1 Marine Terrace",
+      },
+    });
+    const updateBody = await updateRes.json();
+    expect(updateBody.success).toBe(true);
+    expect(updateBody.data?.postCode).toBe("6160");
+    expect(updateBody.data?.suburb).toBe("Fremantle");
+  });
+
+  test("profile postCode syncs to location chip in localStorage", async ({ request, page }) => {
+    const unique = Date.now();
+    const regRes = await request.post(`${API}/auth/register`, {
+      data: {
+        firstName: "ChipSync",
+        lastName: "Test",
+        email: `chipsync${unique}@appilico-e2e.test`,
+        password: "TestPass@123!",
+        confirmPassword: "TestPass@123!",
+      },
+    });
+    const regBody = await regRes.json();
+    const token = regBody?.data?.accessToken;
+    const user = regBody?.data?.user;
+    test.skip(!token, "Registration failed");
+
+    // Pre-update address via API
+    await request.put(`${API}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { suburb: "Cottesloe", postCode: "6011", state: "WA" },
+    });
+
+    await injectAuth(page, token, user);
+    await page.goto("/profile");
+    await page.waitForTimeout(4000);
+
+    // localStorage should now have the postCode from profile
+    const pref = await page.evaluate(() => localStorage.getItem("appilico_preferred_suburb"));
+    if (pref) {
+      const parsed = JSON.parse(pref);
+      expect(parsed.postCode).toBe("6011");
+    }
+    // Header chip should show the suburb or postcode
+    const chip = page.locator("button:has-text('Cottesloe'), button:has-text('6011')").first();
+    await expect(chip).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+// ──────────────────────────────────────────────
+// Location → Browse Integration
+// ──────────────────────────────────────────────
+test.describe("Beauty – Location & Browse Integration", () => {
+  test("Browse link in header includes postCode when location is set", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => {
+      localStorage.setItem("appilico_preferred_suburb", JSON.stringify({
+        id: "1", name: "Fremantle", slug: "fremantle", state: "WA",
+        postCode: "6160", providerCount: 10, distanceKm: 0,
+      }));
+    });
+    await page.reload();
+    const browseLink = page.locator('nav a:has-text("Browse"), header a:has-text("Browse")').first();
+    await expect(browseLink).toBeVisible({ timeout: 5_000 });
+    const href = await browseLink.getAttribute("href");
+    expect(href).toContain("postCode=6160");
+    expect(href).toContain("sortBy=distance");
+  });
+
+  test("search form auto-fills postCode from preferred suburb", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => {
+      localStorage.setItem("appilico_preferred_suburb", JSON.stringify({
+        id: "1", name: "Fremantle", slug: "fremantle", state: "WA",
+        postCode: "6160", providerCount: 10, distanceKm: 0,
+      }));
+    });
+    // Navigate to search with no explicit postCode
+    await page.goto("/search");
+    await page.waitForTimeout(2000);
+
+    // Hidden postCode input should be populated from localStorage
+    const postCodeInput = page.locator('input[name="postCode"]');
+    const val = await postCodeInput.inputValue();
+    expect(val).toBe("6160");
+  });
+
+  test("search results page shows 'Near me' sort option", async ({ page }) => {
+    await page.goto("/search?postCode=6160&sortBy=distance");
+    await expect(page.locator("body")).toBeVisible();
+    const body = await page.locator("body").textContent();
+    expect(body?.toLowerCase()).toMatch(/near|distance|6160/i);
+  });
+
+  test("search with postCode shows distance-sorted heading", async ({ page }) => {
+    await page.goto("/search?postCode=6160&sortBy=distance");
+    await page.waitForTimeout(2000);
+    const heading = await page.locator("h1").first().textContent();
+    expect(heading?.toLowerCase()).toMatch(/6160|near|browse/i);
+  });
+});
+

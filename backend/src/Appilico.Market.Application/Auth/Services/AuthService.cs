@@ -140,7 +140,10 @@ public class AuthService : IAuthService
         if (request.State != null) user.State = request.State;
         user.UpdatedAt = DateTime.UtcNow;
 
-        await _userManager.UpdateAsync(user);
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+            return ApiResponse<UserDto>.Fail("Profile update failed",
+                updateResult.Errors.Select(e => e.Description).ToList());
 
         return await GetProfileAsync(userId);
     }

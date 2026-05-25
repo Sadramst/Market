@@ -5,7 +5,7 @@ import { generatePageMeta, breadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
-import { SuburbAutocomplete } from "@/components/search/SuburbAutocomplete";
+import { SearchFormClient } from "@/components/search/SearchFormClient";
 
 export const metadata: Metadata = generatePageMeta({
   title: "Browse Beauty Providers in Perth",
@@ -87,37 +87,26 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
       {/* Search & Filters */}
       <div className="p-5 mb-10 space-y-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
-        <form className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1">
-            <input type="text" name="q" defaultValue={query} placeholder="Search services, salons..."
-              className="w-full px-4 py-3.5 text-[15px] bg-transparent focus:outline-none"
-              style={{ border: '1px solid var(--border)', borderRadius: '2px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}
-            />
-          </div>
-          <SuburbAutocomplete defaultValue={suburb} />
-          <select name="sort" defaultValue={sort}
-            className="px-4 py-3.5 text-[13px] bg-transparent focus:outline-none sm:w-44"
-            style={{ border: '1px solid var(--border)', borderRadius: '2px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
-          >
-            <option value="rating">Top Rated</option>
-            <option value="newest">Newest</option>
-            <option value="name">A-Z</option>
-            <option value="reviews">Most Reviewed</option>
-          </select>
-          <button type="submit" className="px-8 py-3.5 text-[14px] font-medium text-white shrink-0 transition-all"
-            style={{ background: 'var(--brand-rose)', borderRadius: '2px', fontFamily: 'var(--font-body)' }}
-          >
-            Search
-          </button>
-        </form>
+        <SearchFormClient
+          defaultQuery={query}
+          defaultSuburb={suburb}
+          defaultSort={sort}
+          defaultPostCode={postCode}
+          defaultCategory={category}
+          categoryOptions={categoryFilters}
+        />
 
         {/* Category pills */}
         <div className="flex flex-wrap gap-2">
           {categoryFilters.map((cat) => {
             const isActive = category === cat.value;
-            const href = cat.value
-              ? `/search?${new URLSearchParams({ ...(query ? { q: query } : {}), ...(suburb ? { suburb } : {}), category: cat.value, sort }).toString()}`
-              : `/search?${new URLSearchParams({ ...(query ? { q: query } : {}), ...(suburb ? { suburb } : {}), sort }).toString()}`;
+            const catParams = new URLSearchParams();
+            if (query) catParams.set("q", query);
+            if (suburb) catParams.set("suburb", suburb);
+            if (postCode) catParams.set("postCode", postCode);
+            if (cat.value) catParams.set("category", cat.value);
+            catParams.set("sortBy", sort);
+            const href = `/search?${catParams.toString()}`;
             return (
               <Link key={cat.value} href={href}
                 className="px-3.5 py-1.5 text-[13px] font-medium transition-all"

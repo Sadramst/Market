@@ -58,4 +58,19 @@ public class UpdateProfileRequest
     public string? LastName { get; set; }
     public string? PhoneNumber { get; set; }
     public DateTime? DateOfBirth { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? Suburb { get; set; }
+    public string? PostCode { get; set; }
+    public string? State { get; set; }
+}
+
+public class UserProfileDto : UserDto
+{
+    public string? PhoneNumber { get; set; }
+    public DateTime? DateOfBirth { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? Suburb { get; set; }
+    public string? PostCode { get; set; }
+    public string? State { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

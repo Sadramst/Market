@@ -109,35 +109,65 @@ public class ProviderService : IProviderService
         }
 
         // Sorting with weighted ranking
-        query = request.SortBy?.ToLower() switch
+        // For postcode proximity: resolve postcode to numeric, then sort in-memory after fetch
+        bool proximitySort = request.SortBy?.ToLower() == "distance"
+            && !string.IsNullOrEmpty(request.PostCode)
+            && int.TryParse(request.PostCode, out _);
+
+        if (!proximitySort)
         {
-            "rating" => query.OrderByDescending(p => p.AverageRating)
-                .ThenByDescending(p => p.TotalReviews),
-            "reviews" => query.OrderByDescending(p => p.TotalReviews)
-                .ThenByDescending(p => p.AverageRating),
-            "name" => request.SortDescending
-                ? query.OrderByDescending(p => p.BusinessName)
-                : query.OrderBy(p => p.BusinessName),
-            "newest" => query.OrderByDescending(p => p.CreatedAt),
-            _ => query
-                .OrderByDescending(p => p.IsFeatured)
-                .ThenByDescending(p => p.IsVerified)
-                .ThenByDescending(p =>
-                    p.AverageRating * 0.4 +
-                    Math.Min(p.TotalReviews / 100.0, 1.0) * 0.3 +
-                    (p.Description != null && p.Description.Length > 50 ? 0.1 : 0) +
-                    (p.Phone != null ? 0.05 : 0) +
-                    (p.Website != null ? 0.05 : 0) +
-                    (p.InstagramUrl != null ? 0.05 : 0) +
-                    (p.Services.Count > 0 ? 0.05 : 0)
-                )
-        };
+            query = request.SortBy?.ToLower() switch
+            {
+                "rating" => query.OrderByDescending(p => p.AverageRating)
+                    .ThenByDescending(p => p.TotalReviews),
+                "reviews" => query.OrderByDescending(p => p.TotalReviews)
+                    .ThenByDescending(p => p.AverageRating),
+                "name" => request.SortDescending
+                    ? query.OrderByDescending(p => p.BusinessName)
+                    : query.OrderBy(p => p.BusinessName),
+                "newest" => query.OrderByDescending(p => p.CreatedAt),
+                _ => query
+                    .OrderByDescending(p => p.IsFeatured)
+                    .ThenByDescending(p => p.IsVerified)
+                    .ThenByDescending(p =>
+                        p.AverageRating * 0.4 +
+                        Math.Min(p.TotalReviews / 100.0, 1.0) * 0.3 +
+                        (p.Description != null && p.Description.Length > 50 ? 0.1 : 0) +
+                        (p.Phone != null ? 0.05 : 0) +
+                        (p.Website != null ? 0.05 : 0) +
+                        (p.InstagramUrl != null ? 0.05 : 0) +
+                        (p.Services.Count > 0 ? 0.05 : 0)
+                    )
+            };
+        }
 
         var totalCount = await query.CountAsync();
-        var providers = await query
-            .Skip((request.Page - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToListAsync();
+
+        List<Provider> providers;
+        if (proximitySort && int.TryParse(request.PostCode, out var targetPc))
+        {
+            // Fetch all matching, then sort in memory by postcode distance
+            var all = await query.ToListAsync();
+            providers = all
+                .OrderBy(p =>
+                {
+                    // Try provider's own PostalCode first, then first service area suburb postcode
+                    var pcStr = p.PostalCode
+                        ?? p.ServiceAreas.Select(sa => sa.Suburb?.PostCode).FirstOrDefault(x => x != null);
+                    return int.TryParse(pcStr, out var pc) ? Math.Abs(pc - targetPc) : int.MaxValue;
+                })
+                .ThenByDescending(p => p.AverageRating)
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+        }
+        else
+        {
+            providers = await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+        }
 
         var items = providers.Select(MapToListDto).ToList();
 

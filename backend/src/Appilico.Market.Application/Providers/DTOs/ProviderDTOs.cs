@@ -179,11 +179,12 @@ public class ProviderSearchRequest
     public Guid? SuburbId { get; set; }
     public string? Category { get; set; }  // Category slug (frontend sends ?category=nails)
     public string? Suburb { get; set; }    // Suburb slug (frontend sends ?suburb=subiaco)
+    public string? PostCode { get; set; }  // Postcode for proximity sorting
     public string? City { get; set; }
     public bool? IsFeatured { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 12;
-    public string? SortBy { get; set; } // "rating", "reviews", "newest", "name"
+    public string? SortBy { get; set; } // "rating", "reviews", "newest", "name", "distance"
     public bool SortDescending { get; set; } = true;
 }
 

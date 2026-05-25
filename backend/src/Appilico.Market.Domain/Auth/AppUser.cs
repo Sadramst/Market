@@ -8,6 +8,10 @@ public class AppUser : IdentityUser
     public string LastName { get; set; } = string.Empty;
     public string? Avatar { get; set; }
     public DateTime? DateOfBirth { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? Suburb { get; set; }
+    public string? PostCode { get; set; }
+    public string? State { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }

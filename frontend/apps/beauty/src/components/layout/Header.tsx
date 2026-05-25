@@ -99,7 +99,7 @@ export function Header() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                {detecting ? "Detecting…" : suburb ? suburb.name : "Detect location"}
+                {detecting ? "Detecting…" : suburb ? `${suburb.name}${suburb.postCode ? ` · ${suburb.postCode}` : ""}` : "Detect location"}
               </button>
 
               {isAuthenticated && user ? (
@@ -115,27 +115,33 @@ export function Header() {
                     {user.firstName}
                   </button>
                   {showUserMenu && (
-                    <div className="absolute right-0 top-full mt-1 w-44 py-1 z-50 rounded shadow-lg" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                    <div className="absolute right-0 top-full mt-1 w-48 py-1 z-50 rounded shadow-lg" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                      <Link href="/profile" onClick={() => setShowUserMenu(false)} className="block px-4 py-2.5 text-[13px] hover:bg-gray-50 transition-colors" style={{ color: 'var(--text-secondary)' }}>My Profile</Link>
                       <Link href="/dashboard" onClick={() => setShowUserMenu(false)} className="block px-4 py-2.5 text-[13px] hover:bg-gray-50 transition-colors" style={{ color: 'var(--text-secondary)' }}>Dashboard</Link>
+                      <div style={{ height: 1, background: 'var(--border)', margin: '4px 0' }} />
                       <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-gray-50 transition-colors" style={{ color: 'var(--text-secondary)' }}>Sign out</button>
                     </div>
                   )}
                 </div>
               ) : (
-                <Link
-                  href="/login"
-                  className="hidden sm:flex items-center px-4 py-2 text-[14px] font-normal transition-all duration-200"
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '2px',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand-rose)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                >
-                  Log in
-                </Link>
+                <div className="hidden sm:flex items-center gap-2">
+                  <Link
+                    href="/signup"
+                    className="px-4 py-2 text-[14px] font-normal transition-all duration-200"
+                    style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
+                  >
+                    Sign up
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="flex items-center px-4 py-2 text-[14px] font-normal transition-all duration-200"
+                    style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand-rose)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                  >
+                    Log in
+                  </Link>
+                </div>
               )}
 
               <Link
@@ -195,6 +201,12 @@ export function Header() {
           <div className="p-4 space-y-2" style={{ borderTop: '1px solid var(--border)' }}>
             {isAuthenticated ? (
               <>
+                <Link href="/profile" onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center px-4 py-3 text-[15px] font-normal"
+                  style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
+                >
+                  My Profile
+                </Link>
                 <Link href="/dashboard" onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center px-4 py-3 text-[15px] font-normal"
                   style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
@@ -215,8 +227,12 @@ export function Header() {
                   style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '2px' }}
                 >
                   Log in
-                </Link>
-                <Link href="/join" onClick={() => setMobileOpen(false)}
+                </Link>                <Link href="/signup" onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center px-4 py-3 text-[15px] font-medium"
+                  style={{ color: 'var(--brand-rose)', border: '1px solid var(--brand-rose)', borderRadius: '2px', opacity: 0.9 }}
+                >
+                  Create account
+                </Link>                <Link href="/join" onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center px-4 py-3 text-[15px] font-medium text-white"
                   style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}
                 >

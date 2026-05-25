@@ -29,5 +29,11 @@ export default defineConfig({
       testDir: "./e2e/admin",
       use: { baseURL: "https://admin.appilico.com.au" },
     },
+    {
+      name: "agent",
+      testDir: "./e2e/agent",
+      use: { baseURL: "https://beauty.appilico.com.au" },
+      timeout: 60_000,
+    },
   ],
 });

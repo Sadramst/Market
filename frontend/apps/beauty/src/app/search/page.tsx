@@ -26,19 +26,22 @@ const categoryFilters = [
   { label: "Wellness", value: "wellness" },
 ];
 
-type SearchParams = { q?: string; suburb?: string; category?: string; sort?: string; page?: string };
+type SearchParams = { q?: string; suburb?: string; category?: string; sort?: string; sortBy?: string; page?: string; postCode?: string };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
   const query = params.q || "";
   const suburb = params.suburb || "";
   const category = params.category || "";
-  const sort = params.sort || "rating";
+  const postCode = params.postCode || "";
+  // Support both ?sort= (legacy) and ?sortBy= (new); proximity auto-applies when postCode is set
+  const sort = postCode ? (params.sort || params.sortBy || "distance") : (params.sort || params.sortBy || "rating");
   const page = parseInt(params.page || "1", 10);
 
   const apiParams = new URLSearchParams();
   if (query) apiParams.set("searchTerm", query);
   if (suburb) apiParams.set("suburb", suburb);
+  if (postCode) apiParams.set("postCode", postCode);
   if (category) apiParams.set("category", category);
   apiParams.set("sortBy", sort);
   apiParams.set("page", String(page));
@@ -74,9 +77,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <div className="mb-10 mt-6">
         <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>
           {query ? <>Results for &ldquo;<em>{query}</em>&rdquo;</> : "Browse Beauty Providers"}
-          {suburb ? ` in ${suburb}` : ""}
+          {suburb ? ` in ${suburb}` : postCode ? ` near ${postCode}` : ""}
         </h1>
-        <p className="mt-2 text-[15px] font-light" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{pagination.totalCount} provider{pagination.totalCount !== 1 ? "s" : ""} found</p>
+        <p className="mt-2 text-[15px] font-light" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+          {pagination.totalCount} provider{pagination.totalCount !== 1 ? "s" : ""} found
+          {sort === "distance" && postCode ? ` · sorted by distance from ${postCode}` : ""}
+        </p>
       </div>
 
       {/* Search & Filters */}

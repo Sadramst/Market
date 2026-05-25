@@ -69,6 +69,7 @@ export function LoginForm() {
         {loading ? "Signing in..." : "Sign in"}
       </button>
       <div className="flex items-center justify-between text-[13px]" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
+        <Link href="/signup" className="hover:text-[var(--brand-rose)]">Create account</Link>
         <Link href="/join" className="hover:text-[var(--brand-rose)]">List your business</Link>
         <Link href="/contact" className="hover:text-[var(--brand-rose)]">Need access?</Link>
       </div>

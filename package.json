@@ -11,12 +11,17 @@
     "test:beauty": "npx playwright test --project=beauty",
     "test:admin": "npx playwright test --project=admin",
     "test:services": "npx playwright test --project=services",
+    "test:agent": "npx playwright test --project=agent",
+    "test:agent:run": "npx ts-node e2e/agent/run-agent.ts",
     "test:report": "npx playwright show-report"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.60.0"
+    "@playwright/test": "^1.60.0",
+    "@zerostep/playwright": "^0.1.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
   }
 }

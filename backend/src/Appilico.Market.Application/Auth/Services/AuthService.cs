@@ -105,15 +105,22 @@ public class AuthService : IAuthService
         var roles = await _userManager.GetRolesAsync(user);
         var provider = await _context.Providers.FirstOrDefaultAsync(p => p.UserId == userId);
 
-        return ApiResponse<UserDto>.Ok(new UserDto
+        return ApiResponse<UserDto>.Ok(new UserProfileDto
         {
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email!,
+            PhoneNumber = user.PhoneNumber,
+            DateOfBirth = user.DateOfBirth,
             Avatar = user.Avatar,
+            AddressLine1 = user.AddressLine1,
+            Suburb = user.Suburb,
+            PostCode = user.PostCode,
+            State = user.State,
             Roles = roles.ToList(),
-            ProviderId = provider?.Id
+            ProviderId = provider?.Id,
+            CreatedAt = user.CreatedAt
         });
     }
 
@@ -127,6 +134,10 @@ public class AuthService : IAuthService
         if (request.LastName != null) user.LastName = request.LastName;
         if (request.PhoneNumber != null) user.PhoneNumber = request.PhoneNumber;
         if (request.DateOfBirth.HasValue) user.DateOfBirth = request.DateOfBirth;
+        if (request.AddressLine1 != null) user.AddressLine1 = request.AddressLine1;
+        if (request.Suburb != null) user.Suburb = request.Suburb;
+        if (request.PostCode != null) user.PostCode = request.PostCode;
+        if (request.State != null) user.State = request.State;
         user.UpdatedAt = DateTime.UtcNow;
 
         await _userManager.UpdateAsync(user);

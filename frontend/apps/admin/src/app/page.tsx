@@ -29,7 +29,11 @@ export default function AdminLoginPage() {
     }
   }
 
-  if (loading) return null;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950">
+      <div className="text-indigo-300/60 text-sm">Loading…</div>
+    </div>
+  );
   if (user) return null;
 
   return (

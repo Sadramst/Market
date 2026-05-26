@@ -95,6 +95,11 @@ public static partial class DatabaseSeeder
             { "sora-hair-subiaco-subiaco", "hair" },
             // Maurice Meade is a hair salon, not Skin Care
             { "maurice-meade-subiaco-subiaco", "hair" },
+            // Bodysmart is physio/health, not beauty massage — recategorise to Wellness
+            { "bodysmart-physio-pilates-and-chiro-perth-cbd-perth", "wellness" },
+            // Glow Skin & Spa — Skin is primary
+            { "glow-skin-and-spa-baldivis", "skin-care" },
+            { "glow-skin-spa-baldivis", "skin-care" },
         };
 
         foreach (var (slug, categorySlug) in categoryFixes)
@@ -240,6 +245,18 @@ public static partial class DatabaseSeeder
               "Glow Skin & Spa in Baldivis has quickly become the southern suburbs' go-to beauty destination, earning an extraordinary 284 five-star reviews. Offering a comprehensive menu of skin treatments, waxing, massage and wellness services from their Nancy Alley studio." },
             { "full-spectrum-hair-concept-myaree",
               "Full Spectrum Hair Concept in Myaree is one of Perth's most celebrated hair studios, with 275 glowing reviews and a reputation for exceptional colour work. Their Myaree studio brings creative, fashion-forward hair artistry to Perth's southern corridor." },
+            { "breathe-beauty-wembley",
+              "Owner Serena has crafted one of Perth's most adored beauty sanctuaries in Wembley, earning nearly 500 five-star reviews through consistently exceptional nail, brow, lash and skin services. Clients describe Breathe Beauty as the kind of place that genuinely makes you feel cared for." },
+            { "rejuvewell-retreat-massage-and-beauty-therapy-northbridge",
+              "REJUVEWELL RETREAT in Northbridge is Perth's extraordinary massage and beauty sanctuary with nearly 600 five-star reviews. Perched above James Street, they offer a comprehensive menu of therapeutic massage, body treatments and beauty services in a beautifully designed retreat environment." },
+            { "harper-hair-subiaco",
+              "Perth's destination for expertly crafted blonde hair, balayage and lived-in colour. Harper Hair draws colour-obsessed clients from across the city who trust the team's exceptional eye for natural, sun-kissed tones and seamlessly blended extensions." },
+            { "erin-aesthetics-subiaco",
+              "Trained by world-class medical professionals and anti-ageing leaders, Erin Aesthetics is a premium Subiaco clinic maintaining exceptional standards across medical-grade peels, skin needling and mesotherapy. Known for their honesty-first approach and loyal clientele." },
+            { "elka-clinic-subiaco",
+              "A highly regarded permanent makeup and brow clinic on Hood Street, Elka Clinic specialises in eyebrow tattooing, nano brows, eyeliner tattoo, lip blush and microneedling. Their pharmacist-backed team brings both artistry and clinical knowledge to every treatment." },
+            { "ultimate-aesthetics-subiaco-subiaco",
+              "Ultimate Aesthetics is Subiaco's trusted cosmetic clinic on Barker Road, offering expert cosmetic injectables, advanced skin treatments and body contouring services. With 225 glowing reviews and a team known for natural-looking results." },
         };
 
         foreach (var (slug, description) in descriptionUpdates)

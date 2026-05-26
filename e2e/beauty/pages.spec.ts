@@ -532,3 +532,65 @@ test.describe("Beauty – New Pages Present", () => {
     expect(isOnLogin || hasEmailInput).toBe(true);
   });
 });
+
+// ──────────────────────────────────────────────
+// Pricing & Billing Page
+// ──────────────────────────────────────────────
+test.describe("Beauty – Pricing Page", () => {
+  test("pricing page shows 3 plan tiers", async ({ page }) => {
+    await page.goto("/pricing");
+    const body = await page.textContent("body");
+    expect(body).toMatch(/Free/);
+    expect(body).toMatch(/Pro/);
+    expect(body).toMatch(/Premium/);
+  });
+
+  test("pricing page shows plan prices", async ({ page }) => {
+    await page.goto("/pricing");
+    const body = await page.textContent("body");
+    expect(body).toMatch(/\$0|\$29|\$59/);
+  });
+
+  test("Pro/Premium buttons are visible", async ({ page }) => {
+    await page.goto("/pricing");
+    const buttons = page.locator('button[type="submit"], a:has-text("Get started")');
+    const count = await buttons.count();
+    expect(count).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ──────────────────────────────────────────────
+// Footer Category Links
+// ──────────────────────────────────────────────
+test.describe("Beauty – Footer Categories", () => {
+  test("footer contains all 10 category links", async ({ page }) => {
+    await page.goto("/");
+    const footer = page.locator("footer");
+    const categories = ["nails", "hair", "lashes", "brows", "skin-care", "makeup", "body", "massage", "cosmetic", "wellness"];
+    for (const cat of categories) {
+      await expect(footer.locator(`a[href="/category/${cat}"]`)).toBeVisible();
+    }
+  });
+});
+
+// ──────────────────────────────────────────────
+// Forgot / Reset Password Pages
+// ──────────────────────────────────────────────
+test.describe("Beauty – Forgot/Reset Password", () => {
+  test("forgot password page loads", async ({ page }) => {
+    const res = await page.goto("/forgot-password");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+  });
+
+  test("reset password page loads", async ({ page }) => {
+    const res = await page.goto("/reset-password");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator('input[type="password"]').first()).toBeVisible();
+  });
+
+  test("login page links to forgot password", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.locator('a[href="/forgot-password"]')).toBeVisible();
+  });
+});

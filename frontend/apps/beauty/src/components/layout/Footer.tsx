@@ -15,6 +15,8 @@ const footerLinks = {
     { label: "Makeup", href: "/category/makeup" },
     { label: "Body", href: "/category/body" },
     { label: "Massage", href: "/category/massage" },
+    { label: "Cosmetic", href: "/category/cosmetic" },
+    { label: "Wellness", href: "/category/wellness" },
   ],
   business: [
     { label: "List Your Business", href: "/join" },

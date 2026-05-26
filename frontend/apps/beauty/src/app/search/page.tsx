@@ -23,6 +23,7 @@ const categoryFilters = [
   { label: "Makeup", value: "makeup" },
   { label: "Body", value: "body" },
   { label: "Massage", value: "massage" },
+  { label: "Cosmetic", value: "cosmetic" },
   { label: "Wellness", value: "wellness" },
 ];
 

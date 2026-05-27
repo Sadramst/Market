@@ -188,16 +188,24 @@ app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = Dat
     .WithTags("Health");
 
 // --- Seed Database ---
-using (var scope = app.Services.CreateScope())
+var skipDbSeed = builder.Configuration.GetValue<bool>("SkipDatabaseSeed", false);
+if (!skipDbSeed)
 {
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+        try
+        {
+            await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error occurred while seeding the database");
+        }
     }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "An error occurred while seeding the database");
-    }
+}
+else
+{
+    Log.Information("Skipping database seeding because 'SkipDatabaseSeed' is true");
 }
 
 app.Run();

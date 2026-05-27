@@ -29,17 +29,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({ user: null, token: null, loading: true });
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    const user = localStorage.getItem("admin_user");
-    if (token && user) {
-      try {
-        setState({ token, user: JSON.parse(user), loading: false });
-      } catch {
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_user");
-        setState({ user: null, token: null, loading: false });
+    // Dev-only bypass: when running locally you can enable a quick bypass by
+    // setting localStorage.setItem('admin_dev_bypass', '1') OR by setting
+    // NEXT_PUBLIC_ADMIN_DEV_BYPASS=true in your environment. This is intentionally
+    // guarded so it only activates on localhost or when the public env var is set.
+    try {
+      const devBypassEnv = typeof process !== "undefined" && (process.env.NEXT_PUBLIC_ADMIN_DEV_BYPASS === "true" || process.env.NEXT_PUBLIC_ADMIN_DEV_BYPASS === "1");
+      const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+      const devFlag = typeof window !== "undefined" && localStorage.getItem("admin_dev_bypass") === "1";
+
+      if ((devBypassEnv && typeof window !== "undefined") || (isLocalhost && devFlag)) {
+        const devUser: User = { id: "dev", firstName: "Dev", lastName: "Tester", email: "dev@appilico.com", roles: ["SuperAdmin"] };
+        localStorage.setItem("admin_token", "dev-token");
+        localStorage.setItem("admin_user", JSON.stringify(devUser));
+        setState({ token: "dev-token", user: devUser, loading: false });
+        return;
       }
-    } else {
+
+      const token = localStorage.getItem("admin_token");
+      const user = localStorage.getItem("admin_user");
+      if (token && user) {
+        try {
+          setState({ token, user: JSON.parse(user), loading: false });
+        } catch {
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_user");
+          setState({ user: null, token: null, loading: false });
+        }
+      } else {
+        setState((s) => ({ ...s, loading: false }));
+      }
+    } catch (err) {
+      // Defensive fallback: ensure loading doesn't hang if localStorage access fails
       setState((s) => ({ ...s, loading: false }));
     }
   }, []);

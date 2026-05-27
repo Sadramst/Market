@@ -129,7 +129,12 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative pb-16">
-        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Search", href: "/search" }, { label: provider.businessName }]} />
+        <Breadcrumbs items={[
+          { label: "Home", href: "/" },
+          ...(provider.categories?.[0] ? [{ label: provider.categories[0], href: `/search?category=${encodeURIComponent(provider.categories[0].toLowerCase().replace(/\s+/g, '-'))}` }] : []),
+          ...(provider.city ? [{ label: provider.city, href: `/${provider.city.toLowerCase().replace(/\s+/g, '-')}` }] : []),
+          { label: provider.businessName },
+        ]} />
 
         {/* Profile Header */}
         <div className="p-6 sm:p-8" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: 'var(--shadow-md)' }}>

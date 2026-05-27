@@ -1,12 +1,30 @@
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
+    dataLayer?: Record<string, unknown>[];
   }
 }
 
 export function trackEvent(name: string, params?: Record<string, string | number>) {
-  if (typeof window !== "undefined" && window.gtag) {
+  if (typeof window === "undefined") return;
+  // Push to GTM dataLayer
+  if (window.dataLayer) {
+    window.dataLayer.push({ event: name, ...params });
+  }
+  // Also fire via gtag if available
+  if (window.gtag) {
     window.gtag("event", name, params);
+  }
+}
+
+/** Fire a Google Ads conversion (set NEXT_PUBLIC_GADS_CONVERSION_LABEL in env) */
+export function trackConversion(label?: string) {
+  const conversionId = process.env.NEXT_PUBLIC_GADS_ID;
+  const conversionLabel = label || process.env.NEXT_PUBLIC_GADS_CONVERSION_LABEL;
+  if (typeof window !== "undefined" && window.gtag && conversionId && conversionLabel) {
+    window.gtag("event", "conversion", {
+      send_to: `${conversionId}/${conversionLabel}`,
+    });
   }
 }
 

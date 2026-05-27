@@ -86,7 +86,23 @@ public class ProviderService : IProviderService
         }
 
         if (request.SuburbId.HasValue)
-            query = query.Where(p => p.ServiceAreas.Any(sa => sa.SuburbId == request.SuburbId.Value));
+        {
+            // Match providers with explicit ServiceArea OR whose City matches the suburb name/postcode
+            var suburbEntity = await _context.Suburbs.FindAsync(request.SuburbId.Value);
+            if (suburbEntity != null)
+            {
+                var subName = suburbEntity.Name.ToLower();
+                var subPostCode = suburbEntity.PostCode;
+                query = query.Where(p =>
+                    p.ServiceAreas.Any(sa => sa.SuburbId == request.SuburbId.Value)
+                    || (p.City != null && p.City.ToLower() == subName)
+                    || (p.PostalCode != null && p.PostalCode == subPostCode));
+            }
+            else
+            {
+                query = query.Where(p => p.ServiceAreas.Any(sa => sa.SuburbId == request.SuburbId.Value));
+            }
+        }
 
         if (!string.IsNullOrEmpty(request.City))
             query = query.Where(p => p.City != null && p.City.Contains(request.City));

@@ -1,4 +1,5 @@
 using Appilico.Market.Domain;
+using Appilico.Market.Domain.Categories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Appilico.Market.Infrastructure.Data.Seed;
@@ -14,6 +15,41 @@ public static partial class DatabaseSeeder
         var categories = await context.Categories
             .Where(c => c.ParentCategoryId == null)
             .ToListAsync();
+
+        // --- Ensure Massage exists as a parent (top-level) category ---
+        // On older databases, "massage" may exist only as a subcategory under Body
+        var massageParent = categories.FirstOrDefault(c => c.Slug == "massage");
+        if (massageParent == null)
+        {
+            var massageSub = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "massage");
+            if (massageSub != null)
+            {
+                // Promote to parent category
+                massageSub.ParentCategoryId = null;
+                massageSub.IconName = "Hand";
+                massageSub.Name = "Massage";
+                massageSub.IsActive = true;
+                await context.SaveChangesAsync();
+                massageParent = massageSub;
+            }
+            else
+            {
+                // Create it fresh
+                massageParent = new Category
+                {
+                    Name = "Massage",
+                    Slug = "massage",
+                    IconName = "Hand",
+                    MarketplaceType = ProviderType.Beauty,
+                    IsActive = true,
+                    SortOrder = 10
+                };
+                context.Categories.Add(massageParent);
+                await context.SaveChangesAsync();
+            }
+            // Refresh categories list
+            categories = await context.Categories.Where(c => c.ParentCategoryId == null).ToListAsync();
+        }
 
         // --- BULK FIX: Reassign all massage_providers.json providers to the Massage category ---
         // Massage may exist as parent OR subcategory (under Body) depending on seed history
@@ -134,6 +170,23 @@ public static partial class DatabaseSeeder
             var areas = await context.ProviderServiceAreas.Where(a => a.ProviderId == seuMomentoNails.Id).ToListAsync();
             context.ProviderServiceAreas.RemoveRange(areas);
             context.Providers.Remove(seuMomentoNails);
+            await context.SaveChangesAsync();
+        }
+
+        // --- Remove Glow Skin & Spa duplicate (keep the massage_providers one with description) ---
+        var glowSkinDupe = await context.Providers
+            .FirstOrDefaultAsync(p => p.Slug == "glow-skin-spa-baldivis");
+        if (glowSkinDupe != null)
+        {
+            var reviews2 = await context.Reviews.Where(r => r.ProviderId == glowSkinDupe.Id).ToListAsync();
+            context.Reviews.RemoveRange(reviews2);
+            var services2 = await context.ProviderServices.Where(s => s.ProviderId == glowSkinDupe.Id).ToListAsync();
+            context.ProviderServices.RemoveRange(services2);
+            var gallery2 = await context.ProviderGalleryImages.Where(g => g.ProviderId == glowSkinDupe.Id).ToListAsync();
+            context.ProviderGalleryImages.RemoveRange(gallery2);
+            var areas2 = await context.ProviderServiceAreas.Where(a => a.ProviderId == glowSkinDupe.Id).ToListAsync();
+            context.ProviderServiceAreas.RemoveRange(areas2);
+            context.Providers.Remove(glowSkinDupe);
             await context.SaveChangesAsync();
         }
 

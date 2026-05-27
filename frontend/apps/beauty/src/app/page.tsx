@@ -87,7 +87,7 @@ export default async function HomePage() {
 
               {/* Stats */}
               <div className="animate-fade-in-up animation-delay-500 mt-8 flex items-center gap-6 text-[13px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
-                <span>{totalProviders > 0 ? `${totalProviders.toLocaleString()}+` : '1,000+'} Providers</span>
+                <span suppressHydrationWarning>{totalProviders > 0 ? `${totalProviders.toLocaleString('en-AU')}+` : '1,000+'} Providers</span>
                 <span style={{ color: 'var(--border)' }}>·</span>
                 <span>{suburbCount}+ Suburbs</span>
                 <span style={{ color: 'var(--border)' }}>·</span>

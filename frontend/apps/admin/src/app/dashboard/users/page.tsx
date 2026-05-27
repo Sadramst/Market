@@ -24,6 +24,7 @@ export default function UsersPage() {
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +41,7 @@ export default function UsersPage() {
       const data = await adminApi<PaginatedData<AdminUser>>(token, `/users?${params.toString()}`);
       setUsers(data.items ?? []);
       setTotalPages(data.pagination?.totalPages ?? 1);
+      setTotalCount(data.pagination?.totalCount ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load users");
     } finally {
@@ -54,7 +56,7 @@ export default function UsersPage() {
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold">User Management</h1>
-          <p className="text-sm text-gray-400 mt-1">View customers, providers, moderators, and platform admins.</p>
+          <p className="text-sm text-gray-400 mt-1">View customers, providers, moderators, and platform admins.{!loading && totalCount > 0 ? ` — ${totalCount.toLocaleString('en-AU')} total` : ''}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <input
@@ -100,7 +102,7 @@ export default function UsersPage() {
               <tr key={user.id} className="hover:bg-gray-50/50">
                 <td className="px-6 py-4">
                   <p className="text-sm font-medium text-gray-900">{user.fullName || "Unnamed user"}</p>
-                  <p className="text-xs text-gray-400">{user.providerId ? "Provider account" : "Customer/admin account"}</p>
+                  <p className="text-xs text-gray-400">{user.providerId ? "Provider account" : (user.roles[0] ?? "Customer")}</p>
                 </td>
                 <td className="px-6 py-4">
                   <p className="text-sm text-gray-600">{user.email}</p>

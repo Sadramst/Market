@@ -21,6 +21,19 @@ interface ApiEnvelope<T> {
   errors?: string[];
 }
 
+/** Fetch an admin endpoint that returns raw JSON (not wrapped in ApiEnvelope). */
+export async function adminApiFetch<T>(token: string, path: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
 export async function adminApi<T>(token: string, path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${token}`);

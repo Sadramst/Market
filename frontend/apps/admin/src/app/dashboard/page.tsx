@@ -2,11 +2,30 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { adminApi, formatDateTime } from "../../lib/api";
+import { adminApi, adminApiFetch, formatDateTime } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import dynamic from "next/dynamic";
 
 const LiveVisitorsCard = dynamic(() => import("./LiveVisitorsCard"), { ssr: false });
+
+interface AnalyticsSummary {
+  totalPageViews: number;
+  totalSearches: number;
+  totalEnquiries: number;
+  totalWebsiteClicks: number;
+  totalContactClicks: number;
+  dailyViews: { date: string; count: number }[];
+  topCategories: { category: string; views: number }[];
+  topSuburbs: { suburb: string; views: number }[];
+  referrers: { source: string; count: number }[];
+}
+
+interface TopProvider {
+  providerId: string;
+  businessName: string;
+  suburb: string;
+  views: number;
+}
 
 interface ActivityItem {
   type: string;
@@ -73,6 +92,9 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>(emptyStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState("7d");
+  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [topProviders, setTopProviders] = useState<TopProvider[]>([]);
 
   useEffect(() => {
     if (!token) return;
@@ -91,6 +113,12 @@ export default function DashboardPage() {
 
     load();
   }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    adminApiFetch<AnalyticsSummary>(token, `/admin/analytics/summary?period=${analyticsPeriod}`).then(d => setAnalytics(d));
+    adminApiFetch<TopProvider[]>(token, `/admin/analytics/top-providers?period=${analyticsPeriod}&limit=10`).then(d => setTopProviders(d ?? []));
+  }, [token, analyticsPeriod]);
 
   const statCards = [
     { label: "Providers", value: stats.totalProviders, detail: `${stats.pendingProviders} pending`, href: "/dashboard/providers?status=pending", color: "from-indigo-500 to-indigo-600" },
@@ -156,6 +184,169 @@ export default function DashboardPage() {
       </div>
 
       {error && <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+      {/* ── Analytics Section ── */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Platform Analytics</h2>
+          <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
+            {(["1d", "7d", "30d", "90d"] as const).map(p => (
+              <button
+                key={p}
+                onClick={() => setAnalyticsPeriod(p)}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${analyticsPeriod === p ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                {p === "1d" ? "24h" : p === "7d" ? "7 days" : p === "30d" ? "30 days" : "90 days"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Analytics KPIs */}
+        {analytics && (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+            {[
+              { label: "Page Views", value: analytics.totalPageViews, color: "text-indigo-600" },
+              { label: "Searches", value: analytics.totalSearches, color: "text-sky-600" },
+              { label: "Enquiries", value: analytics.totalEnquiries, color: "text-emerald-600" },
+              { label: "Contact Clicks", value: analytics.totalContactClicks, color: "text-amber-600" },
+              { label: "Website Clicks", value: analytics.totalWebsiteClicks, color: "text-rose-600" },
+            ].map(k => (
+              <div key={k.label} className="bg-white rounded-xl border border-gray-100 p-4">
+                <p className="text-xs text-gray-400 font-medium">{k.label}</p>
+                <p className={`text-2xl font-bold ${k.color} mt-1`}>{k.value.toLocaleString("en-AU")}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Daily Views Chart + Traffic Sources */}
+        {analytics && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            {/* Daily Views Bar Chart */}
+            <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4">Daily Provider Views</h3>
+              {analytics.dailyViews.length === 0 ? (
+                <p className="py-10 text-center text-sm text-gray-400">No view data yet.</p>
+              ) : (
+                <div className="flex items-end gap-1 h-40">
+                  {analytics.dailyViews.map((d, i) => {
+                    const max = Math.max(...analytics.dailyViews.map(x => x.count), 1);
+                    const pct = Math.max(2, (d.count / max) * 100);
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1 group" title={`${new Date(d.date).toLocaleDateString("en-AU", { day: "2-digit", month: "short" })}: ${d.count}`}>
+                        <span className="text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">{d.count}</span>
+                        <div
+                          className="w-full rounded-t-md bg-gradient-to-t from-indigo-500 to-indigo-400 transition-all group-hover:from-indigo-600 group-hover:to-indigo-500"
+                          style={{ height: `${pct}%`, minHeight: 2 }}
+                        />
+                        {analytics.dailyViews.length <= 14 && (
+                          <span className="text-[9px] text-gray-400 mt-0.5">{new Date(d.date).toLocaleDateString("en-AU", { day: "2-digit", month: "short" })}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Traffic Sources */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4">Traffic Sources</h3>
+              {analytics.referrers.length === 0 ? (
+                <p className="py-6 text-center text-sm text-gray-400">No referrer data.</p>
+              ) : (
+                <div className="space-y-3">
+                  {analytics.referrers.map(r => {
+                    const total = analytics.referrers.reduce((s, x) => s + x.count, 0) || 1;
+                    const pct = Math.round((r.count / total) * 100);
+                    const colors: Record<string, string> = { google: "bg-blue-500", instagram: "bg-pink-500", facebook: "bg-sky-600", internal: "bg-indigo-500", direct: "bg-gray-400" };
+                    return (
+                      <div key={r.source}>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="font-medium text-gray-700 capitalize">{r.source}</span>
+                          <span className="text-gray-400">{pct}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                          <div className={`h-full rounded-full ${colors[r.source] || "bg-gray-400"}`} style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Top Categories + Top Suburbs + Top Providers */}
+        {analytics && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Top Categories */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Top Categories</h3>
+              {analytics.topCategories.length === 0 ? (
+                <p className="py-6 text-center text-sm text-gray-400">No data yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {analytics.topCategories.slice(0, 8).map((c, i) => (
+                    <div key={c.category} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-md bg-violet-50 text-violet-500 text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                        <span className="text-gray-700 capitalize">{c.category.replace(/-/g, " ")}</span>
+                      </div>
+                      <span className="text-gray-400 text-xs">{c.views}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Suburbs */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Top Suburbs</h3>
+              {analytics.topSuburbs.length === 0 ? (
+                <p className="py-6 text-center text-sm text-gray-400">No data yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {analytics.topSuburbs.slice(0, 8).map((s, i) => (
+                    <div key={s.suburb} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-md bg-emerald-50 text-emerald-500 text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                        <span className="text-gray-700 capitalize">{s.suburb.replace(/-/g, " ")}</span>
+                      </div>
+                      <span className="text-gray-400 text-xs">{s.views}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Providers */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Top Providers</h3>
+              {topProviders.length === 0 ? (
+                <p className="py-6 text-center text-sm text-gray-400">No data yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {topProviders.slice(0, 8).map((tp, i) => (
+                    <div key={tp.providerId || i} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-5 h-5 rounded-md bg-indigo-50 text-indigo-500 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                        <div className="min-w-0">
+                          <p className="text-gray-700 truncate text-xs font-medium">{tp.businessName}</p>
+                          {tp.suburb && <p className="text-[10px] text-gray-400">{tp.suburb}</p>}
+                        </div>
+                      </div>
+                      <span className="text-gray-400 text-xs shrink-0">{tp.views}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">

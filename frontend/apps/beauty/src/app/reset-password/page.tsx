@@ -8,8 +8,8 @@ import { API_URL } from "@/lib/api";
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const emailFromUrl = searchParams.get("email") || "";
-  const tokenFromUrl = searchParams.get("token") || "";
+  const emailFromUrl = searchParams?.get("email") || "";
+  const tokenFromUrl = searchParams?.get("token") || "";
 
   const [email, setEmail] = useState(emailFromUrl);
   const [token, setToken] = useState(tokenFromUrl);

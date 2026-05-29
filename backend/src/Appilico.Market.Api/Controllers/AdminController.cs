@@ -183,6 +183,43 @@ public class AdminController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Export providers for outreach (CSV-ready JSON).</summary>
+    [HttpGet("outreach/export")]
+    public async Task<IActionResult> ExportOutreach([FromQuery] string? category = null, [FromQuery] string? suburb = null, [FromQuery] bool unclaimedOnly = true)
+    {
+        var query = _context.Providers
+            .Where(p => p.Status == Domain.ProviderStatus.Approved);
+
+        if (unclaimedOnly)
+            query = query.Where(p => !p.IsClaimed);
+        if (!string.IsNullOrWhiteSpace(suburb))
+            query = query.Where(p => p.City != null && p.City.ToLower() == suburb.ToLower());
+
+        var providers = await query
+            .OrderBy(p => p.BusinessName)
+            .Select(p => new
+            {
+                p.Id,
+                p.BusinessName,
+                p.Slug,
+                p.City,
+                p.PostalCode,
+                p.Phone,
+                p.Email,
+                p.Website,
+                p.InstagramUrl,
+                p.FacebookUrl,
+                isClaimed = p.IsClaimed,
+                status = p.Status.ToString(),
+                p.AverageRating,
+                p.TotalReviews,
+                dataSource = p.DataSource,
+            })
+            .ToListAsync();
+
+        return Ok(new { total = providers.Count, providers });
+    }
+
     private static DateTime PeriodToDate(string period) => period switch
     {
         "1d" => DateTime.UtcNow.AddDays(-1),

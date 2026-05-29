@@ -61,7 +61,7 @@ type Review = {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 300 });
+  const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 60 });
   if (!provider) return { title: "Provider Not Found" };
 
   return {
@@ -79,14 +79,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProviderPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 300, tags: ["provider", slug] });
+  const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 60, tags: ["provider", slug] });
   if (!provider) notFound();
 
-  const reviewsData = await fetchApi<{ items: Review[] }>(`/reviews/provider/${provider.id}?pageSize=10`, { revalidate: 300, tags: ["reviews", slug] });
+  const reviewsData = await fetchApi<{ items: Review[] }>(`/reviews/provider/${provider.id}?pageSize=10`, { revalidate: 60, tags: ["reviews", slug] });
   const reviews = reviewsData?.items ?? [];
 
   const [relatedData, nearbyData] = await Promise.all([
-    fetchApi<Array<{ id: string; slug: string; businessName: string; logoUrl?: string; coverImageUrl?: string; averageRating: number; totalReviews: number; city?: string; categories?: string[]; primaryImageUrl?: string; tagline?: string }>>(`/providers/${slug}/related?count=6`, { revalidate: 600 }),
+    fetchApi<Array<{ id: string; slug: string; businessName: string; logoUrl?: string; coverImageUrl?: string; averageRating: number; totalReviews: number; city?: string; categories?: string[]; primaryImageUrl?: string; tagline?: string }>>(`/providers/${slug}/related?count=6`, { revalidate: 60 }),
     fetchApi<Array<{ id: string; slug: string; businessName: string; logoUrl?: string; coverImageUrl?: string; averageRating: number; totalReviews: number; city?: string; categories?: string[]; primaryImageUrl?: string; tagline?: string }>>(`/providers/${slug}/nearby?count=6`, { revalidate: 600 }),
   ]);
   const relatedProviders = relatedData ?? [];
@@ -424,8 +424,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(providerJsonLd(provider)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
         { name: "Home", url: "/" },
-        { name: "Search", url: "/search" },
         ...(provider.categories?.[0] ? [{ name: provider.categories[0], url: `/search?category=${provider.categories[0].toLowerCase().replace(/\s+/g, '-')}` }] : []),
+        ...(provider.city ? [{ name: provider.city, url: `/${provider.city.toLowerCase().replace(/\s+/g, '-')}` }] : []),
         { name: provider.businessName },
       ])) }} />
     </>

@@ -49,6 +49,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-AU" className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable}`}>
+      <head>
+        <meta
+          name="google-site-verification"
+          content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "UHZdMrBhQF3dvWgVJdoX80gBYIQW8RvKpT_u-sdbFJo"}
+        />
+      </head>
       <body className="font-sans min-h-screen antialiased flex flex-col" style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>
         <Analytics />
         <Header />

@@ -34,25 +34,24 @@ WHERE "Slug" = 'glow-skin'
 
 -- ────────────────────────────────────────────────────────────
 -- A4: Fix miscategorised providers
+-- Categories are linked via ProviderServices.CategoryId, not Providers.
+-- Update all services for each provider to the correct category.
 -- ────────────────────────────────────────────────────────────
 
 -- Maurice Meade: should be "Hair" (currently "Skin Care")
-UPDATE "Providers"
-SET "CategoryId" = (SELECT "Id" FROM "Categories" WHERE "Slug" = 'hair' LIMIT 1),
-    "UpdatedAt" = NOW()
-WHERE "Slug" = 'maurice-meade' AND "IsDeleted" = false;
+UPDATE "ProviderServices"
+SET "CategoryId" = (SELECT "Id" FROM "Categories" WHERE "Slug" = 'hair' LIMIT 1)
+WHERE "ProviderId" = (SELECT "Id" FROM "Providers" WHERE "Slug" = 'maurice-meade' AND "IsDeleted" = false LIMIT 1);
 
 -- Sora Hair: should be "Hair" (currently "Brows")
-UPDATE "Providers"
-SET "CategoryId" = (SELECT "Id" FROM "Categories" WHERE "Slug" = 'hair' LIMIT 1),
-    "UpdatedAt" = NOW()
-WHERE "Slug" = 'sora-hair' AND "IsDeleted" = false;
+UPDATE "ProviderServices"
+SET "CategoryId" = (SELECT "Id" FROM "Categories" WHERE "Slug" = 'hair' LIMIT 1)
+WHERE "ProviderId" = (SELECT "Id" FROM "Providers" WHERE "Slug" = 'sora-hair' AND "IsDeleted" = false LIMIT 1);
 
 -- Sonya's Beauty: should be "Lashes" (currently "Nails")
-UPDATE "Providers"
-SET "CategoryId" = (SELECT "Id" FROM "Categories" WHERE "Slug" = 'lashes' LIMIT 1),
-    "UpdatedAt" = NOW()
-WHERE "Slug" = 'sonyas-beauty' AND "IsDeleted" = false;
+UPDATE "ProviderServices"
+SET "CategoryId" = (SELECT "Id" FROM "Categories" WHERE "Slug" = 'lashes' LIMIT 1)
+WHERE "ProviderId" = (SELECT "Id" FROM "Providers" WHERE "Slug" = 'sonyas-beauty' AND "IsDeleted" = false LIMIT 1);
 
 -- ────────────────────────────────────────────────────────────
 -- A4: Fix placeholder descriptions
@@ -85,12 +84,12 @@ WHERE "Slug" = 'breathe-beauty' AND "IsDeleted" = false
 -- ────────────────────────────────────────────────────────────
 -- Verify changes
 -- ────────────────────────────────────────────────────────────
-SELECT "Slug", "BusinessName", "IsDeleted", "CategoryId", LEFT("Description", 60) AS "DescriptionPreview"
-FROM "Providers"
-WHERE "Slug" IN (
+SELECT p."Slug", p."BusinessName", p."IsDeleted", LEFT(p."Description", 60) AS "DescriptionPreview"
+FROM "Providers" p
+WHERE p."Slug" IN (
   'seu-momento', 'glow-skin', 'maurice-meade', 'sora-hair',
   'sonyas-beauty', 'her-on-oxford', 'ivy-reign', 'rejuvewell', 'breathe-beauty'
 )
-ORDER BY "Slug", "IsDeleted";
+ORDER BY p."Slug", p."IsDeleted";
 
 COMMIT;

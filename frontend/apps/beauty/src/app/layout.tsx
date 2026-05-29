@@ -53,6 +53,14 @@ export default function RootLayout({
   return (
     <html lang="en-AU" className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable}`}>
       <head>
+        {GTM_ID && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'? '&l='+l : '';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);} )(window,document,'script','dataLayer','${GTM_ID}');`,
+            }}
+          />
+        )}
+
         <meta
           name="google-site-verification"
           content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "UHZdMrBhQF3dvWgVJdoX80gBYIQW8RvKpT_u-sdbFJo"}
@@ -67,14 +75,6 @@ export default function RootLayout({
               }}
             />
           </>
-        )}
-
-        {GTM_ID && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window.dataLayer = window.dataLayer || []; (function(id){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id='+id;document.head.appendChild(s);})('${GTM_ID}');`,
-            }}
-          />
         )}
       </head>
       <body className="font-sans min-h-screen antialiased flex flex-col" style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>

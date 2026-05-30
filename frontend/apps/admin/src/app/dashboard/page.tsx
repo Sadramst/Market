@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { adminApi, adminApiFetch, formatDateTime } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import dynamic from "next/dynamic";
+import { Building2, Users, Star, Mail, Flag, Search } from "lucide-react";
 
 const LiveVisitorsCard = dynamic(() => import("./LiveVisitorsCard"), { ssr: false });
 
@@ -121,12 +122,12 @@ export default function DashboardPage() {
   }, [token, analyticsPeriod]);
 
   const statCards = [
-    { label: "Providers", value: stats.totalProviders, detail: `${stats.pendingProviders} pending`, href: "/dashboard/providers?status=pending", color: "from-indigo-500 to-indigo-600" },
-    { label: "Users", value: stats.totalUsers, detail: `${stats.activeUsers} active`, href: "/dashboard/users", color: "from-sky-500 to-blue-600" },
-    { label: "Reviews", value: stats.totalReviews, detail: `${stats.pendingReviews} pending`, href: "/dashboard/reviews?status=pending", color: "from-amber-500 to-orange-500" },
-    { label: "Enquiries", value: stats.totalEnquiries, detail: `${stats.newEnquiries} new`, href: "/dashboard/enquiries?status=new", color: "from-emerald-500 to-teal-600" },
-    { label: "Reports", value: stats.totalReports, detail: `${stats.pendingReports} pending`, href: "/dashboard/reports?status=pending", color: "from-rose-500 to-red-600" },
-    { label: "SEO Surface", value: stats.categories + stats.suburbs, detail: `${stats.categories} categories, ${stats.suburbs} suburbs`, href: "/dashboard/categories", color: "from-violet-500 to-purple-600" },
+    { label: "Providers", value: stats.totalProviders, detail: `${stats.pendingProviders} pending`, href: "/dashboard/providers?status=pending", color: "from-indigo-500 to-indigo-600", icon: Building2 },
+    { label: "Users", value: stats.totalUsers, detail: `${stats.activeUsers} active`, href: "/dashboard/users", color: "from-sky-500 to-blue-600", icon: Users },
+    { label: "Reviews", value: stats.totalReviews, detail: `${stats.pendingReviews} pending`, href: "/dashboard/reviews?status=pending", color: "from-amber-500 to-orange-500", icon: Star },
+    { label: "Enquiries", value: stats.totalEnquiries, detail: `${stats.newEnquiries} new`, href: "/dashboard/enquiries?status=new", color: "from-emerald-500 to-teal-600", icon: Mail },
+    { label: "Reports", value: stats.totalReports, detail: `${stats.pendingReports} pending`, href: "/dashboard/reports?status=pending", color: "from-rose-500 to-red-600", icon: Flag },
+    { label: "SEO Surface", value: stats.categories + stats.suburbs, detail: `${stats.categories} categories, ${stats.suburbs} suburbs`, href: "/dashboard/categories", color: "from-violet-500 to-purple-600", icon: Search },
   ];
 
   return (
@@ -173,7 +174,9 @@ export default function DashboardPage() {
               <Link key={stat.label} href={stat.href} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all group">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-gray-500">{stat.label}</span>
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg shadow-gray-200/50 group-hover:scale-105 transition-transform`} />
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg shadow-gray-200/50 group-hover:scale-105 transition-transform flex items-center justify-center`}>
+                    <stat.icon className="w-5 h-5 text-white" strokeWidth={1.5} />
+                  </div>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">{loading ? "..." : stat.value.toLocaleString("en-AU")}</p>
                 <p className="text-xs text-gray-400 mt-1">{stat.detail}</p>

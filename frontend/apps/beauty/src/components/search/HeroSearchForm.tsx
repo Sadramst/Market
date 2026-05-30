@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { PERTH_SUBURBS } from "@/lib/suburbs";
+import { Search, MapPin } from "lucide-react";
 
 export function HeroSearchForm() {
   const [suburb, setSuburb] = useState("");
@@ -46,17 +47,19 @@ export function HeroSearchForm() {
 
   return (
     <form action="/search" method="GET" className="animate-fade-in-up animation-delay-300 mt-10 max-w-[540px]">
-      <div className="flex gap-0" style={{ border: "1px solid var(--border)", background: "var(--bg-card)" }}>
+      <div className="flex gap-0" style={{ border: "1px solid var(--border)", background: "var(--bg-card)", borderRadius: '4px' }}>
         <div className="flex-1 relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
           <input
             type="text"
             name="q"
             placeholder="Service or salon name"
-            className="w-full px-4 py-4 border-0 bg-transparent focus:outline-none text-[15px]"
+            className="w-full pl-11 pr-4 py-4 border-0 bg-transparent focus:outline-none text-[15px]"
             style={{ fontFamily: "var(--font-body)", color: "var(--text-primary)" }}
           />
         </div>
         <div ref={wrapperRef} className="flex-1 relative" style={{ borderLeft: "1px solid var(--border)" }}>
+          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
           <input
             type="text"
             name="suburb"
@@ -70,7 +73,7 @@ export function HeroSearchForm() {
             onKeyDown={handleKeyDown}
             placeholder="Suburb or postcode"
             autoComplete="off"
-            className="w-full px-4 py-4 border-0 bg-transparent focus:outline-none text-[15px]"
+            className="w-full pl-11 pr-4 py-4 border-0 bg-transparent focus:outline-none text-[15px]"
             style={{ fontFamily: "var(--font-body)", color: "var(--text-primary)" }}
           />
           {open && filtered.length > 0 && (
@@ -108,9 +111,10 @@ export function HeroSearchForm() {
         </div>
         <button
           type="submit"
-          className="px-6 py-4 text-[14px] font-medium text-white shrink-0 transition-all duration-200"
+          className="px-6 py-4 text-[14px] font-medium text-white shrink-0 transition-all duration-200 flex items-center gap-2"
           style={{ background: "var(--brand-rose)", fontFamily: "var(--font-body)", borderRadius: 0 }}
         >
+          <Search className="w-4 h-4" strokeWidth={2} />
           Search
         </button>
       </div>

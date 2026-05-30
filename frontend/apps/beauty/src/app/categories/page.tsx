@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { generatePageMeta } from "@/lib/seo";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
 
 export const metadata: Metadata = generatePageMeta({
   title: "Beauty Categories in Perth | Appilico Beauty",
@@ -46,8 +47,8 @@ export default function CategoriesPage() {
               className="premium-card group block overflow-hidden animate-fade-in-up"
               style={{ border: "1px solid var(--border)", borderRadius: "12px", background: "var(--bg-card)", animationDelay: `${i * 0.04}s` }}
             >
-              <div className="flex items-center justify-center group-hover:scale-105 transition-transform duration-500" style={{ height: 120, background: CATEGORY_GRADIENTS[cat.slug], fontSize: 52 }}>
-                {cat.icon}
+              <div className="flex items-center justify-center group-hover:scale-105 transition-transform duration-500" style={{ height: 120, background: CATEGORY_GRADIENTS[cat.slug] }}>
+                <CategoryIcon category={cat.slug} className="w-14 h-14 text-white/90" strokeWidth={1.5} />
               </div>
               <div style={{ padding: "20px 24px 24px" }}>
                 <h2 className="text-[1.4rem]" style={{ fontFamily: "var(--font-heading)", fontWeight: 600, color: "var(--text-primary)", marginBottom: 8 }}>

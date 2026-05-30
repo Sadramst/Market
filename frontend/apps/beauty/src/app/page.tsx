@@ -4,6 +4,8 @@ import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
 import { HeroSearchForm } from "@/components/search/HeroSearchForm";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { Star, MapPin, Camera, BarChart3, ArrowRight, Search, Quote, Sparkles } from "lucide-react";
 
 const popularSuburbs = [
   { name: "Perth CBD", slug: "perth" },
@@ -110,7 +112,7 @@ export default async function HomePage() {
                     <div className="p-3">
                       <p className="text-[14px] italic" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>{card.name}</p>
                       <div className="flex items-center gap-1 mt-1">
-                        <svg className="w-3 h-3 star-filled" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                        <Star className="w-3 h-3" style={{ color: 'var(--brand-rose)' }} fill="currentColor" strokeWidth={0} />
                         <span className="text-[12px] font-medium" style={{ color: 'var(--text-primary)' }}>{card.rating}</span>
                       </div>
                       <span className="inline-block mt-2 px-2 py-0.5 text-[10px]" style={{ background: 'var(--bg-secondary)', borderRadius: '50px', color: 'var(--text-secondary)' }}>{card.cat}</span>
@@ -135,7 +137,7 @@ export default async function HomePage() {
                 className={`premium-card group relative overflow-hidden p-5 text-center animate-fade-in-up bg-gradient-to-br ${cat.gradient}`}
                 style={{ borderRadius: '8px', border: '1px solid var(--border)', animationDelay: `${i * 0.05}s` }}
               >
-                <span className="text-[40px] block mb-3 group-hover:scale-110 transition-transform duration-300">{cat.icon}</span>
+                <CategoryIcon category={cat.slug} className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform duration-300" style={{ color: cat.accent }} strokeWidth={1.5} />
                 <h3 className="text-[15px] font-semibold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>{cat.name}</h3>
                 <p className="text-[12px] font-light mt-1" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>{cat.description}</p>
               </Link>
@@ -169,7 +171,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="text-center py-20" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px' }}>
-              <span className="text-[48px] block mb-4">💅</span>
+              <Sparkles className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />
               <h3 className="text-[20px]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>Featured providers coming soon</h3>
               <p className="text-[14px] mt-2 max-w-md mx-auto" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>Be among the first to list your business on Perth&apos;s newest beauty marketplace.</p>
               <Link href="/join" className="inline-flex items-center mt-6 px-6 py-3 text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}>
@@ -243,13 +245,13 @@ export default async function HomePage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { icon: "📍", title: "Local SEO", desc: "Rank for your suburb + service" },
-                { icon: "⭐", title: "Real Reviews", desc: "Build trust with verified reviews" },
-                { icon: "📸", title: "Portfolio", desc: "Showcase your best work" },
-                { icon: "📊", title: "Insights", desc: "Track views & enquiries" },
+                { icon: <MapPin className="w-6 h-6" />, title: "Local SEO", desc: "Rank for your suburb + service" },
+                { icon: <Star className="w-6 h-6" />, title: "Real Reviews", desc: "Build trust with verified reviews" },
+                { icon: <Camera className="w-6 h-6" />, title: "Portfolio", desc: "Showcase your best work" },
+                { icon: <BarChart3 className="w-6 h-6" />, title: "Insights", desc: "Track views & enquiries" },
               ].map((f) => (
                 <div key={f.title} className="p-5 transition-colors" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px' }}>
-                  <span className="text-[24px] block mb-3">{f.icon}</span>
+                  <div className="mb-3 text-white/70">{f.icon}</div>
                   <h3 className="text-[14px] font-medium" style={{ color: 'var(--text-on-dark)', fontFamily: 'var(--font-body)' }}>{f.title}</h3>
                   <p className="text-[12px] mt-1" style={{ color: 'rgba(250,247,244,0.5)', fontFamily: 'var(--font-body)' }}>{f.desc}</p>
                 </div>
@@ -270,7 +272,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <div key={i} className="p-8" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', boxShadow: 'var(--shadow-sm)' }}>
-                <span className="text-[48px] leading-none" style={{ fontFamily: 'var(--font-display)', color: 'var(--brand-rose)' }}>&ldquo;</span>
+                <Quote className="w-8 h-8 mb-2" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />
                 <p className="text-[15px] italic leading-relaxed -mt-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 300 }}>{t.text}</p>
                 <div className="flex items-center gap-3 mt-6 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)' }}>

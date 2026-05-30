@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
 import { ServicesHeader } from "@/components/ServicesHeader";
+import { Code } from "lucide-react";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -44,7 +45,7 @@ export default function RootLayout({
               <div>
                 <div className="flex items-center gap-2.5 mb-3">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
-                    <svg className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                    <Code className="w-4.5 h-4.5 text-white" strokeWidth={2} />
                   </div>
                   <span className="text-lg font-bold text-white tracking-tight">Appilico <span className="text-blue-400 text-xs uppercase tracking-wider font-semibold">Services</span></span>
                 </div>

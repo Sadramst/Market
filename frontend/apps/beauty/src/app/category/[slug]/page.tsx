@@ -6,6 +6,7 @@ import { categoryJsonLd } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/ui";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
 
 // Force dynamic rendering so category pages always fetch fresh data
 export const dynamic = "force-dynamic";
@@ -54,7 +55,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Categories", href: "/categories" }, { label: cat.name }]} />
           <div className="mt-6 flex items-center gap-4">
-            <span className="text-[48px]">{cat.icon}</span>
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.2)' }}>
+              <CategoryIcon category={cat.slug} className="w-8 h-8 text-white" strokeWidth={1.5} />
+            </div>
             <div>
               <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 400 }}>{cat.name}</h1>
               <p className="text-[15px] font-light mt-1" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{cat.description}</p>
@@ -83,7 +86,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           </>
         ) : (
           <div className="text-center py-20" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px' }}>
-            <span className="text-[48px] block mb-4">{cat.icon}</span>
+            <CategoryIcon category={cat.slug} className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />
             <h3 className="text-[20px]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>No {cat.name.toLowerCase()} providers yet</h3>
             <p className="text-[14px] mt-2 max-w-md mx-auto" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>Be the first to list your business in this category!</p>
             <Link href="/join" className="inline-block mt-6 px-6 py-3 text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)', borderRadius: '2px' }}>

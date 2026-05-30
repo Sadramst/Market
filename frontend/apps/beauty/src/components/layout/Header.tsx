@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@appilico/shared/hooks";
 import { useSuburbPreference } from "@appilico/shared/hooks";
+import { Search, LayoutGrid, MapPin, BookOpen, Info, ArrowRight, User, LogOut, ChevronDown } from "lucide-react";
 
 const navLinks = [
-  { label: "Browse", href: "/search" },
-  { label: "Categories", href: "/categories" },
-  { label: "Suburbs", href: "/suburbs" },
-  { label: "Blog", href: "/blog" },
-  { label: "About", href: "/about" },
+  { label: "Browse", href: "/search", icon: Search },
+  { label: "Categories", href: "/categories", icon: LayoutGrid },
+  { label: "Suburbs", href: "/suburbs", icon: MapPin },
+  { label: "Blog", href: "/blog", icon: BookOpen },
+  { label: "About", href: "/about", icon: Info },
 ];
 
 export function Header() {
@@ -102,10 +103,7 @@ export function Header() {
                   fontFamily: 'var(--font-body)',
                 }}
               >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <MapPin className="w-3 h-3" strokeWidth={2} />
                 {detecting ? "Detecting…" : suburb ? `${suburb.name}${suburb.postCode ? ` · ${suburb.postCode}` : ""}` : "Detect location"}
               </button>
 
@@ -163,7 +161,7 @@ export function Header() {
                 onMouseLeave={e => (e.currentTarget.style.background = 'var(--brand-rose)')}
               >
                 List Your Business
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
               </Link>
 
               {/* Mobile toggle */}
@@ -196,14 +194,18 @@ export function Header() {
       <div className={`fixed top-16 left-0 right-0 z-40 lg:hidden transition-all duration-300 ${mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0 pointer-events-none"}`}>
         <div className="mx-4 mt-2 overflow-hidden" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', boxShadow: 'var(--shadow-lg)' }}>
           <div className="p-4 space-y-1">
-            {navLinks.map((l) => (
+            {navLinks.map((l) => {
+              const NavIcon = l.icon;
+              return (
               <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                className="block px-4 py-3 text-[15px] font-normal rounded transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-[15px] font-normal rounded transition-colors"
                 style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
               >
+                <NavIcon className="w-4 h-4" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />
                 {l.label}
               </Link>
-            ))}
+              );
+            })}
           </div>
           <div className="p-4 space-y-2" style={{ borderTop: '1px solid var(--border)' }}>
             {isAuthenticated ? (

@@ -7,6 +7,8 @@ import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { PERTH_SUBURBS, findSuburb } from "@/lib/suburbs";
 import { getFallbackProviders } from "@/lib/fallback-providers";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { MapPin } from "lucide-react";
 
 export function generateStaticParams() {
   return PERTH_SUBURBS.map((s) => ({ suburb: s.slug }));
@@ -62,7 +64,7 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
               className="flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium transition-all"
               style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '50px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
             >
-              <span>{cat.icon}</span>
+              <CategoryIcon category={cat.slug} className="w-3.5 h-3.5" strokeWidth={2} />
               <span>{cat.name}</span>
             </Link>
           ))}
@@ -77,7 +79,7 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
           </div>
         ) : (
           <EmptyState
-            icon="📍"
+            icon={<MapPin className="w-12 h-12" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />}
             title={`No beauty providers in ${suburb.name} yet`}
             description="Be the first to list your beauty business in this suburb!"
           />

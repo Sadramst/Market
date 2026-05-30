@@ -7,6 +7,8 @@ import { Breadcrumbs, EmptyState } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 import { PERTH_SUBURBS, findSuburb } from "@/lib/suburbs";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { Search as SearchIcon } from "lucide-react";
 
 export function generateStaticParams() {
   const params: Array<{ suburb: string; category: string }> = [];
@@ -56,7 +58,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-secondary)' }}>
-              <span className="text-xl">{cat.icon}</span>
+              <CategoryIcon category={cat.slug} className="w-6 h-6" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />
             </div>
             <div>
               <p className="text-[12px] font-medium uppercase tracking-[0.15em]" style={{ fontFamily: 'var(--font-body)', color: 'var(--brand-rose)' }}>{suburb.name}</p>
@@ -76,7 +78,7 @@ export default async function SuburbCategoryPage({ params }: { params: Promise<{
           </div>
         ) : (
           <EmptyState
-            icon="🔍"
+            icon={<SearchIcon className="w-12 h-12" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />}
             title={`No ${cat.name.toLowerCase()} providers in ${suburb.name} yet`}
             description="Try browsing nearby suburbs or check back soon!"
           />

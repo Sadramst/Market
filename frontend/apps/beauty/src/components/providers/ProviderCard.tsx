@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Star, MapPin, Phone, Globe, BadgeCheck, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
 
 type ProviderCardProps = {
   slug: string;
@@ -21,33 +23,25 @@ type ProviderCardProps = {
   hasRealData?: boolean;
 };
 
-function StarIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
-  );
-}
-
-const CATEGORY_META: Record<string, { icon: string; gradient: string }> = {
-  nails: { icon: '💅', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' },
-  hair: { icon: '💇‍♀️', gradient: 'linear-gradient(135deg, #E8D5B0, #C9A96E)' },
-  lashes: { icon: '👁️', gradient: 'linear-gradient(135deg, #C4A8C8, #9B7B84)' },
-  brows: { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' },
-  'skin-care': { icon: '🧴', gradient: 'linear-gradient(135deg, #A8C8B0, #7B9B84)' },
-  'skin care': { icon: '🧴', gradient: 'linear-gradient(135deg, #A8C8B0, #7B9B84)' },
-  makeup: { icon: '💄', gradient: 'linear-gradient(135deg, #D4A0A8, #A35560)' },
-  body: { icon: '🌸', gradient: 'linear-gradient(135deg, #E8A8C0, #C8737A)' },
-  massage: { icon: '💆', gradient: 'linear-gradient(135deg, #B8D4D4, #6B9B9B)' },
-  cosmetic: { icon: '💉', gradient: 'linear-gradient(135deg, #C4A8C8, #9B7B84)' },
-  wellness: { icon: '🧘', gradient: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)' },
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  nails: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
+  hair: 'linear-gradient(135deg, #E8D5B0, #C9A96E)',
+  lashes: 'linear-gradient(135deg, #C4A8C8, #9B7B84)',
+  brows: 'linear-gradient(135deg, #E8A8AD, #C8737A)',
+  'skin-care': 'linear-gradient(135deg, #A8C8B0, #7B9B84)',
+  'skin care': 'linear-gradient(135deg, #A8C8B0, #7B9B84)',
+  makeup: 'linear-gradient(135deg, #D4A0A8, #A35560)',
+  body: 'linear-gradient(135deg, #E8A8C0, #C8737A)',
+  massage: 'linear-gradient(135deg, #B8D4D4, #6B9B9B)',
+  cosmetic: 'linear-gradient(135deg, #C4A8C8, #9B7B84)',
+  wellness: 'linear-gradient(135deg, #A8C8B8, #7B9B8C)',
 };
 
-function getCategoryMeta(categories?: string[] | string) {
+function getCategoryGradient(categories?: string[] | string) {
   const cats = Array.isArray(categories) ? categories : categories ? [categories] : [];
-  if (!cats[0]) return { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
+  if (!cats[0]) return 'linear-gradient(135deg, #E8A8AD, #C8737A)';
   const slug = cats[0].toLowerCase().replace(/\s+/g, '-');
-  return CATEGORY_META[slug] || CATEGORY_META[cats[0].toLowerCase()] || { icon: '✨', gradient: 'linear-gradient(135deg, #E8A8AD, #C8737A)' };
+  return CATEGORY_GRADIENTS[slug] || CATEGORY_GRADIENTS[cats[0].toLowerCase()] || 'linear-gradient(135deg, #E8A8AD, #C8737A)';
 }
 
 export function ProviderCard({
@@ -66,7 +60,7 @@ export function ProviderCard({
   hasRealData,
 }: ProviderCardProps) {
   const cats = Array.isArray(categories) ? categories : categories ? [categories] : [];
-  const { icon, gradient } = getCategoryMeta(cats);
+  const gradient = getCategoryGradient(cats);
   const trustLabel = isVerified ? "Verified" : hasRealData ? "Source checked" : "New listing";
 
   return (
@@ -83,7 +77,7 @@ export function ProviderCard({
           <Image src={logoUrl} alt={businessName} fill className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[48px] mb-2 opacity-80 group-hover:scale-110 transition-transform duration-500">{icon}</span>
+            <CategoryIcon category={cats[0] || ''} className="w-12 h-12 text-white/80 mb-2 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
             <span className="text-white/90 text-[15px] font-medium tracking-wide text-center px-4 truncate max-w-full" style={{ fontFamily: 'var(--font-heading)', textShadow: '0 1px 8px rgba(0,0,0,0.25)' }}>
               {businessName}
             </span>
@@ -91,14 +85,16 @@ export function ProviderCard({
         )}
         {/* Category badge top-left */}
         {cats.length > 0 && (
-          <span className="absolute top-3 left-3 text-[11px] font-medium px-2.5 py-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-rose-dark)', borderRadius: '50px' }}>
+          <span className="absolute top-3 left-3 text-[11px] font-medium px-2.5 py-1 flex items-center gap-1.5" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-rose-dark)', borderRadius: '50px' }}>
+            <CategoryIcon category={cats[0]} className="w-3 h-3" strokeWidth={2} />
             {cats[0]}
           </span>
         )}
         {/* Trust badge top-right */}
         {(isVerified || hasRealData) && (
-          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-gold)', borderRadius: '50px' }}>
-            {isVerified ? '✦ Verified' : '✦ Source checked'}
+          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1 flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-gold)', borderRadius: '50px' }}>
+            {isVerified ? <BadgeCheck className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
+            {isVerified ? 'Verified' : 'Source checked'}
           </span>
         )}
         {/* Subtle bottom fade */}
@@ -110,7 +106,7 @@ export function ProviderCard({
         {/* Suburb row */}
         {city && (
           <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[12px]">📍</span>
+            <MapPin className="w-3 h-3" style={{ color: 'var(--brand-rose)' }} strokeWidth={2} />
             <span className="text-[12px] font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{city}, WA</span>
           </div>
         )}
@@ -126,14 +122,16 @@ export function ProviderCard({
             <>
               <div className="flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <StarIcon key={i} className={`w-3.5 h-3.5 ${i < Math.round(averageRating) ? 'star-filled' : 'text-gray-200'}`} />
+                  <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(averageRating) ? 'text-[var(--brand-rose)] fill-[var(--brand-rose)]' : 'text-gray-200'}`} strokeWidth={0} fill={i < Math.round(averageRating) ? 'currentColor' : '#E5E7EB'} />
                 ))}
               </div>
               <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>{averageRating.toFixed(1)}</span>
               <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>({totalReviews.toLocaleString()})</span>
             </>
           ) : (
-            <span className="text-[12px] font-medium" style={{ color: 'var(--brand-gold)' }}>New listing</span>
+            <span className="text-[12px] font-medium flex items-center gap-1" style={{ color: 'var(--brand-gold)' }}>
+              <Sparkles className="w-3 h-3" /> New listing
+            </span>
           )}
         </div>
 
@@ -144,15 +142,15 @@ export function ProviderCard({
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <div className="flex items-center gap-2">
-            {phone && <span className="text-[14px]" title="Phone available">📞</span>}
-            {website && <span className="text-[14px]" title="Website available">🌐</span>}
+          <div className="flex items-center gap-3">
+            {phone && <Phone className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />}
+            {website && <Globe className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />}
             {!phone && !website && (
               <span className="text-[11px]" style={{ color: 'var(--brand-gold)' }}>{trustLabel}</span>
             )}
           </div>
-          <span className="text-[12px] font-medium transition-all duration-300 group-hover:translate-x-0.5" style={{ color: 'var(--brand-rose)' }}>
-            View Profile →
+          <span className="text-[12px] font-medium flex items-center gap-1 transition-all duration-300 group-hover:translate-x-0.5" style={{ color: 'var(--brand-rose)' }}>
+            View Profile <ArrowRight className="w-3 h-3" />
           </span>
         </div>
       </div>

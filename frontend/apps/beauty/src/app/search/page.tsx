@@ -7,6 +7,10 @@ import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
 import { SearchFormClient } from "@/components/search/SearchFormClient";
 
+// Prevent Vercel from caching this page as static HTML
+// Without this, URL params (suburb, category) are ignored
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = generatePageMeta({
   title: "Browse Beauty Providers in Perth",
   description: "Search and filter beauty professionals across Perth, Western Australia. Find nail salons, hair stylists, lash technicians, and more.",

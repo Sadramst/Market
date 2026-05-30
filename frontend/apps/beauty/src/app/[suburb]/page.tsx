@@ -7,7 +7,6 @@ import { ProviderCard } from "@/components/providers/ProviderCard";
 import { BEAUTY_CATEGORIES } from "@/lib/categories";
 import { PERTH_SUBURBS, findSuburb } from "@/lib/suburbs";
 import { getFallbackProviders } from "@/lib/fallback-providers";
-import { Footer } from "@/components/layout/Footer";
 
 export function generateStaticParams() {
   return PERTH_SUBURBS.map((s) => ({ suburb: s.slug }));
@@ -110,8 +109,6 @@ export default async function SuburbPage({ params }: { params: Promise<{ suburb:
           }),
         }}
       />
-
-      <Footer />
     </>
   );
 }

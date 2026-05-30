@@ -64,14 +64,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const provider = await fetchApi<Provider>(`/providers/${slug}`, { revalidate: 60 });
   if (!provider) return { title: "Provider Not Found" };
 
+  const catName = provider.categories?.[0] || 'Beauty';
   return {
-    title: `${provider.businessName} — Beauty Services${provider.city ? ` in ${provider.city}` : ""}`,
-    description: provider.description || `${provider.businessName} — beauty services${provider.city ? ` in ${provider.city}, WA` : ""}. Read reviews and view services.`,
+    title: `${provider.businessName} — ${catName} Services${provider.city ? ` in ${provider.city}` : ""} | Appilico Beauty`,
+    description: provider.description
+      ? provider.description.slice(0, 155)
+      : `Find ${provider.businessName} in ${provider.city || 'Perth'}, WA. Read ${provider.totalReviews} reviews and contact directly.`,
     alternates: { canonical: `https://beauty.appilico.com.au/provider/${slug}` },
     openGraph: {
-      title: provider.businessName,
-      description: provider.tagline || provider.description || "",
-      type: "profile",
+      title: `${provider.businessName} | Appilico Beauty`,
+      description: provider.tagline || provider.description?.slice(0, 155) || `Rated ${provider.averageRating.toFixed(1)}★ by ${provider.totalReviews} customers`,
+      url: `https://beauty.appilico.com.au/provider/${slug}`,
+      type: "website",
       ...(provider.logoUrl ? { images: [provider.logoUrl] } : {}),
     },
   };

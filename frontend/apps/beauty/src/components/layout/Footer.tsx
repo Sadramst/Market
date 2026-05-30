@@ -5,6 +5,7 @@ const footerLinks = {
     { label: "Browse Providers", href: "/search" },
     { label: "Categories", href: "/categories" },
     { label: "Perth Suburbs", href: "/suburbs" },
+    { label: "Beauty Blog", href: "/blog" },
   ],
   services: [
     { label: "Nails", href: "/category/nails" },

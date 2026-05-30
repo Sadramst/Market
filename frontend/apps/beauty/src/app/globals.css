@@ -39,7 +39,7 @@
   --brand-mauve: #9B7B84;
 
   /* Text */
-  --text-primary: #B68A3A;
+  --text-primary: #2E211B;
   --text-secondary: #6B5B52;
   --text-muted: #A89890;
   --text-on-dark: #FAF7F4;
@@ -178,7 +178,26 @@ html {
 /* ===== Selection ===== */
 ::selection {
   background-color: var(--brand-rose-light);
-  color: var(--text-primary);
+  color: var(--brand-rose-dark);
+}
+
+/* ===== Accessible focus ring ===== */
+*:focus-visible {
+  outline: 2px solid var(--brand-rose);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ===== Respect reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ===== Loading Shimmer ===== */

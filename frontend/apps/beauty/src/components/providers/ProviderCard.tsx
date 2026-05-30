@@ -72,40 +72,48 @@ export function ProviderCard({
   return (
     <Link
       href={`/provider/${slug}`}
-      className="premium-card group block overflow-hidden"
+      className="premium-card group block overflow-hidden transition-all duration-300 hover:-translate-y-1"
       style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(200, 115, 122, 0.15)'; e.currentTarget.style.borderColor = 'rgba(200,115,122,0.3)'; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
     >
       {/* Cover */}
-      <div className="relative overflow-hidden" style={{ height: '140px', background: gradient }}>
+      <div className="relative overflow-hidden" style={{ height: '160px', background: gradient }}>
         {logoUrl ? (
           <Image src={logoUrl} alt={businessName} fill className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[42px] mb-1.5 opacity-80 group-hover:scale-110 transition-transform duration-500">{icon}</span>
+            <span className="text-[48px] mb-2 opacity-80 group-hover:scale-110 transition-transform duration-500">{icon}</span>
             <span className="text-white/90 text-[15px] font-medium tracking-wide text-center px-4 truncate max-w-full" style={{ fontFamily: 'var(--font-heading)', textShadow: '0 1px 8px rgba(0,0,0,0.25)' }}>
               {businessName}
             </span>
           </div>
         )}
+        {/* Category badge top-left */}
+        {cats.length > 0 && (
+          <span className="absolute top-3 left-3 text-[11px] font-medium px-2.5 py-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-rose-dark)', borderRadius: '50px' }}>
+            {cats[0]}
+          </span>
+        )}
+        {/* Trust badge top-right */}
+        {(isVerified || hasRealData) && (
+          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-gold)', borderRadius: '50px' }}>
+            {isVerified ? '✦ Verified' : '✦ Source checked'}
+          </span>
+        )}
         {/* Subtle bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-8" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.08), transparent)' }} />
+        <div className="absolute bottom-0 left-0 right-0 h-12" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.12), transparent)' }} />
       </div>
 
       {/* Card body */}
       <div className="p-4">
-        {/* Pills */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {cats.length > 0 && (
-            <span className="text-[11px] font-medium px-2.5 py-0.5" style={{ background: 'rgba(200,115,122,0.12)', color: 'var(--brand-rose-dark)', borderRadius: '50px' }}>
-              {cats[0]}
-            </span>
-          )}
-          {city && (
-            <span className="text-[11px] font-medium px-2.5 py-0.5" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', borderRadius: '50px' }}>
-              {city}
-            </span>
-          )}
-        </div>
+        {/* Suburb row */}
+        {city && (
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-[12px]">📍</span>
+            <span className="text-[12px] font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{city}, WA</span>
+          </div>
+        )}
 
         {/* Business name */}
         <h3 className="text-[18px] font-semibold truncate transition-colors group-hover:text-[var(--brand-rose)]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
@@ -122,56 +130,28 @@ export function ProviderCard({
                 ))}
               </div>
               <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>{averageRating.toFixed(1)}</span>
-              <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>({totalReviews})</span>
+              <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>({totalReviews.toLocaleString()})</span>
             </>
           ) : (
             <span className="text-[12px] font-medium" style={{ color: 'var(--brand-gold)' }}>New listing</span>
           )}
         </div>
 
-        {fullAddress && (
-          <div className="text-[12px] mt-2 flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
-            <span className="shrink-0 mt-0.5">📍</span>
-            <span className="truncate">{fullAddress}</span>
-            <a 
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessName + ' ' + fullAddress)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] underline ml-auto shrink-0 transition-opacity hover:opacity-70"
-              style={{ color: 'var(--brand-rose)' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Map
-            </a>
-          </div>
-        )}
-
-        {(phone || website) && (
-          <div className="flex items-center gap-3 mt-1.5 overflow-hidden">
-            {phone && (
-              <div className="text-[12px] flex items-center gap-1 shrink-0" style={{ color: 'var(--text-secondary)' }}>
-                <span>📞</span>
-                <span>{phone}</span>
-              </div>
-            )}
-            {website && (
-              <div className="text-[12px] flex items-center gap-1 truncate" style={{ color: 'var(--text-secondary)' }}>
-                <span>🌐</span>
-                <span className="truncate">{website.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]}</span>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Description */}
         {tagline && (
-          <p className="text-[14px] font-light mt-2 line-clamp-2" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{tagline}</p>
+          <p className="text-[13px] font-light mt-2 line-clamp-2" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>{tagline}</p>
         )}
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <span className="text-[12px]" style={{ color: 'var(--brand-gold)' }} title="This provider's address and contact details were verified against Google Maps">{trustLabel}</span>
-          <span className="text-[12px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: 'var(--brand-rose)' }}>
+          <div className="flex items-center gap-2">
+            {phone && <span className="text-[14px]" title="Phone available">📞</span>}
+            {website && <span className="text-[14px]" title="Website available">🌐</span>}
+            {!phone && !website && (
+              <span className="text-[11px]" style={{ color: 'var(--brand-gold)' }}>{trustLabel}</span>
+            )}
+          </div>
+          <span className="text-[12px] font-medium transition-all duration-300 group-hover:translate-x-0.5" style={{ color: 'var(--brand-rose)' }}>
             View Profile →
           </span>
         </div>

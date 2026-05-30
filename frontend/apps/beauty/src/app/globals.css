@@ -212,3 +212,38 @@ html {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 768px) {
+  /* Provider cards: single column */
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  /* Provider profile: stack sidebar below */
+  .grid.grid-cols-1.lg\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  /* Category tabs: horizontal scroll */
+  .flex.flex-wrap.gap-2 {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .flex.flex-wrap.gap-2::-webkit-scrollbar {
+    display: none;
+  }
+  /* Touch targets minimum size */
+  .flex.flex-wrap.gap-2 > a,
+  .flex.flex-wrap.gap-2 > button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* Prevent horizontal scroll on body */
+html, body {
+  overflow-x: hidden;
+}

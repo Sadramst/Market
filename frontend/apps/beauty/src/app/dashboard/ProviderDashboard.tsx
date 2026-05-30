@@ -186,7 +186,7 @@ export function ProviderDashboard() {
       {activeTab === "overview" && <OverviewTab profile={profile} provider={provider} />}
       {activeTab === "profile" && <ProfileTab provider={provider} token={token} onUpdate={() => token && loadData(token)} />}
       {activeTab === "services" && <ServicesTab provider={provider} token={token} onUpdate={() => token && loadData(token)} />}
-      {activeTab === "gallery" && <GalleryTab provider={provider} />}
+      {activeTab === "gallery" && <GalleryTab provider={provider} token={token} onUpdate={() => token && loadData(token)} />}
       {activeTab === "enquiries" && <EnquiriesTab provider={provider} token={token} />}
       {activeTab === "billing" && <BillingTab provider={provider} />}
     </div>
@@ -463,32 +463,153 @@ function ServicesTab({ provider, token, onUpdate }: { provider: ProviderProfile 
 }
 
 /* ─── Gallery Tab ─────────────────────────────────────────────── */
-function GalleryTab({ provider }: { provider: ProviderProfile | null }) {
+function GalleryTab({ provider, token, onUpdate }: { provider: ProviderProfile | null; token: string | null; onUpdate: () => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+
   if (!provider) {
     return <div className="p-8 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}><p className="text-[14px]" style={{ color: 'var(--text-muted)' }}>Create a listing first to add gallery photos.</p></div>;
   }
 
   const images = provider.galleryImages || [];
+  const MAX_PHOTOS = 20;
+  const MAX_SIZE_MB = 5;
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+  async function uploadFile(file: File) {
+    if (!token || !provider) return;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setMessage({ type: 'error', text: `File too large (max ${MAX_SIZE_MB}MB).` });
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setMessage({ type: 'error', text: 'Invalid file type. Use JPG, PNG or WebP.' });
+      return;
+    }
+    if (images.length >= MAX_PHOTOS) {
+      setMessage({ type: 'error', text: `Maximum ${MAX_PHOTOS} photos allowed.` });
+      return;
+    }
+
+    setUploading(true);
+    setMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(`${API_URL}/providers/${provider.id}/gallery`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (res.ok) {
+        setMessage({ type: 'success', text: 'Photo uploaded successfully!' });
+        onUpdate();
+      } else {
+        const json = await res.json().catch(() => null);
+        setMessage({ type: 'error', text: json?.message || 'Upload failed. Please try again.' });
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    }
+    setUploading(false);
+  }
+
+  async function deleteImage(imageId: string) {
+    if (!token || !provider) return;
+    try {
+      await fetch(`${API_URL}/providers/${provider.id}/gallery/${imageId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      onUpdate();
+    } catch { /* empty */ }
+  }
+
+  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) uploadFile(file);
+    e.target.value = '';
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) uploadFile(file);
+  }
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-[18px]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Gallery ({images.length})</h2>
+        <h2 className="text-[18px]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Gallery ({images.length}/{MAX_PHOTOS})</h2>
       </div>
 
-      <div className="p-5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
-        <p className="text-[14px]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
-          Gallery uploads are coming soon. Contact <Link href="/contact" className="underline" style={{ color: 'var(--brand-rose)' }}>support</Link> to have photos added to your listing.
-        </p>
-      </div>
+      {message && (
+        <div className="p-3 text-[13px]" style={{
+          background: message.type === 'success' ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)',
+          border: `1px solid ${message.type === 'success' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}`,
+          borderRadius: '4px',
+          color: message.type === 'success' ? '#059669' : '#dc2626',
+        }}>{message.text}</div>
+      )}
 
+      {/* Upload drop zone */}
+      {images.length < MAX_PHOTOS && (
+        <div
+          className="relative p-8 text-center cursor-pointer transition-all"
+          style={{
+            background: dragActive ? 'rgba(200,115,122,0.06)' : 'var(--bg-card)',
+            border: `2px dashed ${dragActive ? 'var(--brand-rose)' : 'var(--border)'}`,
+            borderRadius: '8px',
+          }}
+          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById('gallery-upload-input')?.click()}
+        >
+          <input
+            id="gallery-upload-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileInput}
+            className="hidden"
+          />
+          <span className="text-[36px] block mb-3">{uploading ? '⏳' : '📸'}</span>
+          <p className="text-[14px] font-medium" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+            {uploading ? 'Uploading...' : 'Drag photos here or click to upload'}
+          </p>
+          <p className="text-[12px] mt-1" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>
+            JPG, PNG or WebP · Max {MAX_SIZE_MB}MB per photo
+          </p>
+        </div>
+      )}
+
+      {/* Gallery grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {images.map((img) => (
-            <div key={img.id} className="aspect-square overflow-hidden" style={{ borderRadius: '8px', background: 'var(--bg-secondary)' }}>
+            <div key={img.id} className="relative group aspect-square overflow-hidden" style={{ borderRadius: '8px', background: 'var(--bg-secondary)' }}>
               <img src={img.thumbnailUrl || img.imageUrl} alt={img.altText || ''} className="w-full h-full object-cover" loading="lazy" />
+              <button
+                onClick={(e) => { e.stopPropagation(); deleteImage(img.id); }}
+                className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full text-[12px] opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: 'rgba(0,0,0,0.6)', color: 'white' }}
+                title="Delete photo"
+              >
+                ✕
+              </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {images.length === 0 && (
+        <div className="p-8 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+          <span className="text-[36px] block mb-3">📷</span>
+          <p className="text-[14px]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>
+            No photos yet. Profiles with photos get up to 10× more enquiries!
+          </p>
         </div>
       )}
     </div>

@@ -295,8 +295,24 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     </div>
                   ))}
                 </div>
+              ) : provider.totalReviews > 0 ? (
+                <div className="flex items-start gap-4 p-5" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.06), rgba(200,115,122,0.04))', borderRadius: '8px', border: '1px solid rgba(201,169,110,0.15)' }}>
+                  <span className="text-[32px] shrink-0">⭐</span>
+                  <div>
+                    <p className="text-[16px] font-semibold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
+                      {provider.totalReviews.toLocaleString()} verified Google reviews
+                    </p>
+                    <p className="text-[14px] font-light mt-1 leading-relaxed" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+                      This business has an outstanding rating of {provider.averageRating.toFixed(1)} from real customers on Google. Be the first to leave an Appilico review below.
+                    </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <StarRating rating={provider.averageRating} size="md" />
+                      <span className="text-[13px] font-medium" style={{ color: 'var(--brand-gold)' }}>{provider.averageRating.toFixed(1)} / 5.0</span>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>{provider.totalReviews > 0 ? `This provider has ${provider.totalReviews} reviews via Google. Detailed reviews coming soon.` : `No reviews yet. Be the first to leave a review!`}</p>
+                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>No reviews yet. Be the first to leave a review!</p>
               )}
             </section>
 
@@ -393,7 +409,18 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
         {/* Nearby Providers */}
         {nearbyProviders.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-[20px] mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Nearby in {provider.city || 'Your Area'}</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[20px]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 600 }}>Also in {provider.city || 'Your Area'}</h2>
+              {provider.city && (
+                <Link
+                  href={`/${provider.city.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="text-[13px] font-medium transition-colors hover:opacity-80"
+                  style={{ color: 'var(--brand-rose)', fontFamily: 'var(--font-body)' }}
+                >
+                  View all in {provider.city} →
+                </Link>
+              )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {nearbyProviders.map((np) => (
                 <Link key={np.id} href={`/provider/${np.slug}`} className="group block transition-all hover:-translate-y-0.5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>

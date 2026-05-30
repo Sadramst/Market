@@ -266,18 +266,33 @@ public class ProviderService : IProviderService
             return ApiResponse<List<ProviderListDto>>.Fail("Provider not found");
 
         var suburbIds = provider.ServiceAreas.Select(sa => sa.SuburbId).ToList();
+
+        // Fallback 1: same city
+        if (!suburbIds.Any() && !string.IsNullOrEmpty(provider.City))
+        {
+            suburbIds = await _context.Suburbs
+                .Where(s => s.IsActive && s.Name == provider.City)
+                .Select(s => s.Id)
+                .ToListAsync();
+        }
+
+        // Fallback 2: nearby postcodes (same prefix, max ±5 range to avoid distant matches)
         if (!suburbIds.Any() && !string.IsNullOrEmpty(provider.PostalCode))
         {
-            // Fallback: match by postcode proximity
             if (int.TryParse(provider.PostalCode, out var pc))
             {
+                var low = (pc - 5).ToString();
+                var high = (pc + 5).ToString();
                 suburbIds = await _context.Suburbs
-                    .Where(s => s.IsActive && EF.Functions.Like(s.PostCode, $"{pc / 10}%"))
+                    .Where(s => s.IsActive
+                        && string.Compare(s.PostCode, low) >= 0
+                        && string.Compare(s.PostCode, high) <= 0)
                     .Select(s => s.Id)
                     .ToListAsync();
             }
         }
 
+        // Primary query: providers sharing service areas
         var nearby = await _context.Providers
             .Include(p => p.Services).ThenInclude(s => s.Category)
             .Include(p => p.GalleryImages)
@@ -290,6 +305,26 @@ public class ProviderService : IProviderService
             .ThenByDescending(p => p.TotalReviews)
             .Take(count)
             .ToListAsync();
+
+        // If not enough results, expand to same city
+        if (nearby.Count < 3 && !string.IsNullOrEmpty(provider.City))
+        {
+            var existingIds = nearby.Select(n => n.Id).ToList();
+            existingIds.Add(provider.Id);
+            var additional = await _context.Providers
+                .Include(p => p.Services).ThenInclude(s => s.Category)
+                .Include(p => p.GalleryImages)
+                .Include(p => p.ServiceAreas)
+                .Where(p => !existingIds.Contains(p.Id)
+                    && p.Status == ProviderStatus.Approved
+                    && p.ProviderType == provider.ProviderType
+                    && p.City == provider.City)
+                .OrderByDescending(p => p.AverageRating)
+                .ThenByDescending(p => p.TotalReviews)
+                .Take(count - nearby.Count)
+                .ToListAsync();
+            nearby.AddRange(additional);
+        }
 
         return ApiResponse<List<ProviderListDto>>.Ok(nearby.Select(MapToListDto).ToList());
     }

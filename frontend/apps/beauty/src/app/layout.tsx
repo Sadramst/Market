@@ -48,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? process.env.NEXT_PUBLIC_GADS_ID;
-  const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+  const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-TJGWS4XM";
 
   return (
     <html lang="en-AU" className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable}`}>
@@ -60,11 +60,6 @@ export default function RootLayout({
             }}
           />
         )}
-
-        <meta
-          name="google-site-verification"
-          content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "UHZdMrBhQF3dvWgVJdoX80gBYIQW8RvKpT_u-sdbFJo"}
-        />
 
         {GA_ID && (
           <>
@@ -78,10 +73,10 @@ export default function RootLayout({
         )}
       </head>
       <body className="font-sans min-h-screen antialiased flex flex-col" style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>
-        {process.env.NEXT_PUBLIC_GTM_ID && (
+        {GTM_ID && (
           <noscript
             dangerouslySetInnerHTML={{
-              __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
+              __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
             }}
           />
         )}

@@ -7,23 +7,14 @@ const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
 export function Analytics() {
   const primaryId = GA_ID || GADS_ID;
-  
+
   return (
     <>
-      {/* Google Tag Manager */}
-      {GTM_ID && (
-        <Script id="gtm-script" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${GTM_ID}');
-          `}
-        </Script>
-      )}
+      {/* NOTE: Google Tag Manager (GTM-*) is injected once in layout.tsx (head script
+          + body noscript iframe). Do NOT add it here as well — a second container
+          causes Tag Assistant "duplicate installation" errors. */}
 
-      {/* Google Analytics & Google Ads */}
+      {/* Google Analytics & Google Ads — only load directly when GTM is NOT managing tags */}
       {primaryId && !GTM_ID && (
         <>
           <Script

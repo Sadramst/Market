@@ -5,12 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@appilico/shared/hooks";
 import { useSuburbPreference } from "@appilico/shared/hooks";
-import { Search, LayoutGrid, MapPin, BookOpen, Info, ArrowRight, User, LogOut, ChevronDown } from "lucide-react";
+import { Search, LayoutGrid, MapPin, BookOpen, Info, Tag, ArrowRight, User, LogOut, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { label: "Browse", href: "/search", icon: Search },
   { label: "Categories", href: "/categories", icon: LayoutGrid },
   { label: "Suburbs", href: "/suburbs", icon: MapPin },
+  { label: "Pricing", href: "/pricing", icon: Tag },
   { label: "Blog", href: "/blog", icon: BookOpen },
   { label: "About", href: "/about", icon: Info },
 ];

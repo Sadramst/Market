@@ -51,6 +51,16 @@ public class ProviderService : IProviderService
         if (request.MarketplaceType.HasValue)
             query = query.Where(p => p.ProviderType == request.MarketplaceType.Value);
 
+        // Exclude clearly non-beauty businesses (medical/retail) from the beauty marketplace
+        if (!request.MarketplaceType.HasValue || request.MarketplaceType.Value == ProviderType.Beauty)
+        {
+            query = query.Where(p =>
+                !EF.Functions.ILike(p.BusinessName, "%chiropract%") &&
+                !EF.Functions.ILike(p.BusinessName, "%physio%") &&
+                !EF.Functions.ILike(p.BusinessName, "%osteopath%") &&
+                !EF.Functions.ILike(p.BusinessName, "%massage chair%"));
+        }
+
         // Resolve category slug to ID
         if (!request.CategoryId.HasValue && !string.IsNullOrEmpty(request.Category))
         {

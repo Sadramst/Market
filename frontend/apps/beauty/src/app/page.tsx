@@ -45,7 +45,7 @@ export default async function HomePage() {
   ]);
 
   const totalProviders = countData?.pagination?.totalCount ?? 0;
-  const suburbCount = statsData?.suburbCount ?? 70;
+  const suburbCount = statsData?.suburbCount ?? 130;
   const categoryCount = statsData?.categoryCount ?? 10;
   const apiFeatured = providers?.items ?? [];
   const featuredProviders = apiFeatured.length > 0 ? apiFeatured : FALLBACK_FEATURED_PROVIDERS;
@@ -89,7 +89,7 @@ export default async function HomePage() {
 
               {/* Stats */}
               <div className="animate-fade-in-up animation-delay-500 mt-8 flex items-center gap-6 text-[13px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
-                <span suppressHydrationWarning>{totalProviders > 0 ? `${totalProviders.toLocaleString('en-AU')}+` : '1,000+'} Providers</span>
+                <span suppressHydrationWarning>{totalProviders > 0 ? `${totalProviders.toLocaleString('en-AU')}+` : '1,300+'} Providers</span>
                 <span style={{ color: 'var(--border)' }}>·</span>
                 <span>{suburbCount}+ Suburbs</span>
                 <span style={{ color: 'var(--border)' }}>·</span>

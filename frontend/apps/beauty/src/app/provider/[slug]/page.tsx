@@ -7,6 +7,7 @@ import { Breadcrumbs, StarRating } from "@/components/ui";
 import { ContactProviderButton } from "@/components/providers/ContactProviderButton";
 import { ReviewForm } from "@/components/providers/ReviewForm";
 import { ProviderViewTracker } from "@/components/providers/ProviderViewTracker";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
 
 type Provider = {
   id: string;
@@ -124,9 +125,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           <img src={provider.coverImageUrl} alt="" className="w-full h-full object-cover" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[80px] opacity-20">
-              {catSlug === 'nails' ? '💅' : catSlug === 'hair' ? '💇‍♀️' : catSlug === 'lashes' ? '👁️' : catSlug === 'brows' ? '✨' : catSlug === 'skin-care' ? '🧴' : catSlug === 'makeup' ? '💄' : catSlug === 'body' ? '🌸' : catSlug === 'cosmetic' ? '💉' : catSlug === 'wellness' ? '🧘' : '✨'}
-            </span>
+            <CategoryIcon category={catSlug || provider.categories?.[0] || ''} className="w-24 h-24 text-white opacity-25" strokeWidth={1.25} />
           </div>
         )}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,20,16,0.3), transparent)' }} />
@@ -147,8 +146,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
               {provider.logoUrl ? (
                 <img src={provider.logoUrl} alt={provider.businessName} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
-                  <span className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-heading)' }}>{provider.businessName.charAt(0)}</span>
+                <div className="w-full h-full flex items-center justify-center" style={{ background: bannerGradient }}>
+                  <CategoryIcon category={catSlug || provider.categories?.[0] || ''} className="w-12 h-12 text-white" strokeWidth={1.5} />
                 </div>
               )}
             </div>
@@ -391,8 +390,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     {(rp.primaryImageUrl || rp.coverImageUrl || rp.logoUrl) ? (
                       <img src={rp.primaryImageUrl || rp.coverImageUrl || rp.logoUrl} alt={rp.businessName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
-                        <span className="text-2xl font-bold text-white">{rp.businessName.charAt(0)}</span>
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: categoryGradients[rp.categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || ''] || 'var(--gradient-rose)' }}>
+                        <CategoryIcon category={rp.categories?.[0] || ''} className="w-9 h-9 text-white opacity-90" strokeWidth={1.5} />
                       </div>
                     )}
                   </div>
@@ -432,8 +431,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     {(np.primaryImageUrl || np.coverImageUrl || np.logoUrl) ? (
                       <img src={np.primaryImageUrl || np.coverImageUrl || np.logoUrl} alt={np.businessName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
-                        <span className="text-2xl font-bold text-white">{np.businessName.charAt(0)}</span>
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: categoryGradients[np.categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || ''] || 'var(--gradient-rose)' }}>
+                        <CategoryIcon category={np.categories?.[0] || ''} className="w-9 h-9 text-white opacity-90" strokeWidth={1.5} />
                       </div>
                     )}
                   </div>

@@ -1,32 +1,71 @@
 # 🗺️ Appilico Marketplace Ecosystem — Master Roadmap
-> **Last Updated:** May 2026 | **Status:** Phase 1 — Foundation Fix & Data Layer
+> **Last Updated:** 31 May 2026 | **Status:** Phase 2 — Provider Growth Engine (in progress) · Beauty MVP **LIVE**
 
 ---
 
-## 🔍 Current State Audit (Pre-Roadmap)
+## 🔍 Current State Audit (Live — 31 May 2026)
 
-### What's Built
-- ✅ Next.js 15 Turborepo monorepo (`beauty/`, `services/`, `admin/`)
-- ✅ .NET 8 modular monolith backend (domain, infrastructure, application, API layers)
-- ✅ PostgreSQL database schema
-- ✅ JWT authentication system
-- ✅ Docker + Nginx + Vercel deployment infrastructure
-- ✅ Beautiful homepage UI (beauty.appilico.com.au)
-- ✅ SEO metadata & Open Graph on key pages
-- ✅ Basic API endpoints documented (auth, providers, categories, suburbs, reviews)
+The Beauty Marketplace is **live in production** at `beauty.appilico.com.au` with ~1,300+ real
+Perth providers, 130+ suburbs, and 10 categories. The original roadmap below has been re-scored
+against the **actual codebase and live site**. Items proven done are checked `[x]`.
 
-### What's Broken / Missing
-- ❌ `/categories` page → returns empty ("No categories available") — API not seeded
-- ❌ `/suburbs` page → returns empty ("No suburbs available") — API not seeded
-- ❌ `/search` page → returns empty ("No providers found") — no data
-- ❌ `/category/[slug]` → "Category Not Found" — API not connected or not seeded
-- ❌ Provider registration flow broken (redirects to admin, no self-serve signup)
-- ❌ `/login` page (provider auth) — status unknown
-- ❌ Services marketplace (service.appilico.com.au) — unknown state
-- ❌ Admin platform (admin.appilico.com.au) — not public
-- ❌ Database has NO seed data (categories, suburbs, providers)
-- ❌ Backend API either not live or not connected to frontend env vars
-- ❌ No real providers listed anywhere
+### What's Live & Working
+- ✅ Next.js 15 Turborepo monorepo (`beauty/`, `services/`, `admin/`) — beauty fully built
+- ✅ .NET 8 modular monolith backend (Domain / Infrastructure / Application / Api) — 15 controllers
+- ✅ PostgreSQL seeded: ~1,300 providers, 130+ suburbs, 10 categories, reviews
+- ✅ JWT auth (login, signup, forgot/reset password), provider dashboard
+- ✅ Docker + Nginx + Vercel deploy; SSL on all subdomains; live API at `api.appilico.com.au`
+- ✅ Search (filters: category, suburb, sort, pagination) + suburb autocomplete
+- ✅ Category / suburb / `[suburb]/[category]` SEO combo pages with dynamic metadata
+- ✅ Provider profiles: gallery, reviews, services, contact, enquiry modal, claim flow
+- ✅ Pricing page + Stripe checkout route (needs live keys), enquiries, contact form, blog
+- ✅ SEO: dynamic sitemap, robots.ts, JSON-LD (LocalBusiness, BreadcrumbList, Organization)
+- ✅ GTM + GA + Clarity; Google Search Console verified
+- ✅ Test suites: Playwright e2e (beauty/services/admin/agent) + Vitest unit tests
+
+### Known Gaps / In-Flight
+- ⚠️ Admin app missing `NEXT_PUBLIC_API_URL` env var on Vercel (external dashboard fix)
+- ⚠️ Stripe live keys not set (checkout returns 503 until configured)
+- ⚠️ Some DB data-quality issues (miscategorised providers, duplicates) — SQL fixes staged
+- ⚠️ Image upload to CDN, customer accounts (save/favourites), map view — not yet built
+- ⚠️ Services (IT) & Admin marketplaces — scaffolded, not feature-complete
+
+---
+
+## 📊 MASTER STATUS TABLE
+
+Legend: ✅ Done · 🟡 Partial · 🔴 Not started · 🌐 External (needs keys/infra/dashboard)
+
+| Area | Feature | Status |
+|------|---------|--------|
+| **P1 Foundation** | API live, DB seeded, CORS, endpoints, Swagger | ✅ |
+| P1 | All beauty pages render real data | ✅ |
+| P1 | Self-serve `/join`, `/login`, dashboard | ✅ |
+| P1 | SEO: sitemap, robots, schema, canonical, dynamic meta | ✅ |
+| P1 | DevOps: env vars, SSL, health check, backups | 🟡 (admin env var 🌐) |
+| **P2 Growth** | Provider onboarding wizard | 🟡 |
+| P2 | Image upload to CDN | 🔴 🌐 |
+| P2 | Reviews + moderation + aggregation | 🟡 |
+| P2 | Provider dashboard (profile, gallery, analytics, enquiries) | 🟡 |
+| P2 | Customer accounts | 🟡 |
+| P2 | **Save / favourite providers** | ✅ *(this session)* |
+| P2 | Map view of providers | 🔴 |
+| P2 | Filters: rating / distance / price | 🟡 |
+| P2 | "Near me" geolocation | ✅ |
+| P2 | Related / nearby providers | ✅ |
+| **P3 Monetisation** | Subscription tiers + Stripe billing | 🟡 🌐 |
+| P3 | Featured placement, verified badge, priority ranking | 🟡 |
+| P3 | Provider analytics & reporting | 🟡 |
+| **P4 AI/Content** | AI SEO content, blog hub | 🟡 |
+| P4 | AI matching / smart search / review summarisation | 🔴 |
+| P4 | AI moderation (spam, image, fraud) | 🔴 |
+| **P5 Ecosystem** | IT Services marketplace | 🟡 |
+| P5 | Admin platform (approval, moderation, analytics) | 🟡 |
+| P5 | New verticals / white-label | 🔴 |
+
+> This table is the single source of truth for "what's done vs what remains". Update it as
+> features land. Each new feature should ship with tests (Vitest unit + Playwright e2e) before
+> being marked ✅.
 
 ---
 
@@ -36,54 +75,54 @@
 > **Agent Prompt:** See `STEP_1_AGENT_PROMPT.md` → give this to your agent NOW
 
 ### 1.1 Backend — API & Database Fix
-- [ ] Confirm API is live and accessible at `api.appilico.com.au`
-- [ ] Seed all 9 Beauty categories with icons, descriptions, slugs
-- [ ] Seed 150+ Perth suburbs with coordinates and metadata
-- [ ] Create sample/demo providers (10–20 realistic listings) for each category
-- [ ] Seed sample reviews for demo providers
-- [ ] Fix CORS to allow Vercel frontend domains
-- [ ] Confirm all documented endpoints return real data
-- [ ] Add `/api/categories/beauty` with full category objects
-- [ ] Add `/api/locations/suburbs?platform=beauty` endpoint
-- [ ] Add `/api/providers?category=&suburb=&sort=&page=` with pagination
-- [ ] Add `/api/providers/featured` endpoint for homepage
-- [ ] Ensure Swagger is accessible for testing
+- [x] Confirm API is live and accessible at `api.appilico.com.au`
+- [x] Seed all 9 Beauty categories with icons, descriptions, slugs (10 categories live)
+- [x] Seed 150+ Perth suburbs with coordinates and metadata (130+ live)
+- [x] Create sample/demo providers — exceeded: ~1,300 real providers
+- [x] Seed sample reviews for demo providers
+- [x] Fix CORS to allow Vercel frontend domains
+- [x] Confirm all documented endpoints return real data
+- [x] Add `/api/categories/beauty` with full category objects
+- [x] Add `/api/locations/suburbs?platform=beauty` endpoint
+- [x] Add `/api/providers?category=&suburb=&sort=&page=` with pagination
+- [x] Add `/api/providers/featured` endpoint for homepage
+- [x] Ensure Swagger is accessible for testing
 
 ### 1.2 Frontend Beauty App — Page Fixes
-- [ ] `/categories` → Connect to API, render all beauty categories with icons & counts
-- [ ] `/category/[slug]` → Dynamic category page pulling providers from API
-- [ ] `/suburbs` → Connect to API, render all Perth suburbs in alphabetical grid
-- [ ] `/[suburb]` → Dynamic suburb page (e.g., /subiaco) with local providers
-- [ ] `/[suburb]/[category]` → Combo pages (e.g., /joondalup/nail-salon) for SEO
-- [ ] `/search` → Fully working search with filters (category, suburb, sort)
-- [ ] `/providers/[slug]` → Full provider profile page (gallery, reviews, contact)
-- [ ] `/join` → Self-contained registration form (not redirect to admin)
-- [ ] `/login` → Provider login with JWT, redirects to provider dashboard
-- [ ] Provider dashboard → Basic profile management after login
+- [x] `/categories` → Connect to API, render all beauty categories with icons & counts
+- [x] `/category/[slug]` → Dynamic category page pulling providers from API
+- [x] `/suburbs` → Connect to API, render all Perth suburbs in alphabetical grid
+- [x] `/[suburb]` → Dynamic suburb page (e.g., /subiaco) with local providers
+- [x] `/[suburb]/[category]` → Combo pages (e.g., /joondalup/nail-salon) for SEO
+- [x] `/search` → Fully working search with filters (category, suburb, sort)
+- [x] `/provider/[slug]` → Full provider profile page (gallery, reviews, contact)
+- [x] `/join` → Self-contained registration form (not redirect to admin)
+- [x] `/login` → Provider login with JWT, redirects to provider dashboard
+- [x] Provider dashboard → Basic profile management after login
 
 ### 1.3 Frontend — UI/UX Polish
-- [ ] Homepage featured providers section pulls from `/api/providers/featured`
-- [ ] Category cards on homepage show real provider counts
-- [ ] Search autocomplete for suburbs and services
-- [ ] Mobile navigation fully working
-- [ ] Newsletter subscribe form connected to email service
-- [ ] About, Contact, Privacy, Terms pages have real content
+- [x] Homepage featured providers section pulls from `/api/providers/search?sortBy=rating`
+- [x] Category cards on homepage show real provider counts
+- [x] Search autocomplete for suburbs and services
+- [x] Mobile navigation fully working
+- [ ] Newsletter subscribe form connected to email service 🌐
+- [x] About, Contact, Privacy, Terms pages have real content
 
 ### 1.4 SEO Infrastructure
-- [ ] Sitemap.xml dynamically generated (includes all suburb/category combos)
-- [ ] robots.txt properly configured
-- [ ] Schema.org LocalBusiness structured data on provider pages
-- [ ] Schema.org BreadcrumbList on category/suburb pages
-- [ ] Dynamic metadata on all dynamic pages (`/[suburb]`, `/category/[slug]`, `/providers/[slug]`)
-- [ ] Canonical URLs pointing to beauty.appilico.com.au (not vercel.app)
+- [x] Sitemap.xml dynamically generated (includes all suburb/category combos)
+- [x] robots.txt properly configured
+- [x] Schema.org LocalBusiness structured data on provider pages
+- [x] Schema.org BreadcrumbList on category/suburb pages
+- [x] Dynamic metadata on all dynamic pages (`/[suburb]`, `/category/[slug]`, `/provider/[slug]`)
+- [x] Canonical URLs pointing to beauty.appilico.com.au (not vercel.app)
 
 ### 1.5 DevOps
-- [ ] `.env.production` properly configured on Vercel
-- [ ] `NEXT_PUBLIC_API_URL` pointing to `https://api.appilico.com.au`
-- [ ] `NEXT_PUBLIC_GA_ID` and `NEXT_PUBLIC_CLARITY_ID` added to Vercel
-- [ ] Backend health check endpoint returning 200
-- [ ] SSL certificates valid on all subdomains
-- [ ] Database backups configured
+- [x] `.env.production` properly configured on Vercel (beauty)
+- [x] `NEXT_PUBLIC_API_URL` pointing to `https://api.appilico.com.au` (beauty/services)
+- [x] `NEXT_PUBLIC_GA_ID` and `NEXT_PUBLIC_CLARITY_ID` added to Vercel
+- [x] Backend health check endpoint returning 200
+- [x] SSL certificates valid on all subdomains
+- [ ] Database backups configured (verify schedule)
 
 ---
 
@@ -117,17 +156,17 @@
 
 ### 2.4 Customer Features
 - [ ] Customer account registration & login
-- [ ] Save/favourite providers
+- [x] Save/favourite providers ✅ *(shipped this session — localStorage-based, no login required)*
 - [ ] Leave reviews (auth required)
 - [ ] Search history and preferences
-- [ ] Email enquiry to provider from platform
+- [x] Email enquiry to provider from platform (EnquiryModal)
 
 ### 2.5 Advanced Search & Discovery
 - [ ] Map view of providers (Google Maps / Mapbox integration)
 - [ ] Filter by rating, distance, price range, availability
-- [ ] "Near me" geolocation search
-- [ ] Related providers section on provider pages
-- [ ] "You might also like" recommendations
+- [x] "Near me" geolocation search (useSuburbPreference + detect location)
+- [x] Related providers section on provider pages
+- [x] "You might also like" recommendations (nearby/related)
 
 ---
 
@@ -272,4 +311,4 @@ Market/
 
 ---
 
-*Generated by Claude for Appilico | Roadmap v1.0 — May 2026*
+*Roadmap v2.0 — re-audited against live codebase & production site, 31 May 2026. Beauty MVP is LIVE; focus has shifted from Phase 1 (complete) to Phase 2 growth features. Keep the Master Status Table above current as features ship.*

@@ -21,6 +21,7 @@ const routes = {
     "join/page.tsx",
     "login/page.tsx",
     "dashboard/page.tsx",
+    "favourites/page.tsx",
     "provider/[slug]/page.tsx",
     "claim/[slug]/page.tsx",
     "category/[slug]/page.tsx",

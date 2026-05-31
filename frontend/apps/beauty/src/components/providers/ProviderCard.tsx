@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Star, MapPin, Phone, Globe, BadgeCheck, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
 import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { FavouriteButton } from "@/components/providers/FavouriteButton";
 
 type ProviderCardProps = {
   slug: string;
@@ -99,6 +100,21 @@ export function ProviderCard({
         )}
         {/* Subtle bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-12" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.12), transparent)' }} />
+        {/* Save / favourite */}
+        <FavouriteButton
+          className="absolute bottom-3 right-3"
+          provider={{
+            slug,
+            businessName,
+            city,
+            categories: cats,
+            averageRating,
+            totalReviews,
+            logoUrl,
+            isVerified,
+            hasRealData,
+          }}
+        />
       </div>
 
       {/* Card body */}

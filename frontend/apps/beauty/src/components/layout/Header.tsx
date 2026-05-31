@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@appilico/shared/hooks";
 import { useSuburbPreference } from "@appilico/shared/hooks";
-import { Search, LayoutGrid, MapPin, BookOpen, Info, Tag, ArrowRight, User, LogOut, ChevronDown } from "lucide-react";
+import { useFavourites } from "@appilico/shared/hooks";
+import { Search, LayoutGrid, MapPin, BookOpen, Info, Tag, ArrowRight, User, LogOut, ChevronDown, Heart } from "lucide-react";
 
 const navLinks = [
   { label: "Browse", href: "/search", icon: Search },
@@ -22,6 +23,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { suburb, detecting, detectLocation } = useSuburbPreference();
+  const { count: favouritesCount, hydrated: favouritesHydrated } = useFavourites();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
@@ -107,6 +109,25 @@ export function Header() {
                 <MapPin className="w-3 h-3" strokeWidth={2} />
                 {detecting ? "Detecting…" : suburb ? `${suburb.name}${suburb.postCode ? ` · ${suburb.postCode}` : ""}` : "Detect location"}
               </button>
+
+              {/* Saved providers */}
+              <Link
+                href="/favourites"
+                aria-label="Saved providers"
+                title="Saved providers"
+                className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+                style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+              >
+                <Heart className="w-4 h-4" strokeWidth={2} fill={favouritesHydrated && favouritesCount > 0 ? 'var(--brand-rose)' : 'none'} style={{ color: favouritesHydrated && favouritesCount > 0 ? 'var(--brand-rose)' : 'var(--text-secondary)' }} />
+                {favouritesHydrated && favouritesCount > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 flex items-center justify-center text-[10px] font-bold text-white rounded-full"
+                    style={{ minWidth: '16px', height: '16px', padding: '0 4px', background: 'var(--brand-rose)' }}
+                  >
+                    {favouritesCount}
+                  </span>
+                )}
+              </Link>
 
               {isAuthenticated && user ? (
                 <div className="relative">

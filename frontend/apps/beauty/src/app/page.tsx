@@ -275,8 +275,8 @@ export default async function HomePage() {
                 <Quote className="w-8 h-8 mb-2" style={{ color: 'var(--brand-rose)' }} strokeWidth={1.5} />
                 <p className="text-[15px] italic leading-relaxed -mt-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 300 }}>{t.text}</p>
                 <div className="flex items-center gap-3 mt-6 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-medium text-white" style={{ background: 'var(--brand-rose)' }}>
-                    {t.name.charAt(0)}
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--gradient-rose)' }}>
+                    <CategoryIcon category={t.service} className="w-5 h-5 text-white" strokeWidth={1.75} />
                   </div>
                   <div>
                     <p className="text-[14px] font-medium" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>{t.name}</p>

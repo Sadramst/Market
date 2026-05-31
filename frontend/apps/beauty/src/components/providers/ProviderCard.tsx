@@ -61,7 +61,7 @@ export function ProviderCard({
 }: ProviderCardProps) {
   const cats = Array.isArray(categories) ? categories : categories ? [categories] : [];
   const gradient = getCategoryGradient(cats);
-  const trustLabel = isVerified ? "Verified" : hasRealData ? "Source checked" : "New listing";
+  const trustLabel = isVerified ? "Verified" : hasRealData ? "Verified data" : "New listing";
 
   return (
     <Link
@@ -92,9 +92,9 @@ export function ProviderCard({
         )}
         {/* Trust badge top-right */}
         {(isVerified || hasRealData) && (
-          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1 flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--brand-gold)', borderRadius: '50px' }}>
+          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1 flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: isVerified ? 'var(--brand-gold)' : '#3F7E5B', borderRadius: '50px' }}>
             {isVerified ? <BadgeCheck className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
-            {isVerified ? 'Verified' : 'Source checked'}
+            {isVerified ? 'Verified' : 'Verified data'}
           </span>
         )}
         {/* Subtle bottom fade */}

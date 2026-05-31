@@ -303,6 +303,7 @@ public class ProviderService : IProviderService
         }
 
         // Primary query: providers sharing service areas
+        var isBeauty = provider.ProviderType == ProviderType.Beauty;
         var nearby = await _context.Providers
             .Include(p => p.Services).ThenInclude(s => s.Category)
             .Include(p => p.GalleryImages)
@@ -310,6 +311,11 @@ public class ProviderService : IProviderService
             .Where(p => p.Id != provider.Id
                 && p.Status == ProviderStatus.Approved
                 && p.ProviderType == provider.ProviderType
+                && (!isBeauty || (
+                    !EF.Functions.ILike(p.BusinessName, "%chiropract%") &&
+                    !EF.Functions.ILike(p.BusinessName, "%physio%") &&
+                    !EF.Functions.ILike(p.BusinessName, "%osteopath%") &&
+                    !EF.Functions.ILike(p.BusinessName, "%massage chair%")))
                 && p.ServiceAreas.Any(sa => suburbIds.Contains(sa.SuburbId)))
             .OrderByDescending(p => p.AverageRating)
             .ThenByDescending(p => p.TotalReviews)
@@ -328,6 +334,11 @@ public class ProviderService : IProviderService
                 .Where(p => !existingIds.Contains(p.Id)
                     && p.Status == ProviderStatus.Approved
                     && p.ProviderType == provider.ProviderType
+                    && (!isBeauty || (
+                        !EF.Functions.ILike(p.BusinessName, "%chiropract%") &&
+                        !EF.Functions.ILike(p.BusinessName, "%physio%") &&
+                        !EF.Functions.ILike(p.BusinessName, "%osteopath%") &&
+                        !EF.Functions.ILike(p.BusinessName, "%massage chair%")))
                     && p.City == provider.City)
                 .OrderByDescending(p => p.AverageRating)
                 .ThenByDescending(p => p.TotalReviews)

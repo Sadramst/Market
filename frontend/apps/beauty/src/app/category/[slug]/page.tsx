@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/ui";
 import { BEAUTY_CATEGORIES, findCategory } from "@/lib/categories";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { CategorySuburbFilter } from "@/components/category/CategorySuburbFilter";
 
 // Force dynamic rendering so category pages always fetch fresh data
 export const dynamic = "force-dynamic";
@@ -64,6 +65,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             </div>
           </div>
           <p className="mt-4 text-[13px]" style={{ fontFamily: 'var(--font-body)', color: 'var(--text-muted)' }}>{totalCount} provider{totalCount !== 1 ? "s" : ""} in this category</p>
+          <div className="mt-6">
+            <CategorySuburbFilter categorySlug={cat.slug} />
+          </div>
         </div>
       </section>
 

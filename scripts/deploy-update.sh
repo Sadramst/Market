@@ -8,6 +8,12 @@ set -euo pipefail
 DEPLOY_DIR="/opt/appilico"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
 NODE_VERSION="20"
+COMPOSE_FILE="docker-compose.production.yml"
+# Fixed project name so Compose always reconciles the SAME containers,
+# regardless of the directory it's invoked from. Prevents "container name
+# already in use" conflicts on redeploy.
+PROJECT="appilico"
+COMPOSE="docker compose -p $PROJECT -f $COMPOSE_FILE"
 
 cd "$DEPLOY_DIR"
 
@@ -34,10 +40,23 @@ echo "  ✓ Environment OK"
 
 # ── Step 3: Rebuild & restart API container ───────────────────
 echo "[3/6] Rebuilding API container..."
-docker compose -f docker-compose.production.yml build --no-cache api
-echo "  Restarting containers (postgres stays up)..."
-docker compose -f docker-compose.production.yml up -d --no-deps api nginx
-echo "  ✓ API container restarted"
+$COMPOSE build --no-cache api
+
+# Clear any orphaned containers left from a previous failed deploy that
+# would otherwise cause "container name already in use" conflicts.
+for c in appilico-api appilico-nginx; do
+  if docker ps -a --format '{{.Names}}' | grep -qx "$c"; then
+    # Only remove if it's NOT already managed by this compose project
+    if ! docker inspect -f '{{ index .Config.Labels "com.docker.compose.project" }}' "$c" 2>/dev/null | grep -qx "$PROJECT"; then
+      echo "  Removing orphaned container: $c"
+      docker rm -f "$c" 2>/dev/null || true
+    fi
+  fi
+done
+
+echo "  Reconciling full stack (postgres data volume is preserved)..."
+$COMPOSE up -d --remove-orphans
+echo "  ✓ Containers reconciled"
 
 # ── Step 4: Install Node if needed ───────────────────────────
 echo "[4/6] Checking Node.js..."
@@ -125,13 +144,13 @@ done
 echo ""
 pm2 list
 echo ""
-docker compose -f docker-compose.production.yml ps
+$COMPOSE ps
 echo ""
 echo "╔══════════════════════════════╗"
 echo "║  Deploy complete!  ✓         ║"
 echo "╚══════════════════════════════╝"
 echo ""
-echo "  API logs:     docker compose -f docker-compose.production.yml logs api -f"
+echo "  API logs:     $COMPOSE logs api -f"
 echo "  PM2 logs:     pm2 logs"
 echo "  PM2 monitor:  pm2 monit"
 echo ""

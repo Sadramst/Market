@@ -44,17 +44,53 @@ public class ProvidersController : ControllerBase
     [HttpGet("featured")]
     public async Task<IActionResult> Featured([FromQuery] int limit = 6, [FromQuery] int? providerType = null)
     {
-        var request = new ProviderSearchRequest
+        // Featured algorithm: rating >= 4.7 AND reviewCount >= 50, ordered by rating & reviewCount
+        var marketplaceType = providerType.HasValue ? (ProviderType)providerType.Value : ProviderType.Beauty;
+        var featured = await _context.Providers
+            .Include(p => p.Services).ThenInclude(s => s.Category)
+            .Include(p => p.GalleryImages)
+            .Where(p =>
+                p.Status == ProviderStatus.Approved &&
+                p.ProviderType == marketplaceType &&
+                p.AverageRating >= 4.7m &&
+                p.TotalReviews >= 50 &&
+                p.HasRealData == true &&
+                !EF.Functions.ILike(p.BusinessName, "%chiropract%") &&
+                !EF.Functions.ILike(p.BusinessName, "%physio%") &&
+                !EF.Functions.ILike(p.BusinessName, "%osteopath%") &&
+                !EF.Functions.ILike(p.BusinessName, "%massage chair%")
+            )
+            .OrderByDescending(p => p.AverageRating)
+            .ThenByDescending(p => p.TotalReviews)
+            .Take(limit)
+            .ToListAsync();
+
+        var items = featured.Select(p => new
         {
-            IsFeatured = true,
-            PageSize = limit,
-            SortBy = "rating",
-            SortDescending = true
-        };
-        if (providerType.HasValue)
-            request.MarketplaceType = (Appilico.Market.Domain.ProviderType)providerType.Value;
-        var result = await _providerService.SearchAsync(request);
-        return Ok(result);
+            p.Id,
+            p.BusinessName,
+            p.Slug,
+            p.Description,
+            p.LogoUrl,
+            p.CoverImageUrl,
+            p.IsVerified,
+            p.AverageRating,
+            p.TotalReviews,
+            p.City,
+            p.State,
+            p.FullAddress,
+            p.Phone,
+            p.Email,
+            p.Website,
+            p.Tagline,
+            p.HasRealData,
+            Categories = p.Services?.Select(s => s.Category?.Name ?? "").Distinct().Where(n => n != "").ToList() ?? new List<string>(),
+            PrimaryImageUrl = p.GalleryImages?.FirstOrDefault(g => g.IsPrimary)?.ImageUrl
+                ?? p.GalleryImages?.FirstOrDefault()?.ImageUrl,
+            p.CreatedAt
+        }).ToList();
+
+        return Ok(new { success = true, data = items });
     }
 
     [HttpGet("{slug}")]

@@ -1,0 +1,128 @@
+# =============================================================
+# Appilico — DUAL backend production stack
+#   market-api : Appilico.Market.Api      -> api.appilico.com.au       (DB: appilico_market)
+#   shop-api   : AppilicoShopServer.API   -> shop-api.appilico.com.au  (DB: appilico_shop)
+# Shared Postgres (external volume appilico_postgres_data), nginx, certbot.
+#
+# Postgres creds are postgres/postgres to match how the existing data volume was
+# initialised (verified working). The external volume guarantees the restored
+# Market data (appilico_market) and shop data (appilico_shop) are preserved.
+#
+# shop-api reuses the already-built image `appilico-api:latest`. Its source lives
+# at /opt/shopserver/backend on the host; the shop agent will productionise it.
+# =============================================================
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: appilico-db
+    restart: always
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: appilico_market
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - appilico-net
+    command: >
+      postgres
+        -c max_connections=100
+        -c shared_buffers=256MB
+        -c effective_cache_size=768MB
+        -c work_mem=4MB
+        -c maintenance_work_mem=64MB
+
+  market-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: appilico-market-api:latest
+    container_name: appilico-market-api
+    restart: always
+    ports:
+      - "127.0.0.1:5000:5000"
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - AllowedHosts=*
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=appilico_market;Username=postgres;Password=postgres
+      - Jwt__Key=${JWT_SECRET_KEY}
+      - Jwt__Issuer=appilico-market-api
+      - Jwt__Audience=appilico-market-clients
+      - Jwt__ExpiryMinutes=60
+      - Swagger__Enabled=${SWAGGER_ENABLED:-false}
+      - Billing__WebhookSecret=${BILLING_WEBHOOK_SECRET:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - api_logs:/var/log/appilico
+    networks:
+      - appilico-net
+
+  shop-api:
+    image: appilico-api:latest
+    container_name: appilico-shop-api
+    restart: always
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - AllowedHosts=*
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=appilico_shop;Username=postgres;Password=postgres
+      - JWT__Secret=${JWT_SECRET}
+      - JWT__Issuer=AppilicoShopServer
+      - JWT__Audience=Appilico.Client
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - appilico-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: appilico-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - market-api
+    networks:
+      - appilico-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: appilico-certbot
+    restart: always
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - appilico-net
+
+volumes:
+  postgres_data:
+    external: true
+    name: appilico_postgres_data
+  api_logs:
+
+networks:
+  appilico-net:
+    driver: bridge

@@ -22,6 +22,7 @@ type ProviderCardProps = {
   priceFrom?: number;
   isVerified?: boolean;
   hasRealData?: boolean;
+  createdAt?: string | Date;
 };
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
@@ -59,10 +60,16 @@ export function ProviderCard({
   categories,
   isVerified,
   hasRealData,
+  createdAt,
 }: ProviderCardProps) {
   const cats = Array.isArray(categories) ? categories : categories ? [categories] : [];
   const gradient = getCategoryGradient(cats);
-  const trustLabel = isVerified ? "Verified" : hasRealData ? "Verified data" : "New listing";
+
+  // Calculate if this is a new listing: created within 30 days AND has fewer than 10 reviews
+  const isNewListing = createdAt
+    ? new Date().getTime() - new Date(createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 && totalReviews < 10
+    : false;
+  const trustLabel = isVerified ? "Verified" : hasRealData ? "Verified data" : isNewListing ? "New listing" : "";
 
   return (
     <Link
@@ -92,10 +99,21 @@ export function ProviderCard({
           </span>
         )}
         {/* Trust badge top-right */}
-        {(isVerified || hasRealData) && (
-          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1 flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: isVerified ? 'var(--brand-gold)' : '#3F7E5B', borderRadius: '50px' }}>
-            {isVerified ? <BadgeCheck className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
-            {isVerified ? 'Verified' : 'Verified data'}
+        {(isVerified || hasRealData || isNewListing) && (
+          <span className="absolute top-3 right-3 text-[10px] font-medium px-2 py-1 flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: isVerified ? 'var(--brand-gold)' : isNewListing ? 'var(--brand-rose)' : '#3F7E5B', borderRadius: '50px' }}>
+            {isVerified ? (
+              <>
+                <BadgeCheck className="w-3 h-3" /> Verified
+              </>
+            ) : isNewListing ? (
+              <>
+                <Sparkles className="w-3 h-3" /> New listing
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="w-3 h-3" /> Verified data
+              </>
+            )}
           </span>
         )}
         {/* Subtle bottom fade */}
@@ -144,9 +162,13 @@ export function ProviderCard({
               <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>{averageRating.toFixed(1)}</span>
               <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>({totalReviews.toLocaleString()})</span>
             </>
-          ) : (
-            <span className="text-[12px] font-medium flex items-center gap-1" style={{ color: 'var(--brand-gold)' }}>
+          ) : isNewListing ? (
+            <span className="text-[12px] font-medium flex items-center gap-1" style={{ color: 'var(--brand-rose)' }}>
               <Sparkles className="w-3 h-3" /> New listing
+            </span>
+          ) : (
+            <span className="text-[12px] font-medium flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+              No reviews yet
             </span>
           )}
         </div>

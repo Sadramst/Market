@@ -97,7 +97,7 @@ log_info "Pre-flight checks passed\n"
 # Step 1: Backup database
 log_info "Step 1/6: Backing up database..."
 mkdir -p "$BACKUP_DIR"
-BACKUP_FILE="${BACKUP_DIR}/appilico_beauty_${TIMESTAMP}.sql.gz"
+BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql.gz"
 pg_dump -U $DB_SUPERUSER -h $DB_HOST $DB_NAME | gzip > "$BACKUP_FILE"
 if [ -f "$BACKUP_FILE" ]; then
   log_info "Database backed up to $BACKUP_FILE ($(du -h $BACKUP_FILE | cut -f1))\n"
@@ -126,7 +126,7 @@ log_info "Current commit: $CURRENT_COMMIT\n"
 log_info "Step 3/6: Running database migrations (Phase 1 category fixes)..."
 if [ -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql" ]; then
   log_info "Executing Phase 1 SQL script..."
-  psql -U $DB_SUPERUSER -h $DB_HOST -d appilico_beauty -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
+  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
   log_info "Phase 1 database migrations completed\n"
 else
   log_warn "SQL script not found at ${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"

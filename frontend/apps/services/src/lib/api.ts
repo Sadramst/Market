@@ -48,6 +48,6 @@ export async function fetchApi<T>(path: string, options: { revalidate?: number; 
 }
 
 export function providerSearchPath(params: Record<string, string>) {
-  const query = new URLSearchParams({ marketplaceType: "1", ...params });
+  const query = new URLSearchParams({ platform: "services", marketplaceType: "1", ...params });
   return `/providers/search?${query.toString()}`;
 }

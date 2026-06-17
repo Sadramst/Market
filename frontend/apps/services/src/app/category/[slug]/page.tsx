@@ -4,11 +4,10 @@ import { notFound } from "next/navigation";
 import { fetchApi, providerSearchPath, type ProviderSearchResult } from "../../../lib/api";
 import { findServiceCategory, serviceCategories } from "../../../lib/serviceCategories";
 
-type PageProps = { params: Promise<{ slug: string }> };
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-export function generateStaticParams() {
-  return serviceCategories.map((category) => ({ slug: category.slug }));
-}
+type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -25,7 +24,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const category = findServiceCategory(slug);
   if (!category) notFound();
 
-  const data = await fetchApi<ProviderSearchResult>(providerSearchPath({ category: slug, pageSize: "12", sortBy: "rating" }), { revalidate: 300, tags: ["services-providers", slug] });
+  const data = await fetchApi<ProviderSearchResult>(providerSearchPath({ category: slug, pageSize: "24", sortBy: "rating" }), { revalidate: 0, tags: ["services-providers", slug] });
   const providers = data?.items ?? [];
 
   return (

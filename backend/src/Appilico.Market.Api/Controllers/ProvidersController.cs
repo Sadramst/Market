@@ -52,7 +52,7 @@ public class ProvidersController : ControllerBase
             .Where(p =>
                 p.Status == ProviderStatus.Approved &&
                 p.ProviderType == marketplaceType &&
-                p.AverageRating >= 4.7m &&
+                p.AverageRating >= 4.7d &&
                 p.TotalReviews >= 50 &&
                 p.HasRealData == true &&
                 !EF.Functions.ILike(p.BusinessName, "%chiropract%") &&

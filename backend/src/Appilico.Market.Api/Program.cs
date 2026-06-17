@@ -162,6 +162,10 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+var seedServicesOnly = args.Any(a =>
+    a.Equals("seed:services", StringComparison.OrdinalIgnoreCase) ||
+    a.Equals("--seed:services", StringComparison.OrdinalIgnoreCase));
+
 // --- Middleware Pipeline ---
 app.UseExceptionHandling();
 app.UseSerilogRequestLogging();
@@ -186,6 +190,14 @@ app.MapControllers();
 // --- Health Check ---
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
     .WithTags("Health");
+
+if (seedServicesOnly)
+{
+    using var scope = app.Services.CreateScope();
+    await DatabaseSeeder.SeedServicesAsync(scope.ServiceProvider);
+    Log.Information("Completed services marketplace seed command");
+    return;
+}
 
 // --- Seed Database ---
 var skipDbSeed = builder.Configuration.GetValue<bool>("SkipDatabaseSeed", false);

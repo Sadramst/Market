@@ -3,6 +3,9 @@ import Link from "next/link";
 import { fetchApi, providerSearchPath, type ProviderSearchResult, type ProviderSummary } from "../../lib/api";
 import { serviceCategories } from "../../lib/serviceCategories";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Browse IT Professionals",
   description: "Search Perth IT professionals, developers, designers, cloud engineers, consultants, and support providers.",
@@ -20,9 +23,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     ...(query ? { searchTerm: query } : {}),
     ...(category ? { category } : {}),
     page,
-    pageSize: "12",
+    pageSize: "24",
     sortBy: "rating",
-  }), { revalidate: 60, tags: ["services-providers"] });
+  }), { revalidate: 0, tags: ["services-providers"] });
 
   const items = data?.items ?? [];
   const pagination = data?.pagination ?? { currentPage: Number(page), totalPages: 1, totalCount: 0 };

@@ -50,8 +50,8 @@ BACKEND_PATH="${REPO_PATH}/backend"
 FRONTEND_PATH="${REPO_PATH}/frontend"
 DB_HOST="localhost"
 DB_NAME="appilico_market"
-DB_USER="appilico_user"
-DB_PASSWORD=""
+DB_SUPERUSER="postgres"
+DB_SUPERUSER_PASSWORD=""
 BACKUP_DIR="${REPO_PATH}/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
@@ -63,13 +63,12 @@ if [ -f "${REPO_PATH}/.env" ]; then
   log_info "Loaded environment from .env"
 fi
 
-# Allow environment overrides
-DB_PASSWORD="${DB_PASSWORD:-${POSTGRES_PASSWORD}}"
-DB_USER="${DB_USER:-appilico_user}"
-DB_NAME="${DB_NAME:-appilico_market}"
+# Use postgres superuser for DB operations (backups, migrations)
+# POSTGRES_PASSWORD is the superuser password from .env
+DB_SUPERUSER_PASSWORD="${POSTGRES_PASSWORD}"
 
-# Export password for psql
-export PGPASSWORD="$DB_PASSWORD"
+# Export password for psql (use superuser)
+export PGPASSWORD="$DB_SUPERUSER_PASSWORD"
 
 echo -e "${BLUE}================================${NC}"
 echo -e "${BLUE}APPILICO STABILIZATION 1-4${NC}"
@@ -99,7 +98,7 @@ log_info "Pre-flight checks passed\n"
 log_info "Step 1/6: Backing up database..."
 mkdir -p "$BACKUP_DIR"
 BACKUP_FILE="${BACKUP_DIR}/appilico_beauty_${TIMESTAMP}.sql.gz"
-pg_dump -U $DB_USER -h $DB_HOST $DB_NAME | gzip > "$BACKUP_FILE"
+pg_dump -U $DB_SUPERUSER -h $DB_HOST $DB_NAME | gzip > "$BACKUP_FILE"
 if [ -f "$BACKUP_FILE" ]; then
   log_info "Database backed up to $BACKUP_FILE ($(du -h $BACKUP_FILE | cut -f1))\n"
 else
@@ -127,7 +126,7 @@ log_info "Current commit: $CURRENT_COMMIT\n"
 log_info "Step 3/6: Running database migrations (Phase 1 category fixes)..."
 if [ -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql" ]; then
   log_info "Executing Phase 1 SQL script..."
-  psql -U $DB_USER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
+  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
   log_info "Phase 1 database migrations completed\n"
 else
   log_warn "SQL script not found at ${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
@@ -295,7 +294,7 @@ echo "  - API calls include platform=services"
 echo "  - Deploy the frontend/app service site through its normal Vercel pipeline after merge\n"
 
 log_info "To rollback if issues occur:"
-echo "  psql -U $DB_USER -h $DB_HOST -d $DB_NAME < $BACKUP_FILE"
+echo "  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME < $BACKUP_FILE"
 echo "  systemctl restart appilico-api\n"
 
 echo -e "${GREEN}Deployment finished at $(date)${NC}\n"

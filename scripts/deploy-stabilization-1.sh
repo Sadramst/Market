@@ -24,10 +24,27 @@ fi
 BACKEND_PATH="${REPO_PATH}/backend"
 FRONTEND_PATH="${REPO_PATH}/frontend"
 DB_HOST="localhost"
-DB_NAME="appilico_beauty"
-DB_USER="appilico"
+DB_NAME="appilico_market"
+DB_USER="appilico_user"
+DB_PASSWORD=""
 BACKUP_DIR="${REPO_PATH}/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Load from .env if it exists
+if [ -f "${REPO_PATH}/.env" ]; then
+  set +a
+  source "${REPO_PATH}/.env"
+  set -a
+  log_info "Loaded environment from .env"
+fi
+
+# Allow environment overrides
+DB_PASSWORD="${DB_PASSWORD:-${POSTGRES_PASSWORD}}"
+DB_USER="${DB_USER:-appilico_user}"
+DB_NAME="${DB_NAME:-appilico_market}"
+
+# Export password for psql
+export PGPASSWORD="$DB_PASSWORD"
 
 echo -e "${BLUE}================================${NC}"
 echo -e "${BLUE}APPILICO STABILIZATION 1-4${NC}"

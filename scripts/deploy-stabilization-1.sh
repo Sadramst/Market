@@ -126,7 +126,7 @@ log_info "Current commit: $CURRENT_COMMIT\n"
 log_info "Step 3/6: Running database migrations (Phase 1 category fixes)..."
 if [ -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql" ]; then
   log_info "Executing Phase 1 SQL script..."
-  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
+  psql -U $DB_SUPERUSER -h $DB_HOST -d appilico_beauty -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
   log_info "Phase 1 database migrations completed\n"
 else
   log_warn "SQL script not found at ${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"

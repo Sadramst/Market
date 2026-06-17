@@ -54,6 +54,20 @@ resolve_compose_cmd() {
   return 1
 }
 
+resolve_deploy_topology() {
+  if docker ps --format '{{.Names}}' | grep -q '^appilico-market-api$'; then
+    echo "${REPO_PATH}/docker-compose.dual.yml|market-api|appilico-market-api"
+    return 0
+  fi
+
+  if [ -f "${REPO_PATH}/docker-compose.dual.yml" ]; then
+    echo "${REPO_PATH}/docker-compose.dual.yml|market-api|appilico-market-api"
+    return 0
+  fi
+
+  echo "${REPO_PATH}/docker-compose.production.yml|api|appilico-api"
+}
+
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -67,7 +81,6 @@ DB_NAME="appilico_market"
 DB_SUPERUSER="postgres"
 DB_SUPERUSER_PASSWORD=""
 BACKUP_DIR="${REPO_PATH}/backups"
-COMPOSE_FILE="${REPO_PATH}/docker-compose.production.yml"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 # Load from .env if it exists
@@ -86,6 +99,11 @@ DB_SUPERUSER_PASSWORD="${POSTGRES_PASSWORD}"
 export PGPASSWORD="$DB_SUPERUSER_PASSWORD"
 
 COMPOSE_CMD="$(resolve_compose_cmd || true)"
+DEPLOY_TOPOLOGY="$(resolve_deploy_topology)"
+COMPOSE_FILE="${DEPLOY_TOPOLOGY%%|*}"
+DEPLOY_TOPOLOGY_REST="${DEPLOY_TOPOLOGY#*|}"
+API_SERVICE="${DEPLOY_TOPOLOGY_REST%%|*}"
+API_CONTAINER="${DEPLOY_TOPOLOGY_REST##*|}"
 
 echo -e "${BLUE}================================${NC}"
 echo -e "${BLUE}APPILICO STABILIZATION 1-4${NC}"
@@ -118,6 +136,9 @@ if [ ! -f "$COMPOSE_FILE" ]; then
   log_error "Compose file not found at $COMPOSE_FILE"
   exit 1
 fi
+
+log_info "Using compose file: $COMPOSE_FILE"
+log_info "Using API service: $API_SERVICE ($API_CONTAINER)"
 
 log_info "Pre-flight checks passed\n"
 
@@ -200,13 +221,13 @@ log_info "Step 5/6: Deploying backend via Docker Compose..."
 cd "$REPO_PATH"
 
 log_info "Building and restarting API container..."
-$COMPOSE_CMD -f "$COMPOSE_FILE" up -d --build api
+$COMPOSE_CMD -f "$COMPOSE_FILE" up -d --build "$API_SERVICE"
 sleep 5
 
-if docker ps --format '{{.Names}}' | grep -q '^appilico-api$'; then
-  log_info "appilico-api container is running\n"
+if docker ps --format '{{.Names}}' | grep -q "^${API_CONTAINER}$"; then
+  log_info "$API_CONTAINER container is running\n"
 else
-  log_error "appilico-api container is not running after deploy"
+  log_error "$API_CONTAINER container is not running after deploy"
   $COMPOSE_CMD -f "$COMPOSE_FILE" ps
   exit 1
 fi
@@ -228,8 +249,8 @@ log_info "Post-deployment verification..."
 
 # Check API health
 log_info "Checking API health..."
-API_HEALTH_URL="http://localhost:5000/api/providers/stats"
-if curl -s "$API_HEALTH_URL" > /dev/null 2>&1; then
+API_HEALTH_URL="http://localhost:5000/health"
+if curl -fsS "$API_HEALTH_URL" > /dev/null 2>&1; then
   log_info "API is responding\n"
 else
   log_warn "Could not verify API health\n"
@@ -245,7 +266,7 @@ echo "  Phases:          1-4 Stabilization (featured, new listing, suburb filter
 echo "  Previous Commit: $PREVIOUS_COMMIT"
 echo "  Current Commit:  $CURRENT_COMMIT"
 echo "  Database Backup: $BACKUP_FILE"
-echo "  API Deployment:  docker container appilico-api"
+echo "  API Deployment:  docker container $API_CONTAINER"
 echo "  Timestamp:       $TIMESTAMP\n"
 
 log_info "Deployed Fixes:"
@@ -276,7 +297,7 @@ echo "  - Deploy the frontend/app service site through its normal Vercel pipelin
 
 log_info "To rollback if issues occur:"
 echo "  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME < $BACKUP_FILE"
-echo "  $COMPOSE_CMD -f $COMPOSE_FILE up -d --build api\n"
+echo "  $COMPOSE_CMD -f $COMPOSE_FILE up -d --build $API_SERVICE\n"
 
 echo -e "${GREEN}Deployment finished at $(date)${NC}\n"
 

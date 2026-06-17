@@ -244,10 +244,19 @@ Use this checklist when running `scripts/deploy-stabilization-1.sh` on VPS.
 
 This project is deployed with Docker Compose production stack, not a systemd `appilico-api` unit.
 
+On the current VPS, the active live topology is the dual-stack file with these containers:
+
+- `appilico-market-api`
+- `appilico-shop-api`
+- `appilico-db`
+- `appilico-nginx`
+
 ```bash
 cd /opt/appilico
 docker ps | grep -E "appilico-api|appilico-db|appilico-nginx"
 ```
+
+If you also see `appilico-market-api`, deploy against `docker-compose.dual.yml`, not `docker-compose.production.yml`.
 
 ### 2. Confirm database and credentials
 
@@ -303,9 +312,27 @@ The script now:
 - Loads `.env` from repo root
 - Uses `POSTGRES_PASSWORD` for superuser DB operations
 - Backs up `appilico_market`
-- Uses `docker compose` (or `docker-compose`) with `docker-compose.production.yml`
-- Rebuilds/restarts `api` container instead of systemd service
+- Auto-detects whether the host is running the dual-stack or single-stack compose topology
+- Uses `docker compose` (or `docker-compose`) with the matching compose file
+- Rebuilds/restarts `market-api` or `api` container instead of systemd service
 - Seeds services data via `dotnet run --project src/Appilico.Market.Api -- seed:services`
+- Verifies the API via `/health` instead of `/api/providers/stats`
+
+### 5.1 Port conflict symptom and cause
+
+If deploy logs show:
+
+```text
+Bind for 127.0.0.1:5000 failed: port is already allocated
+```
+
+the script is targeting the wrong compose service/file while an existing market API container already owns port `5000`.
+
+Correct live target on this VPS:
+
+```bash
+docker compose -f docker-compose.dual.yml up -d --build market-api
+```
 
 ### 6. Safe rerun sequence
 
@@ -321,5 +348,14 @@ bash scripts/deploy-stabilization-1.sh
 cd /opt/appilico
 docker compose -f docker-compose.production.yml ps
 docker compose -f docker-compose.production.yml logs --tail=100 api
+curl -sS http://localhost:5000/health
+```
+
+For the current VPS dual-stack deployment, use:
+
+```bash
+cd /opt/appilico
+docker compose -f docker-compose.dual.yml ps
+docker compose -f docker-compose.dual.yml logs --tail=100 market-api
 curl -sS http://localhost:5000/health
 ```

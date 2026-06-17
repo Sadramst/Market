@@ -185,6 +185,12 @@ else
   exit 1
 fi
 
+# Phase 4: Seed services marketplace data on the server
+log_info "Phase 4: Seeding services marketplace data..."
+cd "$BACKEND_PATH"
+dotnet run --project src/Appilico.Market.Api -- seed:services
+log_info "Phase 4 services seed completed\n"
+
 # Step 6: Build and deploy frontend
 log_info "Step 6/6: Building and deploying frontend (Phases 1-4)..."
 cd "$FRONTEND_PATH"

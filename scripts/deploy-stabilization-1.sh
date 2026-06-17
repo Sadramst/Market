@@ -16,13 +16,17 @@ BLUE='\033[0;34m'
 NC='\033[0m'  # No Color
 
 # Configuration
-REPO_PATH="/home/appilico/appilico-market"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_PATH="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO_PATH" ]; then
+  REPO_PATH="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
 BACKEND_PATH="${REPO_PATH}/backend"
 FRONTEND_PATH="${REPO_PATH}/frontend"
 DB_HOST="localhost"
 DB_NAME="appilico_beauty"
 DB_USER="appilico"
-BACKUP_DIR="/home/appilico/backups"
+BACKUP_DIR="${REPO_PATH}/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 echo -e "${BLUE}================================${NC}"

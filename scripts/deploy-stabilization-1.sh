@@ -40,6 +40,20 @@ check_service() {
   fi
 }
 
+resolve_compose_cmd() {
+  if command -v docker >/dev/null 2>&1; then
+    if docker compose version >/dev/null 2>&1; then
+      echo "docker compose"
+      return 0
+    fi
+  fi
+  if command -v docker-compose >/dev/null 2>&1; then
+    echo "docker-compose"
+    return 0
+  fi
+  return 1
+}
+
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -53,6 +67,7 @@ DB_NAME="appilico_market"
 DB_SUPERUSER="postgres"
 DB_SUPERUSER_PASSWORD=""
 BACKUP_DIR="${REPO_PATH}/backups"
+COMPOSE_FILE="${REPO_PATH}/docker-compose.production.yml"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 # Load from .env if it exists
@@ -69,6 +84,8 @@ DB_SUPERUSER_PASSWORD="${POSTGRES_PASSWORD}"
 
 # Export password for psql (use superuser)
 export PGPASSWORD="$DB_SUPERUSER_PASSWORD"
+
+COMPOSE_CMD="$(resolve_compose_cmd || true)"
 
 echo -e "${BLUE}================================${NC}"
 echo -e "${BLUE}APPILICO STABILIZATION 1-4${NC}"
@@ -89,6 +106,16 @@ fi
 
 if ! command -v psql &> /dev/null; then
   log_error "PostgreSQL client not found"
+  exit 1
+fi
+
+if [ -z "$COMPOSE_CMD" ]; then
+  log_error "Neither 'docker compose' nor 'docker-compose' is available"
+  exit 1
+fi
+
+if [ ! -f "$COMPOSE_FILE" ]; then
+  log_error "Compose file not found at $COMPOSE_FILE"
   exit 1
 fi
 
@@ -125,9 +152,13 @@ log_info "Current commit: $CURRENT_COMMIT\n"
 # Step 3: Run database migrations (SQL fixes for Phase 1)
 log_info "Step 3/6: Running database migrations (Phase 1 category fixes)..."
 if [ -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql" ]; then
-  log_info "Executing Phase 1 SQL script..."
-  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
-  log_info "Phase 1 database migrations completed\n"
+  if psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME -tAc "SELECT to_regclass('public.categories')" | grep -q "categories"; then
+    log_info "Executing Phase 1 SQL script..."
+    psql -v ON_ERROR_STOP=1 -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
+    log_info "Phase 1 database migrations completed\n"
+  else
+    log_warn "Table public.categories not found in $DB_NAME; skipping Phase 1 SQL script\n"
+  fi
 else
   log_warn "SQL script not found at ${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
   log_warn "Skipping Phase 1 database migrations\n"
@@ -164,44 +195,19 @@ fi
 
 log_info "Backend build completed\n"
 
-# Step 5: Deploy backend artifacts
-log_info "Step 5/6: Deploying backend artifacts..."
+# Step 5: Deploy backend via Docker Compose production stack
+log_info "Step 5/6: Deploying backend via Docker Compose..."
+cd "$REPO_PATH"
 
-# Stop the API service
-if check_service "appilico-api"; then
-  log_info "Stopping appilico-api service..."
-  sudo systemctl stop appilico-api
-  sleep 2
-fi
+log_info "Building and restarting API container..."
+$COMPOSE_CMD -f "$COMPOSE_FILE" up -d --build api
+sleep 5
 
-# Copy published files
-API_DEPLOY_PATH="/home/appilico/appilico-api"
-if [ -d "$API_DEPLOY_PATH" ]; then
-  log_info "Backing up current API deployment..."
-  sudo mv "$API_DEPLOY_PATH" "${API_DEPLOY_PATH}.backup.${TIMESTAMP}"
-fi
-
-sudo mkdir -p "$API_DEPLOY_PATH"
-sudo cp -r ./bin/Release/publish/* "$API_DEPLOY_PATH/"
-sudo chown -R appilico:appilico "$API_DEPLOY_PATH"
-
-log_info "Backend deployed to $API_DEPLOY_PATH"
-
-# Restart the API service
-log_info "Starting appilico-api service..."
-sudo systemctl start appilico-api
-sleep 3
-
-if check_service "appilico-api"; then
-  log_info "appilico-api service started successfully\n"
+if docker ps --format '{{.Names}}' | grep -q '^appilico-api$'; then
+  log_info "appilico-api container is running\n"
 else
-  log_error "Failed to start appilico-api service"
-  log_warn "Rolling back to previous deployment..."
-  if [ -d "${API_DEPLOY_PATH}.backup.${TIMESTAMP}" ]; then
-    sudo rm -rf "$API_DEPLOY_PATH"
-    sudo mv "${API_DEPLOY_PATH}.backup.${TIMESTAMP}" "$API_DEPLOY_PATH"
-    sudo systemctl start appilico-api
-  fi
+  log_error "appilico-api container is not running after deploy"
+  $COMPOSE_CMD -f "$COMPOSE_FILE" ps
   exit 1
 fi
 
@@ -211,36 +217,11 @@ cd "$BACKEND_PATH"
 dotnet run --project src/Appilico.Market.Api -- seed:services
 log_info "Phase 4 services seed completed\n"
 
-# Step 6: Build and deploy frontend
-log_info "Step 6/6: Building and deploying frontend (Phases 1-4)..."
-cd "$FRONTEND_PATH"
-
-if [ ! -f "package.json" ]; then
-  log_error "Frontend package.json not found at $FRONTEND_PATH"
-  exit 1
-fi
-
-log_info "Installing dependencies..."
-npm install --legacy-peer-deps 2>&1 | tail -5
-
-log_info "Building frontend..."
-npm run build
-
-log_info "Deploying frontend..."
-
-# Frontend is typically deployed via Docker or to static hosting
-# This example assumes Docker deployment
-if command -v docker &> /dev/null; then
-  log_info "Building Docker images..."
-  cd "$REPO_PATH"
-  docker-compose -f docker-compose.yml build
-  
-  log_info "Restarting services..."
-  docker-compose -f docker-compose.yml up -d
-  
-  sleep 5
-  log_info "Services restarted\n"
-fi
+# Step 6: Finalize stack and report frontend deployment path
+log_info "Step 6/6: Ensuring production stack services are up..."
+cd "$REPO_PATH"
+$COMPOSE_CMD -f "$COMPOSE_FILE" up -d nginx postgres
+log_info "Production containers reconciled\n"
 
 # Post-deployment verification
 log_info "Post-deployment verification..."
@@ -264,7 +245,7 @@ echo "  Phases:          1-4 Stabilization (featured, new listing, suburb filter
 echo "  Previous Commit: $PREVIOUS_COMMIT"
 echo "  Current Commit:  $CURRENT_COMMIT"
 echo "  Database Backup: $BACKUP_FILE"
-echo "  API Deployment:  $API_DEPLOY_PATH"
+echo "  API Deployment:  docker container appilico-api"
 echo "  Timestamp:       $TIMESTAMP\n"
 
 log_info "Deployed Fixes:"
@@ -285,7 +266,7 @@ echo "  4. Featured section should show only 4.7+ rated providers"
 echo "  5. New listing badge only on <30 day old + <10 review providers\n"
 
 log_info "Phase 4 server seeding command:"
-echo "  cd /home/appilico/appilico-market/backend"
+echo "  cd ${REPO_PATH}/backend"
 echo "  dotnet run --project src/Appilico.Market.Api -- seed:services\n"
 
 log_info "Phase 4 service-site notes:"
@@ -295,7 +276,7 @@ echo "  - Deploy the frontend/app service site through its normal Vercel pipelin
 
 log_info "To rollback if issues occur:"
 echo "  psql -U $DB_SUPERUSER -h $DB_HOST -d $DB_NAME < $BACKUP_FILE"
-echo "  systemctl restart appilico-api\n"
+echo "  $COMPOSE_CMD -f $COMPOSE_FILE up -d --build api\n"
 
 echo -e "${GREEN}Deployment finished at $(date)${NC}\n"
 

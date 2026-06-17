@@ -235,3 +235,91 @@ The API auto-seeds on first run:
 | SSL cert error | Ensure DNS is pointing to VPS first |
 | CORS error | Check `appsettings.Production.json` origins |
 | 502 Bad Gateway | API container may be restarting — check health |
+
+## Stabilization Deploy Incident Playbook (2026-06-17)
+
+Use this checklist when running `scripts/deploy-stabilization-1.sh` on VPS.
+
+### 1. Verify deployment mode (Docker vs systemd)
+
+This project is deployed with Docker Compose production stack, not a systemd `appilico-api` unit.
+
+```bash
+cd /opt/appilico
+docker ps | grep -E "appilico-api|appilico-db|appilico-nginx"
+```
+
+### 2. Confirm database and credentials
+
+Observed working environment:
+
+- DB name: `appilico_market`
+- DB user for deployment operations: `postgres`
+- DB container: `appilico-db`
+
+Inspect container env if password confusion occurs:
+
+```bash
+docker inspect appilico-db | grep -A 20 '"Env"'
+```
+
+List actual databases:
+
+```bash
+PGPASSWORD=postgres psql -U postgres -h localhost -l
+```
+
+If auth fails unexpectedly, reset postgres password from inside the running container:
+
+```bash
+docker exec -it appilico-db psql -U postgres -d postgres -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+```
+
+### 3. Known migration script caveat
+
+`scripts/stabilization-phase-1-fix-categories.sql` depends on `public.categories` in the target DB.
+If that table is not present, skip this script for that environment.
+
+The deployment script now auto-checks table existence and skips safely.
+
+### 4. Tooling prerequisites on server
+
+```bash
+apt-get update
+apt-get install -y postgresql-client
+```
+
+Install .NET 8 SDK if missing:
+
+```bash
+apt-get install -y dotnet-sdk-8.0
+```
+
+### 5. Current deploy script behavior (fixed)
+
+The script now:
+
+- Resolves repo root dynamically (no hardcoded `/home/...` paths)
+- Loads `.env` from repo root
+- Uses `POSTGRES_PASSWORD` for superuser DB operations
+- Backs up `appilico_market`
+- Uses `docker compose` (or `docker-compose`) with `docker-compose.production.yml`
+- Rebuilds/restarts `api` container instead of systemd service
+- Seeds services data via `dotnet run --project src/Appilico.Market.Api -- seed:services`
+
+### 6. Safe rerun sequence
+
+```bash
+cd /opt/appilico
+git pull origin main
+bash scripts/deploy-stabilization-1.sh
+```
+
+### 7. Quick post-deploy checks
+
+```bash
+cd /opt/appilico
+docker compose -f docker-compose.production.yml ps
+docker compose -f docker-compose.production.yml logs --tail=100 api
+curl -sS http://localhost:5000/health
+```

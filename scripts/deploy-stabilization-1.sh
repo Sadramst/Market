@@ -15,6 +15,31 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'  # No Color
 
+# Function to log messages (define early)
+log_info() {
+  echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+log_warn() {
+  echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+log_error() {
+  echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to check if service is running
+check_service() {
+  local service=$1
+  if systemctl is-active --quiet $service; then
+    log_info "$service is running"
+    return 0
+  else
+    log_warn "$service is not running"
+    return 1
+  fi
+}
+
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -49,31 +74,6 @@ export PGPASSWORD="$DB_PASSWORD"
 echo -e "${BLUE}================================${NC}"
 echo -e "${BLUE}APPILICO STABILIZATION 1-4${NC}"
 echo -e "${BLUE}================================${NC}\n"
-
-# Function to log messages
-log_info() {
-  echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-log_warn() {
-  echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-  echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Function to check if service is running
-check_service() {
-  local service=$1
-  if systemctl is-active --quiet $service; then
-    log_info "$service is running"
-    return 0
-  else
-    log_warn "$service is not running"
-    return 1
-  fi
-}
 
 # Pre-flight checks
 log_info "Running pre-flight checks..."

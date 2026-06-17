@@ -34,7 +34,13 @@ export default function AdminLoginPage() {
       <div className="text-indigo-300/60 text-sm">Loading…</div>
     </div>
   );
-  if (user) return null;
+  if (user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950">
+        <div className="text-indigo-300/60 text-sm">Redirecting to dashboard…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 overflow-hidden">

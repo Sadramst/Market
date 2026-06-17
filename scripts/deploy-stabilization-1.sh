@@ -2,8 +2,8 @@
 
 ################################################################################
 # APPILICO STABILIZATION PHASES 1-4 - SERVER DEPLOYMENT
-# Usage: bash deploy-stabilization-all.sh
-# Purpose: Deploy all 4 stabilization phases at once
+# Usage: bash deploy-stabilization-1.sh
+# Purpose: Deploy backend/frontend stabilization phases; admin Vercel redeploy is separate
 ################################################################################
 
 set -e  # Exit on error
@@ -248,6 +248,7 @@ echo "  PHASE 1: Category misassignments (Hussein, Bang, BI HAIR)"
 echo "  PHASE 2: Suburb filter with autocomplete dropdown"
 echo "  PHASE 2: Category tabs that preserve suburb param"
 echo "  PHASE 2: Dynamic page rendering (no static cache)\n"
+echo "  PHASE 3: Admin Vercel env var + auth route hardening (redeploy admin app separately)\n"
 
 log_info "Verification Tests:"
 echo "  1. Visit: https://beauty.appilico.com.au/search"

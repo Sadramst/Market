@@ -6,7 +6,7 @@ import { AuthProvider } from "../lib/auth";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: { default: "Admin Dashboard", template: "%s | Appilico Admin" },
+  title: { default: "Appilico Admin", template: "%s | Appilico Admin" },
   description: "Manage providers, reviews, content, and platform settings.",
   robots: { index: false, follow: false },
 };

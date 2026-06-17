@@ -44,7 +44,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!loading && !user) router.replace("/");
   }, [loading, user, router]);
 
-  if (loading || !user) return null;
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
+          Loading admin session…
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">

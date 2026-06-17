@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ################################################################################
-# APPILICO STABILIZATION PHASE 1 - SERVER DEPLOYMENT
-# Usage: bash deploy-stabilization-1.sh
-# Purpose: Deploy featured section fix, new listing badge fix, and category fixes
+# APPILICO STABILIZATION PHASES 1-4 - SERVER DEPLOYMENT
+# Usage: bash deploy-stabilization-all.sh
+# Purpose: Deploy all 4 stabilization phases at once
 ################################################################################
 
 set -e  # Exit on error
@@ -26,7 +26,7 @@ BACKUP_DIR="/home/appilico/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 echo -e "${BLUE}================================${NC}"
-echo -e "${BLUE}APPILICO STABILIZATION PHASE 1${NC}"
+echo -e "${BLUE}APPILICO STABILIZATION 1-4${NC}"
 echo -e "${BLUE}================================${NC}\n"
 
 # Function to log messages
@@ -102,19 +102,19 @@ git pull origin $CURRENT_BRANCH
 CURRENT_COMMIT=$(git rev-parse HEAD)
 log_info "Current commit: $CURRENT_COMMIT\n"
 
-# Step 3: Run database migrations (SQL fix)
-log_info "Step 3/6: Running database migrations..."
+# Step 3: Run database migrations (SQL fixes for Phase 1)
+log_info "Step 3/6: Running database migrations (Phase 1 category fixes)..."
 if [ -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql" ]; then
-  log_info "Executing stabilization SQL script..."
+  log_info "Executing Phase 1 SQL script..."
   psql -U $DB_USER -h $DB_HOST -d $DB_NAME -f "${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
-  log_info "Database migrations completed\n"
+  log_info "Phase 1 database migrations completed\n"
 else
   log_warn "SQL script not found at ${REPO_PATH}/scripts/stabilization-phase-1-fix-categories.sql"
-  log_warn "Skipping database migrations\n"
+  log_warn "Skipping Phase 1 database migrations\n"
 fi
 
 # Step 4: Build and deploy backend
-log_info "Step 4/6: Building backend..."
+log_info "Step 4/6: Building backend (Phases 1-2)..."
 cd "$BACKEND_PATH"
 
 # Check if solution file exists
@@ -186,7 +186,7 @@ else
 fi
 
 # Step 6: Build and deploy frontend
-log_info "Step 6/6: Building and deploying frontend..."
+log_info "Step 6/6: Building and deploying frontend (Phases 1-4)..."
 cd "$FRONTEND_PATH"
 
 if [ ! -f "package.json" ]; then
@@ -234,22 +234,31 @@ echo -e "${GREEN}DEPLOYMENT COMPLETED${NC}"
 echo -e "${GREEN}================================${NC}\n"
 
 log_info "Deployment Summary:"
+echo "  Phases:          1-4 Stabilization (featured, new listing, suburb filter, category tabs)"
 echo "  Previous Commit: $PREVIOUS_COMMIT"
 echo "  Current Commit:  $CURRENT_COMMIT"
 echo "  Database Backup: $BACKUP_FILE"
 echo "  API Deployment:  $API_DEPLOY_PATH"
 echo "  Timestamp:       $TIMESTAMP\n"
 
-log_info "Next Steps:"
-echo "  1. Verify featured section displays correct providers (rating >= 4.7, reviews >= 50)"
-echo "  2. Check 'New listing' badge only appears on providers <30 days old with <10 reviews"
-echo "  3. Run SQL verification query:"
-echo "     SELECT COUNT(*) as featured_count FROM providers"
-echo "     WHERE status = 1 AND provider_type = 0"
-echo "     AND average_rating >= 4.7 AND total_reviews >= 50;\n"
+log_info "Deployed Fixes:"
+echo "  PHASE 1: Featured section (rating >= 4.7, reviews >= 50)"
+echo "  PHASE 1: New listing badge (< 30 days AND < 10 reviews)"
+echo "  PHASE 1: Category misassignments (Hussein, Bang, BI HAIR)"
+echo "  PHASE 2: Suburb filter with autocomplete dropdown"
+echo "  PHASE 2: Category tabs that preserve suburb param"
+echo "  PHASE 2: Dynamic page rendering (no static cache)\n"
+
+log_info "Verification Tests:"
+echo "  1. Visit: https://beauty.appilico.com.au/search"
+echo "  2. Click suburb filter, select Subiaco"
+echo "  3. Click Nails category tab - suburb should be preserved"
+echo "  4. Featured section should show only 4.7+ rated providers"
+echo "  5. New listing badge only on <30 day old + <10 review providers\n"
 
 log_info "To rollback if issues occur:"
 echo "  psql -U $DB_USER -h $DB_HOST -d $DB_NAME < $BACKUP_FILE"
 echo "  systemctl restart appilico-api\n"
 
 echo -e "${GREEN}Deployment finished at $(date)${NC}\n"
+

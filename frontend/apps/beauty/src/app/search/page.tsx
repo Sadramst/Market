@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { fetchApi } from "@/lib/api";
 import { generatePageMeta, breadcrumbJsonLd } from "@/lib/seo";
@@ -6,10 +7,13 @@ import { Breadcrumbs } from "@/components/ui";
 import { ProviderCard } from "@/components/providers/ProviderCard";
 import { FALLBACK_FEATURED_PROVIDERS } from "@/lib/fallback-providers";
 import { SearchFormClient } from "@/components/search/SearchFormClient";
+import { CategoryTabs } from "@/components/search/CategoryTabs";
+import { SuburbFilter } from "@/components/search/SuburbFilter";
 
 // Prevent Vercel from caching this page as static HTML
 // Without this, URL params (suburb, category) are ignored
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = generatePageMeta({
   title: "Browse Beauty Providers in Perth",
@@ -101,34 +105,16 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           categoryOptions={categoryFilters}
         />
 
-        {/* Category pills */}
-        <div className="flex flex-wrap gap-2">
-          {categoryFilters.map((cat) => {
-            const isActive = category === cat.value;
-            const catParams = new URLSearchParams();
-            if (query) catParams.set("q", query);
-            if (suburb) catParams.set("suburb", suburb);
-            if (postCode) catParams.set("postCode", postCode);
-            if (cat.value) catParams.set("category", cat.value);
-            catParams.set("sortBy", sort);
-            const href = `/search?${catParams.toString()}`;
-            return (
-              <Link key={cat.value} href={href}
-                className="px-3.5 py-1.5 text-[13px] font-medium transition-all"
-                style={{
-                  borderRadius: '50px',
-                  fontFamily: 'var(--font-body)',
-                  ...(isActive
-                    ? { background: 'var(--brand-rose)', color: 'white' }
-                    : { background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }
-                  ),
-                }}
-              >
-                {cat.label}
-              </Link>
-            );
-          })}
+        {/* Suburb Filter */}
+        <div>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Filter by Suburb</label>
+          <SuburbFilter />
         </div>
+
+        {/* Category tabs — client component that preserves suburb */}
+        <Suspense fallback={<div style={{ height: 42 }} />}>
+          <CategoryTabs activeCategory={category} />
+        </Suspense>
       </div>
 
       {/* Results */}

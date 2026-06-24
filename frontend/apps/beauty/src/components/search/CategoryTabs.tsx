@@ -23,9 +23,11 @@ export function CategoryTabs({ activeCategory }: { activeCategory?: string }) {
   const tabUrl = (slug: string) => {
     // Copy ALL existing params — this preserves suburb, sort, q, etc.
     const next = new URLSearchParams()
-    sp.forEach((v, k) => {
-      if (k !== 'page') next.set(k, v) // Reset page on tab change
-    })
+    if (sp) {
+      sp.forEach((v, k) => {
+        if (k !== 'page') next.set(k, v) // Reset page on tab change
+      })
+    }
     // Normalise sortBy → sort
     if (next.has('sortBy')) {
       next.set('sort', next.get('sortBy')!)

@@ -9,7 +9,7 @@ type S = (typeof PERTH_SUBURBS)[number]
 export function SuburbFilter() {
   const router = useRouter()
   const sp = useSearchParams()
-  const cur = sp.get('suburb')
+  const cur = sp?.get('suburb') ?? null
   const [val, setVal] = useState('')
   const [opts, setOpts] = useState<readonly S[]>([])
   const [open, setOpen] = useState(false)
@@ -43,7 +43,9 @@ export function SuburbFilter() {
   const pick = useCallback((s: S) => {
     setVal(`${s.name} (${s.postCode})`); setOpen(false)
     const next = new URLSearchParams()
-    sp.forEach((v, k) => { if (k !== 'page') next.set(k, v) })
+    if (sp) {
+      sp.forEach((v, k) => { if (k !== 'page') next.set(k, v) })
+    }
     if (next.has('sortBy')) { next.set('sort', next.get('sortBy')!); next.delete('sortBy') }
     next.set('suburb', s.slug)
     router.push(`/search?${next.toString()}`)
@@ -52,7 +54,9 @@ export function SuburbFilter() {
   const clear = useCallback(() => {
     setVal(''); setOpen(false)
     const next = new URLSearchParams()
-    sp.forEach((v, k) => { if (k !== 'page' && k !== 'suburb') next.set(k, v) })
+    if (sp) {
+      sp.forEach((v, k) => { if (k !== 'page' && k !== 'suburb') next.set(k, v) })
+    }
     router.push(`/search?${next.toString()}`)
   }, [router, sp])
 

@@ -78,11 +78,11 @@ fi
 log "Creating database backup: $BACKUP_FILE"
 docker exec "$DB_CONTAINER" sh -lc "PGPASSWORD='$DB_PASSWORD' pg_dump -U '$DB_USER' '$DB_NAME'" | gzip > "$BACKUP_FILE"
 
-log "Applying stabilization SQL"
-docker exec -i "$DB_CONTAINER" sh -lc "PGPASSWORD='$DB_PASSWORD' psql -v ON_ERROR_STOP=1 -U '$DB_USER' -d '$DB_NAME'" < "$SQL_FILE"
-
 log "Running main deploy script"
 bash "$BASE_DEPLOY_SCRIPT"
+
+log "Applying stabilization SQL"
+docker exec -i "$DB_CONTAINER" sh -lc "PGPASSWORD='$DB_PASSWORD' psql -v ON_ERROR_STOP=1 -U '$DB_USER' -d '$DB_NAME'" < "$SQL_FILE"
 
 log "Verifying API health"
 if curl -fsS http://localhost:5000/health >/dev/null 2>&1; then

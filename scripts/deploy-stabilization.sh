@@ -1,121 +1,99 @@
 #!/bin/bash
 
-# Appilico Market - Stabilization Phase Deployment Script
-# Deploys all 4 stabilization prompts with database fixes, backend rebuild, and container restart
+set -euo pipefail
 
-set -e  # Exit on error
-
-echo "========================================="
-echo "Appilico Market - Stabilization Deploy"
-echo "========================================="
-echo ""
-
-# Configuration
 REPO_DIR="/opt/appilico"
 DB_NAME="appilico_market"
-DB_USER="postgres"
-BACKUP_DIR="/opt/appilico/backups"
+BACKUP_DIR="$REPO_DIR/backups"
+SQL_FILE="$REPO_DIR/scripts/stabilization-prompt-1-4.sql"
+BASE_DEPLOY_SCRIPT="$REPO_DIR/scripts/deploy-update.sh"
+DB_CONTAINER="appilico-db"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-# Step 1: Backup database
-echo "[1/7] Creating database backup..."
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
+
+require_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        echo "Missing required command: $1" >&2
+        exit 1
+    fi
+}
+
+log "Appilico stabilization deploy starting"
+
+require_cmd git
+require_cmd docker
+require_cmd curl
+
+if [ ! -d "$REPO_DIR" ]; then
+    echo "Repo directory not found: $REPO_DIR" >&2
+    exit 1
+fi
+
+if [ ! -f "$BASE_DEPLOY_SCRIPT" ]; then
+    echo "Base deploy script not found: $BASE_DEPLOY_SCRIPT" >&2
+    exit 1
+fi
+
+cd "$REPO_DIR"
+
+if [ -f ".env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    source .env
+    set +a
+else
+    echo "Missing $REPO_DIR/.env" >&2
+    exit 1
+fi
+
+DB_USER="${DB_USER:-}"
+DB_PASSWORD="${DB_PASSWORD:-}"
+
+if [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ]; then
+    echo "DB_USER or DB_PASSWORD is missing from .env" >&2
+    exit 1
+fi
+
+if [ ! -f "$SQL_FILE" ]; then
+    echo "SQL file not found: $SQL_FILE" >&2
+    exit 1
+fi
+
 mkdir -p "$BACKUP_DIR"
-BACKUP_FILE="$BACKUP_DIR/market_backup_${TIMESTAMP}.sql"
-PGPASSWORD="$POSTGRES_PASSWORD" pg_dump -h localhost -U "$DB_USER" "$DB_NAME" > "$BACKUP_FILE"
-echo "✓ Database backed up to $BACKUP_FILE"
-echo ""
+BACKUP_FILE="$BACKUP_DIR/${DB_NAME}_stabilization_${TIMESTAMP}.sql.gz"
 
-# Step 2: Pull latest code
-echo "[2/7] Pulling latest code from origin/main..."
-cd "$REPO_DIR"
+log "Fetching latest code"
+git fetch origin
 git pull origin main
-echo "✓ Code updated"
-echo ""
 
-# Step 3: Execute database stabilization script
-echo "[3/7] Executing database stabilization script..."
-if [ -f "scripts/stabilization-prompt-1-4.sql" ]; then
-    PGPASSWORD="$POSTGRES_PASSWORD" psql -h localhost -U "$DB_USER" -d "$DB_NAME" -f "scripts/stabilization-prompt-1-4.sql"
-    echo "✓ Database stabilization completed (Prompts 1 & 4)"
-    echo "  - Fixed beauty service provider categories"
-    echo "  - Seeded IT service categories and providers"
-else
-    echo "✗ ERROR: scripts/stabilization-prompt-1-4.sql not found"
-    exit 1
-fi
-echo ""
-
-# Step 4: Rebuild backend in Release mode
-echo "[4/7] Rebuilding backend in Release configuration..."
-cd "$REPO_DIR/backend"
-dotnet build -c Release
-echo "✓ Backend rebuilt successfully"
-echo ""
-
-# Step 5: Build frontend
-echo "[5/7] Building frontend..."
-cd "$REPO_DIR/frontend"
-npm run build
-echo "✓ Frontend built successfully"
-echo ""
-
-# Step 6: Stop and restart Docker containers
-echo "[6/7] Restarting Docker containers..."
-cd "$REPO_DIR"
-
-# Check if production compose file exists
-if [ -f "docker-compose.production.yml" ]; then
-    docker-compose -f docker-compose.production.yml down
-    docker-compose -f docker-compose.production.yml up -d
-    echo "✓ Containers restarted (production compose)"
-elif [ -f "docker-compose.yml" ]; then
-    docker-compose down
-    docker-compose up -d
-    echo "✓ Containers restarted (default compose)"
-else
-    echo "✗ ERROR: No docker-compose file found"
-    exit 1
-fi
-echo ""
-
-# Step 7: Verify services are running
-echo "[7/7] Verifying services..."
-sleep 5
-
-# Check API endpoint
-API_URL="http://localhost:8080/api/health"
-if curl -s "$API_URL" > /dev/null 2>&1; then
-    echo "✓ API responding at $API_URL"
-else
-    echo "⚠ WARNING: API not responding - check logs with: docker logs market_api"
-fi
-
-# Check database connection
-if PGPASSWORD="$POSTGRES_PASSWORD" psql -h localhost -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1" > /dev/null 2>&1; then
-    echo "✓ Database connected successfully"
-else
-    echo "✗ ERROR: Database connection failed"
+log "Checking database container"
+if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
+    echo "Database container is not running: $DB_CONTAINER" >&2
     exit 1
 fi
 
-echo ""
-echo "========================================="
-echo "✅ DEPLOYMENT COMPLETED SUCCESSFULLY"
-echo "========================================="
-echo ""
-echo "Summary:"
-echo "  • Database backed up: $BACKUP_FILE"
-echo "  • Code updated from origin/main"
-echo "  • Database stabilization applied (Prompts 1 & 4)"
-echo "  • Backend rebuilt (Release mode)"
-echo "  • Frontend rebuilt"
-echo "  • Docker containers restarted"
-echo "  • Services verified"
-echo ""
-echo "To verify live site changes:"
-echo "  1. Check beauty categories at: https://appilico.com.au"
-echo "  2. Verify IT services appear in search"
-echo "  3. View new providers and ratings"
-echo ""
-echo "Rollback available at: $BACKUP_FILE"
-echo "========================================="
+log "Creating database backup: $BACKUP_FILE"
+docker exec "$DB_CONTAINER" sh -lc "PGPASSWORD='$DB_PASSWORD' pg_dump -U '$DB_USER' '$DB_NAME'" | gzip > "$BACKUP_FILE"
+
+log "Applying stabilization SQL"
+docker exec -i "$DB_CONTAINER" sh -lc "PGPASSWORD='$DB_PASSWORD' psql -v ON_ERROR_STOP=1 -U '$DB_USER' -d '$DB_NAME'" < "$SQL_FILE"
+
+log "Running main deploy script"
+bash "$BASE_DEPLOY_SCRIPT"
+
+log "Verifying API health"
+if curl -fsS http://localhost:5000/health >/dev/null 2>&1; then
+    log "API health check passed"
+else
+    echo "API health check failed after deploy" >&2
+    exit 1
+fi
+
+echo
+echo "Deploy complete"
+echo "Backup: $BACKUP_FILE"
+echo "SQL applied: $SQL_FILE"
+echo "Next: verify https://api.appilico.com.au/health and live marketplace pages"
